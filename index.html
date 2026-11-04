@@ -256,7 +256,7 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:64px;background:none;color:#fff;font-size:42px;line-height:1;text-shadow:0 0 4px rgba(0,0,0,.7),0 0 1px rgba(0,0,0,.9);opacity:.9;display:grid;place-items:center}
 .vw-nav:hover{opacity:1}
 .vw-nav.prev{left:max(10px,env(safe-area-inset-left,0px))}.vw-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
-.vw-count{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:var(--bg);color:var(--ink);font-size:12px;font-weight:700;padding:3px 10px;font-variant-numeric:tabular-nums}
+.vw-count{position:absolute;bottom:12px;left:max(14px,env(safe-area-inset-left,0px));background:rgba(255,255,255,.9);color:#111;font-size:11px;font-weight:400;letter-spacing:.08em;padding:5px 9px;font-variant-numeric:tabular-nums}
 .vw-msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
 .vw-body{display:grid;grid-template-columns:minmax(0,1fr) 8px minmax(180px,var(--pw));min-height:0}
 .vw-body.resizing{user-select:none}
@@ -271,17 +271,19 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-sz{display:flex;align-items:center;gap:2px;flex:none;margin-left:auto}
 .vw-sz input{width:80px;flex:none;margin:0;accent-color:var(--ink)}
 .vw-sz button{width:24px;height:24px;font-size:16px;font-weight:700;line-height:1;color:var(--ink);display:grid;place-items:center}
-.vw-grid button[data-k].main,.vw-grid button[data-k].main[aria-current="true"]{border-color:var(--pink)}
-/* MAIN 표시: 오른쪽 위 모서리 분홍 삼각형 + 흰 별 (글자는 화면 읽기용으로만 남김) */
-.vw-tag{position:absolute;top:0;right:0;width:40px;height:40px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 100%);font-size:0;color:transparent;overflow:hidden;pointer-events:none;z-index:1}
-.vw-tag::after{content:"★";position:absolute;top:5px;right:6px;font-size:12px;line-height:1;color:#fff}
-.vw-main .vw-tag{width:54px;height:54px;z-index:2}
-.vw-main .vw-tag::after{top:7px;right:8px;font-size:16px}
+
 .vw-grid{overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 18px;display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));gap:6px;align-content:start}
-.vw-grid button[data-k]{position:relative;display:block;width:100%;height:var(--th,160px);border:2px solid transparent;padding:0;background:var(--tile);overflow:hidden;min-width:0}
-.vw-grid button[data-k] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.vw-grid button[data-k][aria-current="true"]{border-color:var(--ink)}
-.vw-grid button[data-k]:hover{border-color:var(--muted)}
+/* 사진 칸: 사진 + 아래 작은 번호(01, 02 …). 메인은 'Main' 글자 + 사진 아래 검은 선 (번호 색인 방식) */
+.vw-grid button[data-k]{position:relative;display:flex;flex-direction:column;width:100%;padding:0;border:0;background:none;min-width:0;text-align:left}
+.vw-grid button[data-k] .im{position:relative;display:block;height:var(--th,160px);background:var(--tile);overflow:hidden}
+.vw-grid button[data-k] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s}
+.vw-grid button[data-k]:hover img{opacity:.86}
+.vw-grid button[data-k][aria-current="true"] .im{outline:1.5px solid var(--ink);outline-offset:-1.5px}
+.vw-grid button[data-k].main .im::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--ink);z-index:1}
+.vw-grid .cp{display:flex;justify-content:space-between;gap:6px;margin-top:5px;font-size:10.5px;line-height:1.2;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.vw-grid .cp b{font-weight:400;color:var(--ink)}
+.vw-grid button[data-k].main .cp{color:var(--ink);font-weight:700}
+.vw-grid button[data-k].main .cp b{font-weight:700}
 .vw-sec{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;font-size:12px;font-weight:800;color:var(--ink);letter-spacing:.04em;padding:8px 0 2px;text-transform:uppercase}
 .vw-sec:not(:first-child){border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
 .vw-sec span{font-weight:400;color:var(--muted)}
@@ -1103,16 +1105,17 @@ function drawViewer(){
   const secLab=(x,i)=>(i===0||vList[i-1].k!==x.k)?(/^f/.test(x.k)?(x.f||""):(x.k==="s"?T("vwSnaps"):T("vwPortfolio"))):"";
   const cnt=k=>vList.filter(x=>x.k===k).length;
   const vc=k=>vList.filter(x=>x.k===k&&x.vid).length;
-  const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k);
+  const seq={};
+  const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k),no=String(seq[x.k]=(seq[x.k]||0)+1).padStart(2,"0");
     const head=l?(fold(x)?`<button type="button" class="vw-sec tg" data-g="${x.k}" aria-expanded="${!closed}"><i aria-hidden="true"></i>${esc(l)}<span>${cnt(x.k)}${vc(x.k)?` · ${T("videoN",{n:vc(x.k)})}`:""}</span></button>`:`<div class="vw-sec">${esc(l)}<span>${cnt(x.k)}</span></div>`):"";
-    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}>${x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
+    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}><span class="im">${x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}</span><span class="cp"><b>${no}</b>${x.main?"<span>Main</span>":""}</span></button>`}).join("");
   const who=[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean);
   const meas=sizeRows(it);
   const facts=who.length||meas.length?`<div class="vw-facts">${who.length?`<div class="g">${who.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}${who.length&&meas.length?`<i aria-hidden="true"></i>`:""}${meas.length?`<div class="g m">${meas.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}</div>`:"";
   vw.innerHTML=`<div class="vw-top"><div class="t"><div class="nm"><b>${esc(it.name)}</b>${it.agency?`<span class="ag">${esc(it.agency)}</span>`:""}</div>${facts}</div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
-      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><span class="vw-tag" id="vwMainTag" hidden>MAIN</span><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
+      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
         <p class="vw-msg" id="vwMsg" ${n?"hidden":""}>${n?"":T("vwNone")}</p></div>
       <div class="vw-split" id="vwSplit" role="separator" aria-orientation="${narrow()?"horizontal":"vertical"}" tabindex="0" aria-label="resize"><i></i></div>
       <div class="vw-panel">
@@ -1144,7 +1147,6 @@ function drawViewer(){
   gridEl.querySelectorAll("[data-g]").forEach(h=>h.onclick=()=>{const k=h.dataset.g,open=!vOpen.has(k);if(open)vOpen.add(k);else vOpen.delete(k);
     h.setAttribute("aria-expanded",open);gridEl.querySelectorAll(`[data-gk="${k}"]`).forEach(b=>b.hidden=!open)});
   setupSplit();setupZoom();showCurrent();
-  const mEl=document.getElementById("vwMain");if(mEl&&window.ResizeObserver)new ResizeObserver(()=>placeTag()).observe(mEl);
 }
 function dropBroken(k){
   if(!vList[k]||vList[k].own||vList[k].main)return;
@@ -1160,23 +1162,12 @@ function showCurrent(){
   const vb=document.getElementById("vwVideo");
   if(vb){if(cur.vid||cur.vsrc){vb.innerHTML=cur.vid?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`:`<video src="${esc(cur.vsrc)}" controls playsinline preload="metadata"></video>`;vb.hidden=false;img.hidden=true}
     else{if(!vb.hidden){vb.innerHTML="";vb.hidden=true}img.hidden=false}}
-  const c=document.getElementById("vwCount");if(c)c.textContent=`${vIdx+1} / ${vList.length}`;
-  const tg=document.getElementById("vwMainTag");if(tg){tg.hidden=!cur.main;if(cur.main){img.addEventListener("load",placeTag,{once:true});placeTag()}}
+  const c=document.getElementById("vwCount");if(c)c.textContent=`${String(vIdx+1).padStart(2,"0")} / ${String(vList.length).padStart(2,"0")}${cur.main?" — Main":""}`;
   const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid||!!cur.vsrc;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
   const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
   resetZoom&&resetZoom();
 }
-/* 큰 화면 MAIN 표시를 실제 사진의 오른쪽 위 모서리에 둠 (사진은 화면 맞춤이라 여백이 생김) */
-function placeTag(){
-  const tg=document.getElementById("vwMainTag"),img=document.getElementById("vwImg"),m=document.getElementById("vwMain");
-  if(!tg||!img||!m||tg.hidden)return;
-  const W=m.clientWidth,H=m.clientHeight,nw=img.naturalWidth,nh=img.naturalHeight;
-  if(!nw||!nh){tg.style.top="";tg.style.right="";return}
-  const sc=Math.min(W/nw,H/nh),dw=nw*sc,dh=nh*sc;
-  tg.style.top=Math.round((H-dh)/2)+"px";tg.style.right=Math.round((W-dw)/2)+"px";
-}
-window.addEventListener("resize",()=>placeTag());
 function go(d){if(!vList.length)return;vIdx=(vIdx+d+vList.length)%vList.length;showCurrent()}
 /* 패널 경계 끌어서 폭(폰은 높이) 조절 */
 function setupSplit(){
