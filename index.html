@@ -1521,6 +1521,13 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 })();
 
 /* ---------- 시작 ---------- */
+/* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
+const APP_VER="2026-11-04.2";
+(async()=>{try{
+  const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
+  const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
+  if(v&&v!==APP_VER&&sessionStorage.getItem("mdi-ver-reload")!==v){sessionStorage.setItem("mdi-ver-reload",v);location.reload()}
+}catch(e){}})();
 staticText();
 async function boot(session){
   me=session?.user||null;
