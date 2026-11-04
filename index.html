@@ -306,7 +306,7 @@ dialog#setDlg::backdrop{background:transparent}
 #setDlg .pv-menu button:hover{background:var(--tile)}
 .hd .right button.acct{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 2px;border:0;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
 .hd .right button.acct:hover{color:var(--ink)}
-.acct svg{width:15px;height:15px;flex:none}.acct .cv{width:10px;height:10px;color:var(--muted)}
+.acct svg{width:15px;height:15px;flex:none}.acct .gr{width:16px;height:16px;color:var(--muted)}.acct:hover .gr{color:var(--ink)}.acct .cv{width:10px;height:10px;color:var(--muted)}
 .acct .nm{max-width:140px;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){.acct .nm{max-width:96px}}
 #viewer{margin:0;width:100vw;max-width:100vw;height:100%;max-height:100%;border:0;padding:0;background:var(--bg);color:var(--fg)}
@@ -648,14 +648,14 @@ function openSettings(){
   if(btn){const r=btn.getBoundingClientRect();d.style.top=Math.round(r.bottom+8)+"px";d.style.right=Math.max(12,Math.round(innerWidth-r.right))+"px"}
   if(!d.open)d.showModal();
 }
-const gear=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"/></svg>`;
+const gear=`<svg class="gr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
 /* iOS 사파리는 user-scalable=no를 무시하므로 확대 제스처를 직접 막음 */
 ["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 /* 팝업 바깥을 누르거나 화면 크기가 바뀌면 닫힘 */
 document.getElementById("setDlg").addEventListener("click",e=>{if(e.target.id==="setDlg")e.target.close()});
 addEventListener("resize",()=>{const d=document.getElementById("setDlg");if(d.open)d.close()});
 const chev=`<svg class="cv" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 3.8 5 6.6 8 3.8"/></svg>`;
-function setBtnHtml(){const nm=me?(profile?.display_name||me.email):T("settings");return `<button id="openSet" class="acct" aria-haspopup="dialog"><span class="nm">${esc(nm)}</span>${chev}</button>`}
+function setBtnHtml(){const nm=me?(profile?.display_name||me.email):T("settings");return `<button id="openSet" class="acct" aria-haspopup="dialog"><span class="nm">${esc(nm)}</span>${gear}</button>`}
 function bindSetBtn(){const b=document.getElementById("openSet");if(b)b.onclick=openSettings}
 
 /* ---------- 인증 ---------- */
@@ -1527,7 +1527,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.6";
+const APP_VER="2026-11-04.7";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
