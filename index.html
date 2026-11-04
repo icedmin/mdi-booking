@@ -13,15 +13,15 @@
 /* Layout: 모델 에이전시 사이트형. 흰 고정 헤더(굵은 대문자 워드마크) · 가운데 단계 탭 · 큰 세로 사진 + 가운데 대문자 이름 + 'Label - value' 정보줄 */
 :root{
   --bg:#ffffff; --fg:#1b1b1b; --ink:#000000; --muted:#767676; --line:#e5e5e5; --tile:#f3f3f3;
-  --pink:#ff2b2b; --red:#ff2b2b; --ok:#000000; --bad:#000000; --acc:#ff2b2b; --accbg:transparent; --accbg2:#f2f2f2; --muted:#8a8a8a; --line:#ececec;
+  --pink:#e8370b; --red:#e8370b; --go:#16c25a; --ok:#000000; --bad:#000000; --acc:#e8370b; --accbg:transparent; --accbg2:#f2f2f2; --muted:#8a8a8a; --line:#ececec;
   --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#ff5a52; --red:#ff5a52; --ok:#ffffff; --bad:#ffffff; --acc:#ff5a52; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}}
+  --pink:#e8370b; --red:#e8370b; --go:#2fd36f; --ok:#ffffff; --bad:#ffffff; --acc:#e8370b; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#ff5a52; --red:#ff5a52; --ok:#ffffff; --bad:#ffffff; --acc:#ff5a52; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}
+  --pink:#e8370b; --red:#e8370b; --go:#2fd36f; --ok:#ffffff; --bad:#ffffff; --acc:#e8370b; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased;word-break:keep-all}
 p,h2,h3{text-wrap:pretty}
@@ -195,6 +195,8 @@ body{letter-spacing:-.005em}
 .score .avg{font-weight:300;font-size:32px;letter-spacing:-.02em}
 .score .avg small{font-size:12px}
 .score .st{font-weight:500;font-size:12px;color:var(--muted)}.score .st.ok{color:var(--ink)}
+.score .st{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.score .st .dot{width:8px;height:8px;border-radius:50%;flex:none}.score .st .dot.go{background:var(--go)}.score .st .dot.no{background:var(--red)}
 .bar{height:1px;margin-top:14px;background:#d8d8d8}
 .bar i,.bar i.ok{top:-.5px;bottom:auto;height:2px;background:var(--ink)}
 .bar .cut{width:2px;height:11px;top:-5px;background:var(--red)}
@@ -423,7 +425,7 @@ ko:{
  loading:"불러오는 중…",infoFail:"정보를 불러오지 못했습니다",dataFail:"데이터를 불러오지 못했습니다",
  left:"남은 시간",closedAt:"마감",day:"일 ",
  agency:"Agency",guarantee:"Guarantee",link:"Link",memo:"Memo",open:"열기 ↗",notEntered:"미입력",gNone:"없음",gTbd:"미정",gNoAmt:"금액 미입력",
- noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"분홍 선이 통과선 6.0점(60%)",
+ noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
  voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",
@@ -470,7 +472,7 @@ en:{
  loading:"Loading…",infoFail:"Couldn't load your profile",dataFail:"Couldn't load data",
  left:"Time left",closedAt:"Closed",day:"d ",
  agency:"Agency",guarantee:"Guarantee",link:"Link",memo:"Memo",open:"Open ↗",notEntered:"Not entered",gNone:"None",gTbd:"TBD",gNoAmt:"Amount not entered",
- noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Pink line = pass line 6.0 (60%)",
+ noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
  voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",
@@ -749,7 +751,7 @@ function card(it){
       ${it.memo?`<dt>${T("memo")}</dt><dd>${esc(it.memo)}</dd>`:""}
     </dl>
     <div class="score">
-      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}% · ${ok?T("passUp"):T("passDown")}`:T("noVotes")}</span></div>
+      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}%<i class="dot ${ok?"go":"no"}" role="img" aria-label="${ok?T("passUp"):T("passDown")}" title="${ok?T("passUp"):T("passDown")}"></i>`:T("noVotes")}</span></div>
       <div class="bar" title="${T("passLine")}"><i class="${ok?"ok":""}" style="width:${Math.min(100,s.pct*100)}%"></i><span class="cut"></span></div>
       <div class="bar-lab"><span>0</span><span class="c">6.0</span><span>10</span></div>
     </div>
