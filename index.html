@@ -35,7 +35,7 @@ dialog:focus{outline:none}
 html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .gut{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-.inner{max-width:1240px;margin:0 auto}
+.inner{max-width:none;margin:0 auto}   /* 화면 폭 전체 사용, 양옆 여백은 .gut 20px */
 
 /* 헤더 */
 .hd{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
@@ -74,7 +74,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .btn.line{background:transparent;color:var(--ink)}
 
 /* 그리드 */
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:56px 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:56px 28px}   /* 넓은 화면일수록 칸 수가 늘어남 (1920px 화면 6칸) */
 @media (max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:780px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:44px 14px}}
 @media (max-width:460px){.grid{grid-template-columns:minmax(0,1fr)}}
@@ -1527,7 +1527,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.4";
+const APP_VER="2026-11-04.5";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
