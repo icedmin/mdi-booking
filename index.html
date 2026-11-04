@@ -223,8 +223,13 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-top .acts{display:flex;align-items:center;gap:14px;font-size:13px;flex:none}
 .vw-top .acts a{color:var(--ink);font-weight:700}
 .vw-top .x{font-size:26px;line-height:1;color:var(--ink)}
-.vw-main{position:relative;min-height:0;display:grid;place-items:center;background:var(--tile);overflow:hidden}
-.vw-main img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.vw-main{position:relative;min-height:0;background:var(--tile);overflow:hidden;touch-action:none}
+.vw-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;transform-origin:0 0;user-select:none;-webkit-user-drag:none;cursor:zoom-in;will-change:transform}
+.vw-main.zoomed img{cursor:grab}
+.vw-main.zoomed.drag img{cursor:grabbing}
+.vw-zoom{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;display:flex;gap:2px;z-index:2}
+.vw-zoom button{background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;min-width:34px;height:30px;padding:0 8px;font-variant-numeric:tabular-nums}
+.vw-nav,.vw-count{z-index:2}
 .vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;background:var(--bg);color:var(--ink);font-size:22px;opacity:.85;display:grid;place-items:center}
 .vw-nav:hover{opacity:1}
 .vw-nav.prev{left:max(10px,env(safe-area-inset-left,0px))}.vw-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
@@ -241,6 +246,13 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .facts button[aria-pressed="true"]{color:var(--ink);border-color:var(--pink)}
 .fnote{font-size:12.5px;color:var(--muted);margin:-10px 0 18px}
 .fnote button{color:var(--ink);font-weight:700;border-bottom:1px solid var(--ink);margin-left:6px}
+.wdx{position:absolute;top:8px;right:8px;z-index:2;width:28px;height:28px;display:grid;place-items:center;background:var(--bg);color:var(--ink);font-size:18px;line-height:1;opacity:.85}
+.wdx:hover{opacity:1;color:var(--bad)}
+.wdov{position:absolute;inset:0;z-index:3;background:color-mix(in srgb,var(--bg) 88%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center;cursor:default}
+.wdov p{margin:0;font-size:14px;font-weight:800;color:var(--ink)}
+.wdov div{display:flex;gap:6px}
+.wdov .btn{padding:9px 16px;font-size:12.5px}
+.wdov .btn:first-child{background:var(--bad);border-color:var(--bad)}
 .wd{margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .wd button{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding:2px 0}
 .wd button:hover{color:var(--bad);border-color:var(--bad)}
@@ -323,7 +335,7 @@ ko:{
  pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
  setTitle:"설정",lang:"언어",close:"닫기",
  vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
- vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",
+ vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",zIn:"확대",zOut:"축소",zFit:"맞춤",
  withdraw:"투표에서 내리기",wdAsk:"이 후보를 투표에서 내릴까요?",wdYes:"내리기",wdDone:"투표에서 내렸습니다",wdList:"내린 후보",restore:"다시 올리기",restored:"다시 올렸습니다",wdBy:"내린 사람",wdFail:"처리하지 못했습니다: ",
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
@@ -370,7 +382,7 @@ en:{
  pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
  setTitle:"Settings",lang:"Language",close:"Close",
  vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
- vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",
+ vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
  withdraw:"Remove from voting",wdAsk:"Remove this candidate from voting?",wdYes:"Remove",wdDone:"Removed from voting",wdList:"Removed candidates",restore:"Restore",restored:"Restored",wdBy:"Removed by",wdFail:"Couldn't update: ",
  fAll:"Show all",fShowing:"Showing:",fNone:"No candidates match"
 }};
@@ -549,7 +561,7 @@ function card(it){
   const P=n=>n+T("pts");
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="wdx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}">×</button>`):""}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
     <p class="name">${esc(it.name)}</p>
     <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
     <dl class="info">
@@ -572,7 +584,6 @@ function card(it){
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
     <p class="by">${T("regBy")} ${esc(name(it.created_by))} · ${fmt(it.created_at)}</p>
-    ${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wd"><span class="q">${T("wdAsk")}</span><button class="yes" data-wdyes="${it.id}">${T("wdYes")}</button><button data-wdno="${it.id}">${T("cancel")}</button></div>`:`<div class="wd"><button data-wd="${it.id}">${T("withdraw")}</button></div>`):""}
   </article>`;
 }
 
@@ -623,9 +634,9 @@ function render(){
   const o=document.getElementById("openReg");if(o)o.onclick=openReg;
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
   root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;render()});
-  root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{wdAsk.add(b.dataset.wd);render()});
-  root.querySelectorAll("[data-wdno]").forEach(b=>b.onclick=()=>{wdAsk.delete(b.dataset.wdno);render()});
-  root.querySelectorAll("[data-wdyes]").forEach(b=>b.onclick=async()=>{
+  root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=e=>{e.stopPropagation();wdAsk.add(b.dataset.wd);render()});
+  root.querySelectorAll("[data-wdno]").forEach(b=>b.onclick=e=>{e.stopPropagation();wdAsk.delete(b.dataset.wdno);render()});
+  root.querySelectorAll("[data-wdyes]").forEach(b=>b.onclick=async e=>{e.stopPropagation();
     b.disabled=true;const id=b.dataset.wdyes;
     const {error}=await sb.from("candidates").update({withdrawn_at:new Date().toISOString()}).eq("id",id);
     wdAsk.delete(id);
@@ -639,7 +650,7 @@ function render(){
     await loadAll();render();
   });
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
-  root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+  root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=e=>{if(e.target.closest(".wdx,.wdov"))return;go()};el.onkeydown=e=>{if(e.target!==el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{
     const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
     const score=+b.dataset.v;
@@ -822,7 +833,7 @@ function drawViewer(){
   const strip=vList.map((x,i)=>`${i===0&&x.own?`<span class="lab">${T("vwSaved")}</span>`:""}${!x.own&&(i===0||vList[i-1].own||vList[i-1].k!==x.k)?`<span class="lab">${x.k==="s"?T("vwSnaps"):T("vwPortfolio")}</span>`:""}<button type="button" data-k="${i}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer"></button>`).join("");
   vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
-    <div class="vw-main" id="vwMain">${cur?`<img id="vwImg" src="${esc(cur.u)}" alt="${esc(it.name)} ${vIdx+1}" referrerpolicy="no-referrer">${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count">${vIdx+1} / ${n}</span>`:""}`:""}
+    <div class="vw-main" id="vwMain">${cur?`<img id="vwImg" src="${esc(cur.u)}" alt="${esc(it.name)} ${vIdx+1}" referrerpolicy="no-referrer">${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count">${vIdx+1} / ${n}</span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
       <p class="vw-msg" id="vwMsg" ${cur?"hidden":""}>${cur?"":T("vwNone")}</p></div>
     <div class="vw-strip" id="vwStrip">${strip}</div>`;
   document.getElementById("vwClose").onclick=()=>viewer.close();
@@ -831,10 +842,56 @@ function drawViewer(){
   vw.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{vIdx=+b.dataset.k;drawViewer()};b.querySelector("img").onerror=()=>{const k=+b.dataset.k;if(vList[k]&&!vList[k].own){vList.splice(k,1);if(vIdx>=vList.length)vIdx=Math.max(0,vList.length-1);drawViewer()}}});
   const img=document.getElementById("vwImg");if(img)img.onerror=()=>{if(cur&&!cur.own){vList.splice(vIdx,1);if(vIdx>=vList.length)vIdx=Math.max(0,vList.length-1);drawViewer()}};
   const act=vw.querySelector('[aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"center"});
-  const main=document.getElementById("vwMain");let sx=null;
-  main.ontouchstart=e=>{sx=e.touches[0].clientX};main.ontouchend=e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?1:-1);sx=null};
+  setupZoom();
 }
 function go(d){if(!vList.length)return;vIdx=(vIdx+d+vList.length)%vList.length;drawViewer()}
+/* 확대·축소: 마우스 휠, 두 손가락 벌리기, 두 번 누르기, +/− 버튼. 확대 중에는 끌어서 이동 */
+let Z={s:1,x:0,y:0};
+function setupZoom(){
+  const main=document.getElementById("vwMain"),img=document.getElementById("vwImg");
+  Z={s:1,x:0,y:0};
+  if(!main||!img)return;
+  const MAX=6;
+  const rect=()=>main.getBoundingClientRect();
+  const apply=()=>{const r=rect();if(Z.s<=1.001){Z={s:1,x:0,y:0}}else{Z.x=Math.min(0,Math.max(r.width-r.width*Z.s,Z.x));Z.y=Math.min(0,Math.max(r.height-r.height*Z.s,Z.y))}
+    img.style.transform=`translate(${Z.x}px,${Z.y}px) scale(${Z.s})`;main.classList.toggle("zoomed",Z.s>1)};
+  const zoomAt=(ns,px,py)=>{ns=Math.min(MAX,Math.max(1,ns));Z.x=px-(px-Z.x)*(ns/Z.s);Z.y=py-(py-Z.y)*(ns/Z.s);Z.s=ns;apply()};
+  const center=()=>{const r=rect();return [r.width/2,r.height/2]};
+  window.__vwZoom=()=>({...Z});
+  main.addEventListener("wheel",e=>{e.preventDefault();const r=rect();zoomAt(Z.s*Math.exp(-e.deltaY*0.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+  document.getElementById("zIn").onclick=()=>{const [cx,cy]=center();zoomAt(Z.s*1.5,cx,cy)};
+  document.getElementById("zOut").onclick=()=>{const [cx,cy]=center();zoomAt(Z.s/1.5,cx,cy)};
+  document.getElementById("zFit").onclick=()=>{Z={s:1,x:0,y:0};apply()};
+  const pts=new Map();let start=null,pinch=null,lastTap=0;
+  main.addEventListener("pointerdown",e=>{
+    if(e.target.closest("button"))return;
+    main.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===1){start={x:e.clientX,y:e.clientY,zx:Z.x,zy:Z.y,t:Date.now()};main.classList.add("drag")}
+    if(pts.size===2){const [a,b]=[...pts.values()];const r=rect();pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:Z.s,mx:(a.x+b.x)/2-r.left,my:(a.y+b.y)/2-r.top,zx:Z.x,zy:Z.y};start=null}
+  });
+  main.addEventListener("pointermove",e=>{
+    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch&&pts.size>=2){const [a,b]=[...pts.values()];const r=rect();const d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2-r.left,my=(a.y+b.y)/2-r.top;
+      const ns=Math.min(MAX,Math.max(1,pinch.s*d/pinch.d));
+      Z.s=ns;Z.x=mx-(pinch.mx-pinch.zx)*(ns/pinch.s);Z.y=my-(pinch.my-pinch.zy)*(ns/pinch.s);apply();return}
+    if(start&&Z.s>1){Z.x=start.zx+(e.clientX-start.x);Z.y=start.zy+(e.clientY-start.y);apply()}
+  });
+  const end=e=>{
+    if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);
+    if(pts.size<2)pinch=null;
+    if(pts.size===0){
+      main.classList.remove("drag");
+      if(start){
+        const dx=e.clientX-start.x,dy=e.clientY-start.y,moved=Math.hypot(dx,dy);
+        if(Z.s<=1&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(dx<0?1:-1);
+        else if(moved<8){const now=Date.now();const r=rect();if(now-lastTap<300){if(Z.s>1){Z={s:1,x:0,y:0};apply()}else zoomAt(2.5,e.clientX-r.left,e.clientY-r.top);lastTap=0}else lastTap=now}
+      }
+      start=null;
+    }else if(pts.size===1){const [a]=[...pts.values()];start={x:a.x,y:a.y,zx:Z.x,zy:Z.y,t:Date.now()}}
+  };
+  main.addEventListener("pointerup",end);main.addEventListener("pointercancel",end);
+  apply();
+}
 document.addEventListener("keydown",e=>{if(!viewer.open)return;if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1)});
 viewer.addEventListener("close",()=>{vIt=null});
 
