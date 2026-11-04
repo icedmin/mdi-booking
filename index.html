@@ -249,6 +249,8 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-main{position:relative;min-height:0;background:var(--tile);overflow:hidden;touch-action:none}
 .vw-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;transform-origin:0 0;user-select:none;-webkit-user-drag:none;cursor:zoom-in;will-change:transform}
 .vw-main.zoomed img{cursor:grab}
+.vw-main img.vw-peek{display:none;pointer-events:none;will-change:transform}
+.vw-main.swiping img.vw-peek{display:block}
 .vw-main.zoomed.drag img{cursor:grabbing}
 .vw-zoom{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;display:flex;gap:2px;z-index:2}
 .vw-zoom button{background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;min-width:34px;height:30px;padding:0 8px;font-variant-numeric:tabular-nums}
@@ -679,7 +681,7 @@ function sizeRows(it){
   const rows=[];
   if(it.height)rows.push(NA(it.height)?T("mHeight")+" "+T("naShort"):(/^\d{3}(\.\d+)?$/.test(it.height)?it.height+"cm":it.height));
   const b=[it.bust,it.waist,it.hips];
-  if(b.some(Boolean))rows.push(b.every(NA)?T("sizeNA"):b.map(v=>v&&!NA(v)?threeVal(v):"–").join(" - ")+(b.some(v=>num(v)!=null)?(U.three==="cm"?" cm":" in"):""));
+  if(b.some(Boolean))rows.push(b.every(NA)?T("sizeNA"):b.map(v=>v&&!NA(v)?threeVal(v):"–").join(" - "));
   if(it.shoe)rows.push("Shoes "+(NA(it.shoe)?T("naShort"):shoeVal(it.shoe)));
   return rows;
 }
@@ -877,6 +879,7 @@ async function runScan(quiet){
   try{
     const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];linkSnaps=r.snaps||[];linkFolders=r.folders||null;
     const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title.toUpperCase();
+    for(const [k,fid] of Object.entries(INFO_MAP)){const el=document.getElementById(fid);if(r.info?.[k]&&el&&!el.value.trim()&&el.dataset.na!=="1"&&document.activeElement!==el)el.value=String(r.info[k]).toUpperCase()}
     if(!r.images.length){msg.textContent=T("noImgFound");msg.className="pickmsg err";return}
     if(r.suggested)linkSel=[r.suggested];
     msg.textContent=T("autoPicked",{n:r.images.length});
@@ -1009,12 +1012,18 @@ const mkey=u=>{u=u||"";const h=u.indexOf("#");if(h>=0){const k=new URLSearchPara
 /* 저장된 사진 문자열 풀기: "v:ID"(드라이브 영상), "x:주소#t=포스터"(바로 재생되는 영상), "큰사진#t=썸네일&k=고유키"(드롭박스) */
 function parseItem(s){
   if(/^v:/.test(s)){const id=s.slice(2);return {s,u:dThumb(id),t:dThumb(id),vid:id}}
-  if(/^x:/.test(s)){const h=s.indexOf("#");return {s,u:"",t:"",vsrc:decodeURIComponent(s.slice(2,h<0?undefined:h))}}
+  if(/^h:/.test(s)){const h=s.indexOf("#");const po=h<0?"":(new URLSearchParams(s.slice(h+1)).get("t")||"");return {s,u:po,t:po,vsrc:decodeURIComponent(s.slice(2,h<0?undefined:h)),hls:true}}
+  if(/^x:/.test(s)){const h=s.indexOf("#");const po=h<0?"":(new URLSearchParams(s.slice(h+1)).get("t")||"");const p2=/dropboxusercontent/.test(po)?"":po;   // 드롭박스 영상 포스터는 32px라 쓰지 않음
+    return {s,u:p2,t:p2,vsrc:decodeURIComponent(s.slice(2,h<0?undefined:h))}}
   const h=s.indexOf("#");if(h<0)return {s,u:s,t:s};
   const q=new URLSearchParams(s.slice(h+1)),u=s.slice(0,h);return {s,u,t:q.get("t")||u};
 }
 const isDbx=u=>/(^|\.)dropbox\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
 const dbxFresh=new Set();
+const isPf=u=>/(^|\.)picflow\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
+const isMs=u=>/(^|\.)mediaslide\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
+/* 링크에서 읽은 치수(키·가슴·허리·힙·신발) — 비어 있는 칸만 채움 */
+const INFO_MAP={height:"f-height",bust:"f-bust",waist:"f-waist",hips:"f-hips",shoe:"f-shoe"};
 const canEdit=it=>it&&(it.created_by===me.id||profile.role==="admin");
 /* 포트폴리오 목록: 링크 사진(포트폴리오→스냅) + 직접 올린 사진. 메인 사진은 표시만 하고 따로 두지 않음 */
 const isDrive=u=>/(^|\.)drive\.google\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
@@ -1039,6 +1048,7 @@ function buildList(it,g,sn,fo){
 /* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
 function needRescan(it){
   if(!it.link)return false;
+  if((isMs(it.link)||isPf(it.link))&&!it.folders?.length)return true;   // 앨범·영상 구조가 아직 없음   // mediaslide: 앨범·영상 구조가 아직 없음
   if(isDbx(it.link))return !dbxFresh.has(it.id)||!it.folders?.length;   // 드롭박스 사진 주소는 만료될 수 있어 세션마다 1번 다시 읽음
   if(isDrive(it.link)&&/\/folders\//.test(it.link))return !it.folders?.length;   // 웹하드: 폴더 구조가 없을 때만 다시 읽음 (드라이브 주소는 만료 없음)
   const g=it.gallery||[],sn=it.snaps||[];
@@ -1061,7 +1071,8 @@ async function openViewer(it){
       const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
       if(vIt!==it)return;
       if(g.length||sn.length||fo){
-        if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){it.gallery=g;it.snaps=sn;if(fo)it.folders=fo}}
+        if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;
+          for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!it[k])patch[k]=String(r.info[k]).slice(0,20);const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){Object.assign(it,patch)}}
         const cur=vList[vIdx];
         vList=buildList(it,g,sn,fo||it.folders);
         const k=cur?vList.findIndex(x=>mkey(x.s||x.u)===mkey(cur.s||cur.u)):-1;vIdx=k>=0?k:0;
@@ -1115,7 +1126,7 @@ function drawViewer(){
   vw.innerHTML=`<div class="vw-top"><div class="t"><div class="nm"><b>${esc(it.name)}</b>${it.agency?`<span class="ag">${esc(it.agency)}</span>`:""}</div>${facts}</div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
-      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
+      <div class="vw-main" id="vwMain">${n?`<img class="vw-peek" id="vwPeekP" alt="" referrerpolicy="no-referrer"><img class="vw-peek" id="vwPeekN" alt="" referrerpolicy="no-referrer"><img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
         <p class="vw-msg" id="vwMsg" ${n?"hidden":""}>${n?"":T("vwNone")}</p></div>
       <div class="vw-split" id="vwSplit" role="separator" aria-orientation="${narrow()?"horizontal":"vertical"}" tabindex="0" aria-label="resize"><i></i></div>
       <div class="vw-panel">
@@ -1160,14 +1171,22 @@ function showCurrent(){
   if(cur.u)img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
   // 영상: 구글 드라이브 재생 화면을 큰 사진 자리에 띄움
   const vb=document.getElementById("vwVideo");
-  if(vb){if(cur.vid||cur.vsrc){vb.innerHTML=cur.vid?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`:`<video src="${esc(cur.vsrc)}" controls playsinline preload="metadata"></video>`;vb.hidden=false;img.hidden=true}
-    else{if(!vb.hidden){vb.innerHTML="";vb.hidden=true}img.hidden=false}}
+  if(vb){if(cur.vid||cur.vsrc){stopHls();vb.innerHTML=cur.vid?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`:(cur.hls?`<video controls playsinline preload="metadata"${cur.u?` poster="${esc(cur.u)}"`:""}></video>`:`<video src="${esc(cur.vsrc)}" controls playsinline preload="metadata"></video>`);vb.hidden=false;img.hidden=true;
+      if(cur.hls)playHls(vb.querySelector("video"),cur.vsrc)}
+    else{if(!vb.hidden){stopHls();vb.innerHTML="";vb.hidden=true}img.hidden=false}}
   const c=document.getElementById("vwCount");if(c)c.textContent=`${String(vIdx+1).padStart(2,"0")} / ${String(vList.length).padStart(2,"0")}${cur.main?" — Main":""}`;
   const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid||!!cur.vsrc;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
   const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
   resetZoom&&resetZoom();
 }
+/* HLS(.m3u8) 영상: 사파리·아이폰은 바로 재생, 그 밖에는 hls.js를 처음 한 번만 불러와 재생 */
+let hlsLib=null;
+const stopHls=()=>{if(window.__hls){try{window.__hls.destroy()}catch(e){}window.__hls=null}};
+function playHls(v,src){if(!v)return;stopHls();
+  if(v.canPlayType("application/vnd.apple.mpegurl")&&/iPhone|iPad|Safari/.test(navigator.userAgent)&&!/Chrome|Android/.test(navigator.userAgent)){v.src=src;return}
+  hlsLib=hlsLib||new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js";sc.onload=()=>ok(window.Hls);sc.onerror=no;document.head.appendChild(sc)});
+  hlsLib.then(H=>{if(!v.isConnected)return;if(H&&H.isSupported()){const h=new H();window.__hls=h;h.loadSource(src);h.attachMedia(v)}else v.src=src}).catch(()=>{v.src=src})}
 function go(d){if(!vList.length)return;vIdx=(vIdx+d+vList.length)%vList.length;showCurrent()}
 /* 패널 경계 끌어서 폭(폰은 높이) 조절 */
 function setupSplit(){
@@ -1201,11 +1220,23 @@ function setupZoom(){
   document.getElementById("zIn").onclick=()=>{const [cx,cy]=center();zoomAt(Z.s*1.5,cx,cy)};
   document.getElementById("zOut").onclick=()=>{const [cx,cy]=center();zoomAt(Z.s/1.5,cx,cy)};
   document.getElementById("zFit").onclick=()=>resetZoom();
-  const pts=new Map();let start=null,pinch=null,lastTap=0;
+  const pts=new Map();let start=null,pinch=null,lastTap=0,sw=null;
+  const peekP=document.getElementById("vwPeekP"),peekN=document.getElementById("vwPeekN");
+  const at=(i)=>vList[(i+vList.length)%vList.length];
+  const setX=(dx,anim)=>{const W=rect().width,t=anim?"transform .24s cubic-bezier(.2,.7,.2,1)":"none";
+    img().style.transition=t;peekP.style.transition=t;peekN.style.transition=t;
+    img().style.transform=`translateX(${dx}px)`;peekP.style.transform=`translateX(${dx-W}px)`;peekN.style.transform=`translateX(${dx+W}px)`};
+  const swipeStart=()=>{if(vList.length<2)return false;const p=at(vIdx-1),n=at(vIdx+1);
+    peekP.src=p.u||p.t||"";peekN.src=n.u||n.t||"";main.classList.add("swiping");return true};
+  const swipeEnd=(dx,vx)=>{const W=rect().width;const d=(dx<-W*0.18||vx<-0.45)?1:(dx>W*0.18||vx>0.45)?-1:0;
+    setX(d?-d*W:0,true);
+    setTimeout(()=>{main.classList.remove("swiping");img().style.transition="none";peekP.style.transition="none";peekN.style.transition="none";
+      if(d){const nx=at(vIdx+d);if(nx.u)img().src=nx.u;go(d)}img().style.transform="";peekP.style.transform="";peekN.style.transform=""},250)};
   main.addEventListener("pointerdown",e=>{
     if(e.target.closest("button"))return;
     main.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(pts.size===1){start={x:e.clientX,y:e.clientY,zx:Z.x,zy:Z.y,t:Date.now()};main.classList.add("drag")}
+    if(pts.size===1){start={x:e.clientX,y:e.clientY,zx:Z.x,zy:Z.y,t:Date.now()};main.classList.add("drag");sw=(e.pointerType==="touch"&&Z.s<=1)?{on:false,lx:e.clientX,lt:Date.now(),vx:0}:null}
+    if(pts.size===2&&sw){if(sw.on){setX(0,false);main.classList.remove("swiping")}sw=null}
     if(pts.size===2){const [a,b]=[...pts.values()];const r=rect();pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:Z.s,mx:(a.x+b.x)/2-r.left,my:(a.y+b.y)/2-r.top,zx:Z.x,zy:Z.y};start=null}
   });
   main.addEventListener("pointermove",e=>{
@@ -1213,7 +1244,10 @@ function setupZoom(){
     if(pinch&&pts.size>=2){const [a,b]=[...pts.values()];const r=rect();const d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2-r.left,my=(a.y+b.y)/2-r.top;
       const ns=Math.min(MAX,Math.max(1,pinch.s*d/pinch.d));
       Z.s=ns;Z.x=mx-(pinch.mx-pinch.zx)*(ns/pinch.s);Z.y=my-(pinch.my-pinch.zy)*(ns/pinch.s);apply();return}
-    if(start&&Z.s>1){Z.x=start.zx+(e.clientX-start.x);Z.y=start.zy+(e.clientY-start.y);apply()}
+    if(start&&Z.s>1){Z.x=start.zx+(e.clientX-start.x);Z.y=start.zy+(e.clientY-start.y);apply();return}
+    if(start&&sw&&pts.size===1){const dx=e.clientX-start.x,dy=e.clientY-start.y;
+      if(!sw.on&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))sw.on=swipeStart();
+      if(sw.on){const now=Date.now();sw.vx=(e.clientX-sw.lx)/Math.max(1,now-sw.lt);sw.lx=e.clientX;sw.lt=now;setX(dx,false)}}
   });
   const end=e=>{
     if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);
@@ -1222,16 +1256,34 @@ function setupZoom(){
       main.classList.remove("drag");
       if(start){
         const dx=e.clientX-start.x,dy=e.clientY-start.y,moved=Math.hypot(dx,dy);
-        if(Z.s<=1&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(dx<0?1:-1);
+        if(sw&&sw.on)swipeEnd(dx,sw.vx);
+        else if(Z.s<=1&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(dx<0?1:-1);
         else if(moved<8){const now=Date.now();const r=rect();if(now-lastTap<300){if(Z.s>1)resetZoom();else zoomAt(2.5,e.clientX-r.left,e.clientY-r.top);lastTap=0}else lastTap=now}
       }
-      start=null;
+      start=null;sw=null;
     }else if(pts.size===1){const [a]=[...pts.values()];start={x:a.x,y:a.y,zx:Z.x,zy:Z.y,t:Date.now()}}
   };
   main.addEventListener("pointerup",end);main.addEventListener("pointercancel",end);
   apply();
 }
-document.addEventListener("keydown",e=>{if(!viewer.open||e.target.closest?.("input,#vwSplit"))return;if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1)});
+/* 방향키: 그리드에서 사진을 고른 뒤에는 위·아래·옆 사진으로 선택 이동 (스크롤 대신). 그 밖에는 ←/→로 앞뒤 사진 */
+function gridMove(key){
+  const tiles=[...document.querySelectorAll("#vwGrid [data-k]")].filter(b=>!b.hidden);
+  const cur=tiles.find(b=>+b.dataset.k===vIdx)||document.activeElement?.closest?.("#vwGrid [data-k]");if(!cur)return false;
+  const i=tiles.indexOf(cur);let nx=null;
+  if(key==="ArrowRight")nx=tiles[i+1];else if(key==="ArrowLeft")nx=tiles[i-1];
+  else{const r=cur.getBoundingClientRect(),cx=r.left+r.width/2,up=key==="ArrowUp";
+    const rows=tiles.filter(b=>{const q=b.getBoundingClientRect();return up?q.bottom<=r.top+2:q.top>=r.bottom-2});
+    if(rows.length){const edge=up?Math.max(...rows.map(b=>b.getBoundingClientRect().top)):Math.min(...rows.map(b=>b.getBoundingClientRect().top));
+      const row=rows.filter(b=>Math.abs(b.getBoundingClientRect().top-edge)<4);
+      nx=row.reduce((a,b)=>{const da=Math.abs(a.getBoundingClientRect().left+a.getBoundingClientRect().width/2-cx),db=Math.abs(b.getBoundingClientRect().left+b.getBoundingClientRect().width/2-cx);return db<da?b:a})}}
+  if(!nx)return true;
+  vIdx=+nx.dataset.k;showCurrent();nx.focus({preventScroll:true});nx.scrollIntoView({block:"nearest"});return true;
+}
+document.addEventListener("keydown",e=>{if(!viewer.open||e.target.closest?.("input,#vwSplit"))return;
+  if(!/^Arrow(Up|Down|Left|Right)$/.test(e.key))return;
+  if(e.target.closest?.("#vwGrid")){e.preventDefault();gridMove(e.key);return}
+  if(e.key==="ArrowRight"){e.preventDefault();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();go(-1)}});
 viewer.addEventListener("close",()=>{vIt=null});
 
 /* ---------- 시작 ---------- */
@@ -1262,6 +1314,7 @@ async function autoFill(){
       if(!it.gallery?.length&&r.gallery?.length)patch.gallery=r.gallery.slice(0,200);
       if(!it.snaps?.length&&r.snaps?.length)patch.snaps=r.snaps.slice(0,200);
       if(!it.folders&&r.folders?.length)patch.folders=r.folders;
+      for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!it[k])patch[k]=String(r.info[k]).slice(0,20);
       if(Object.keys(patch).length)await sb.from("candidates").update(patch).eq("id",it.id);
     }catch(e){console.warn("autofill",it.id,e.message)}
   }
