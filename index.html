@@ -281,7 +281,8 @@ button.vw-sec.tg:hover{color:var(--acc)}
 .vw-play{position:absolute;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(0,0,0,.55);pointer-events:none}
 .vw-play::after{content:"";position:absolute;left:13px;top:10px;border-left:11px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent}
 .vw-video{position:absolute;inset:0;background:#000;z-index:1}
-.vw-video iframe{width:100%;height:100%;border:0;display:block}
+.vw-video iframe,.vw-video video{width:100%;height:100%;border:0;display:block;object-fit:contain;background:#000}
+.vw-vtile{position:absolute;inset:0;background:#1d1d1f;color:rgba(255,255,255,.45);font-size:10px;font-weight:800;letter-spacing:.14em;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px}
 @media (max-width:760px){
   .vw-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(120px,1fr) 10px minmax(110px,var(--ph))}
   .vw-split{cursor:row-resize}
@@ -976,21 +977,31 @@ function bindPick(){
 const viewer=document.getElementById("viewer"),vw=document.getElementById("vw");
 let vList=[],vIdx=0,vIt=null,vOpen=new Set();
 /* 같은 사진 판별: Cloudflare Images 서명 주소는 서명·만료값이 바뀌어도 같은 사진 */
-const mkey=u=>{try{const x=new URL(u);return /(^|\.)imagedelivery\.net$/.test(x.hostname)?x.origin+x.pathname:u}catch(e){return u}};
+const mkey=u=>{u=u||"";const h=u.indexOf("#");if(h>=0){const k=new URLSearchParams(u.slice(h+1)).get("k");if(k)return "k:"+k;u=u.slice(0,h)}
+  try{const x=new URL(u);return /(^|\.)imagedelivery\.net$/.test(x.hostname)?x.origin+x.pathname:u}catch(e){return u}};
+/* 저장된 사진 문자열 풀기: "v:ID"(드라이브 영상), "x:주소#t=포스터"(바로 재생되는 영상), "큰사진#t=썸네일&k=고유키"(드롭박스) */
+function parseItem(s){
+  if(/^v:/.test(s)){const id=s.slice(2);return {s,u:dThumb(id),t:dThumb(id),vid:id}}
+  if(/^x:/.test(s)){const h=s.indexOf("#");return {s,u:"",t:"",vsrc:decodeURIComponent(s.slice(2,h<0?undefined:h))}}
+  const h=s.indexOf("#");if(h<0)return {s,u:s,t:s};
+  const q=new URLSearchParams(s.slice(h+1)),u=s.slice(0,h);return {s,u,t:q.get("t")||u};
+}
+const isDbx=u=>/(^|\.)dropbox\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
+const dbxFresh=new Set();
 const canEdit=it=>it&&(it.created_by===me.id||profile.role==="admin");
 /* 포트폴리오 목록: 링크 사진(포트폴리오→스냅) + 직접 올린 사진. 메인 사진은 표시만 하고 따로 두지 않음 */
 const isDrive=u=>/(^|\.)drive\.google\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
 const dThumb=id=>`https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1600`;
 function buildList(it,g,sn,fo){
   const remote=fo&&fo.length
-    ?fo.flatMap((grp,gi)=>(grp.i||[]).map(x=>/^v:/.test(x)?{u:dThumb(x.slice(2)),vid:x.slice(2),k:"f"+gi,f:grp.n||""}:{u:x,k:"f"+gi,f:grp.n||""}))
-    :g.map(u=>({u,k:"p"})).concat(sn.map(u=>({u,k:"s"})));
+    ?fo.flatMap((grp,gi)=>(grp.i||[]).map(x=>({...parseItem(x),k:"f"+gi,f:grp.n||""})))
+    :g.map(u=>({...parseItem(u),k:"p"})).concat(sn.map(u=>({...parseItem(u),k:"s"})));
   const own=it.photos.map((path,i)=>({u:photoUrls[path],path,k:"p",own:true,i})).filter(x=>x.u);
   const uploads=own.filter(x=>!/\/link-/.test(x.path));
   const first=own.find(x=>x.i===0);
   let mainHit=null;
   if(first&&!/\/link-/.test(first.path))mainHit=first;
-  else if(it.main_url){const k=mkey(it.main_url);mainHit=remote.find(x=>mkey(x.u)===k)||null}
+  else if(it.main_url){const k=mkey(it.main_url);mainHit=remote.find(x=>mkey(x.s||x.u)===k)||null}
   let lead=[];
   if(!mainHit&&first){lead=[first];mainHit=first}   // 예전에 등록된 후보: 메인 사진이 포트폴리오 안에서 확인되지 않으면 맨 앞에 한 장만 표시
   if(mainHit)mainHit.main=true;
@@ -1001,6 +1012,7 @@ function buildList(it,g,sn,fo){
 /* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
 function needRescan(it){
   if(!it.link)return false;
+  if(isDbx(it.link))return !dbxFresh.has(it.id)||!it.folders?.length;   // 드롭박스 사진 주소는 만료될 수 있어 세션마다 1번 다시 읽음
   if(isDrive(it.link)&&/\/folders\//.test(it.link))return !it.folders?.length;   // 웹하드: 폴더 구조가 없을 때만 다시 읽음 (드라이브 주소는 만료 없음)
   const g=it.gallery||[],sn=it.snaps||[];
   if(!g.length&&!sn.length)return true;
@@ -1018,13 +1030,14 @@ async function openViewer(it){
     if(!vList.length)setVwMsg(T("vwLoading"));
     try{
       const r=await scanLink(it.link);
+      if(isDbx(it.link))dbxFresh.add(it.id);
       const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
       if(vIt!==it)return;
       if(g.length||sn.length||fo){
         if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){it.gallery=g;it.snaps=sn;if(fo)it.folders=fo}}
         const cur=vList[vIdx];
         vList=buildList(it,g,sn,fo||it.folders);
-        const k=cur?vList.findIndex(x=>mkey(x.u)===mkey(cur.u)):-1;vIdx=k>=0?k:0;
+        const k=cur?vList.findIndex(x=>mkey(x.s||x.u)===mkey(cur.s||cur.u)):-1;vIdx=k>=0?k:0;
       }
       drawViewer();
     }catch(e){if(vIt===it&&!vList.length){drawViewer();setVwMsg(T("vwFail")+e.message)}}
@@ -1032,7 +1045,7 @@ async function openViewer(it){
 }
 /* 지금 보고 있는 사진을 메인 사진으로 지정 (등록자·관리자) */
 async function setMain(){
-  const it=vIt,x=vList[vIdx];if(!it||!x||x.main||x.vid||!canEdit(it))return;
+  const it=vIt,x=vList[vIdx];if(!it||!x||x.main||x.vid||x.vsrc||!canEdit(it))return;
   const btn=document.getElementById("vwSetMain");if(btn){btn.disabled=true;btn.textContent=T("mainSaving")}
   try{
     let path=x.path;
@@ -1043,14 +1056,14 @@ async function setMain(){
     }
     const old=it.photos[0];
     const photos=[path,...it.photos.filter(p=>p!==path&&!(p===old&&/\/link-/.test(p)))];
-    const main_url=x.own?null:x.u;
+    const main_url=x.own?null:(x.s||x.u);
     const {error}=await sb.from("candidates").update({photos,main_url}).eq("id",it.id);
     if(error)throw error;
     it.photos=photos;it.main_url=main_url;
     await signPaths(photos);
-    const k=mkey(x.u);
+    const k=mkey(x.s||x.u);
     vList=buildList(it,it.gallery||[],it.snaps||[],it.folders);
-    const ni=vList.findIndex(y=>y.main);vIdx=ni>=0?ni:vList.findIndex(y=>mkey(y.u)===k);if(vIdx<0)vIdx=0;
+    const ni=vList.findIndex(y=>y.main);vIdx=ni>=0?ni:vList.findIndex(y=>mkey(y.s||y.u)===k);if(vIdx<0)vIdx=0;
     drawViewer();toast(T("mainDone"));scheduleReload();
   }catch(e){toast(T("mainFail")+(e.message==="import"?"":e.message));if(btn){btn.disabled=false;btn.textContent=T("setMain")}}
 }
@@ -1067,7 +1080,7 @@ function drawViewer(){
   const vc=k=>vList.filter(x=>x.k===k&&x.vid).length;
   const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k);
     const head=l?(fold(x)?`<button type="button" class="vw-sec tg" data-g="${x.k}" aria-expanded="${!closed}"><i aria-hidden="true"></i>${esc(l)}<span>${cnt(x.k)}${vc(x.k)?` · ${T("videoN",{n:vc(x.k)})}`:""}</span></button>`:`<div class="vw-sec">${esc(l)}<span>${cnt(x.k)}</span></div>`):"";
-    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">${x.vid?`<span class="vw-play" aria-hidden="true"></span>`:""}${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
+    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}>${x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
   vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
@@ -1083,7 +1096,7 @@ function drawViewer(){
   const p=document.getElementById("vwPrev"),nx=document.getElementById("vwNext");
   if(p)p.onclick=()=>go(-1);if(nx)nx.onclick=()=>go(1);
   const gridEl=document.getElementById("vwGrid");
-  gridEl.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{vIdx=+b.dataset.k;showCurrent()};b.querySelector("img").onerror=()=>dropBroken(+b.dataset.k)});
+  gridEl.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{vIdx=+b.dataset.k;showCurrent()};const im=b.querySelector("img");if(im)im.onerror=()=>dropBroken(+b.dataset.k)});
   const size=document.getElementById("vwSize");
   // 열 수 = 패널 폭 ÷ 원하는 사진 폭, 사진 높이 = 실제 열 폭 × 1.25 (4:5)
   const layout=()=>{const cs=getComputedStyle(gridEl),w=gridEl.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),gap=6;
@@ -1113,14 +1126,14 @@ function dropBroken(k){
 function showCurrent(){
   const cur=vList[vIdx],img=document.getElementById("vwImg");if(!cur||!img)return;
   img.onerror=()=>dropBroken(vIdx);
-  img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
+  if(cur.u)img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
   // 영상: 구글 드라이브 재생 화면을 큰 사진 자리에 띄움
   const vb=document.getElementById("vwVideo");
-  if(vb){if(cur.vid){vb.innerHTML=`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`;vb.hidden=false;img.hidden=true}
+  if(vb){if(cur.vid||cur.vsrc){vb.innerHTML=cur.vid?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`:`<video src="${esc(cur.vsrc)}" controls playsinline preload="metadata"></video>`;vb.hidden=false;img.hidden=true}
     else{if(!vb.hidden){vb.innerHTML="";vb.hidden=true}img.hidden=false}}
   const c=document.getElementById("vwCount");if(c)c.textContent=`${vIdx+1} / ${vList.length}`;
   const tg=document.getElementById("vwMainTag");if(tg)tg.hidden=!cur.main;
-  const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid;
+  const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid||!!cur.vsrc;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
   const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
   resetZoom&&resetZoom();
