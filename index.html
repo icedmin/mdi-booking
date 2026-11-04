@@ -1279,7 +1279,7 @@ function dropBroken(k){
   if(vIdx>k)vIdx--;
   drawViewer();
 }
-function showCurrent(){
+function showCurrent(noScroll){
   const cur=vList[vIdx],img=document.getElementById("vwImg");if(!cur||!img)return;
   img.onerror=()=>dropBroken(vIdx);
   if(cur.u)img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
@@ -1291,7 +1291,12 @@ function showCurrent(){
   const c=document.getElementById("vwCount");if(c)c.textContent=`${String(vIdx+1).padStart(2,"0")} / ${String(vList.length).padStart(2,"0")}${cur.main?" — Main":""}`;
   const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid||!!cur.vsrc;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
-  const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
+  const act=document.querySelector('#vwGrid [aria-current="true"]');
+  if(act){const g=document.getElementById("vwGrid");   // 그리드 안에서만 스크롤 (폰에서 화면 전체가 튀지 않게)
+    if(g&&g.scrollHeight>g.clientHeight+1){const gr=g.getBoundingClientRect(),ar=act.getBoundingClientRect();if(ar.top<gr.top)g.scrollTop+=ar.top-gr.top-8;else if(ar.bottom>gr.bottom)g.scrollTop+=ar.bottom-gr.bottom+8}
+    else if(!noScroll)act.scrollIntoView({block:"nearest",inline:"nearest"})}
+  // 앞뒤 사진 미리 받아 두기 (넘길 때 빈 화면 방지)
+  for(const k of [1,-1]){const n=vList[(vIdx+k+vList.length)%vList.length];if(n&&n.u&&!n.vid&&!n.vsrc){const pre=new Image();pre.referrerPolicy="no-referrer";pre.src=n.u}}
   resetZoom&&resetZoom();
 }
 /* HLS(.m3u8) 영상: 사파리·아이폰은 바로 재생, 그 밖에는 hls.js를 처음 한 번만 불러와 재생 */
@@ -1337,20 +1342,31 @@ function setupZoom(){
   const pts=new Map();let start=null,pinch=null,lastTap=0,sw=null;
   const peekP=document.getElementById("vwPeekP"),peekN=document.getElementById("vwPeekN");
   const at=(i)=>vList[(i+vList.length)%vList.length];
-  const setX=(dx,anim)=>{const W=rect().width,t=anim?"transform .24s cubic-bezier(.2,.7,.2,1)":"none";
-    img().style.transition=t;peekP.style.transition=t;peekN.style.transition=t;
-    img().style.transform=`translateX(${dx}px)`;peekP.style.transform=`translateX(${dx-W}px)`;peekN.style.transform=`translateX(${dx+W}px)`};
-  const swipeStart=()=>{if(vList.length<2)return false;const p=at(vIdx-1),n=at(vIdx+1);
+  // 앨범처럼: 사진 사이 간격, 손가락 속도를 이어받는 감속 애니메이션, 다음 사진이 준비된 뒤 교체
+  const GAP=24;let swT=null;
+  const setX=(dx,ms)=>{const W=rect().width,t=ms?`transform ${ms}ms cubic-bezier(.16,.7,.25,1)`:"none";
+    for(const el of [img(),peekP,peekN])el.style.transition=t;
+    img().style.transform=`translate3d(${dx}px,0,0)`;peekP.style.transform=`translate3d(${dx-W-GAP}px,0,0)`;peekN.style.transform=`translate3d(${dx+W+GAP}px,0,0)`};
+  const swipeStart=()=>{if(vList.length<2)return false;clearTimeout(swT);const p=at(vIdx-1),n=at(vIdx+1);
     peekP.src=p.u||p.t||"";peekN.src=n.u||n.t||"";main.classList.add("swiping");return true};
-  const swipeEnd=(dx,vx)=>{const W=rect().width;const d=(dx<-W*0.18||vx<-0.45)?1:(dx>W*0.18||vx>0.45)?-1:0;
-    setX(d?-d*W:0,true);
-    setTimeout(()=>{main.classList.remove("swiping");img().style.transition="none";peekP.style.transition="none";peekN.style.transition="none";
-      if(d){const nx=at(vIdx+d);if(nx.u)img().src=nx.u;go(d)}img().style.transform="";peekP.style.transform="";peekN.style.transform=""},250)};
+  const swipeEnd=(dx,vx)=>{const W=rect().width;
+    const d=(dx<-W*0.25||(vx<-0.35&&dx<0))?1:(dx>W*0.25||(vx>0.35&&dx>0))?-1:0;
+    const target=d?-d*(W+GAP):0,rem=Math.abs(target-dx),v=Math.abs(vx);
+    // 시작 속도가 손가락 속도와 이어지도록 시간 계산 (곡선 시작 기울기 ≈ 4.4)
+    const ms=Math.round(Math.min(420,Math.max(d?260:220,v>0.05?4.4*rem/v:999)));
+    setX(target,ms);
+    swT=setTimeout(async()=>{
+      const done=()=>{main.classList.remove("swiping");for(const el of [img(),peekP,peekN]){el.style.transition="none";el.style.transform=""}};
+      if(!d){done();return}
+      const nx=at(vIdx+d),im=img();
+      if(nx.u&&!nx.vid&&!nx.vsrc){im.style.transition="none";im.src=nx.u;try{await im.decode()}catch(e){}}
+      done();vIdx=(vIdx+d+vList.length)%vList.length;showCurrent(true);
+    },ms+16)};
   main.addEventListener("pointerdown",e=>{
     if(e.target.closest("button"))return;
     main.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(pts.size===1){start={x:e.clientX,y:e.clientY,zx:Z.x,zy:Z.y,t:Date.now()};main.classList.add("drag");sw=(e.pointerType==="touch"&&Z.s<=1)?{on:false,lx:e.clientX,lt:Date.now(),vx:0}:null}
-    if(pts.size===2&&sw){if(sw.on){setX(0,false);main.classList.remove("swiping")}sw=null}
+    if(pts.size===1){start={x:e.clientX,y:e.clientY,zx:Z.x,zy:Z.y,t:Date.now()};main.classList.add("drag");sw=(e.pointerType==="touch"&&Z.s<=1)?{on:false,lx:e.clientX,lt:performance.now(),vx:0}:null}
+    if(pts.size===2&&sw){if(sw.on){setX(0,0);main.classList.remove("swiping")}sw=null}
     if(pts.size===2){const [a,b]=[...pts.values()];const r=rect();pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:Z.s,mx:(a.x+b.x)/2-r.left,my:(a.y+b.y)/2-r.top,zx:Z.x,zy:Z.y};start=null}
   });
   main.addEventListener("pointermove",e=>{
@@ -1361,7 +1377,7 @@ function setupZoom(){
     if(start&&Z.s>1){Z.x=start.zx+(e.clientX-start.x);Z.y=start.zy+(e.clientY-start.y);apply();return}
     if(start&&sw&&pts.size===1){const dx=e.clientX-start.x,dy=e.clientY-start.y;
       if(!sw.on&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))sw.on=swipeStart();
-      if(sw.on){const now=Date.now();sw.vx=(e.clientX-sw.lx)/Math.max(1,now-sw.lt);sw.lx=e.clientX;sw.lt=now;setX(dx,false)}}
+      if(sw.on){const now=performance.now();const dt=Math.max(1,now-sw.lt);const v=(e.clientX-sw.lx)/dt;sw.vx=sw.vx*0.6+v*0.4;sw.lx=e.clientX;sw.lt=now;setX(dx,0)}}
   });
   const end=e=>{
     if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);
