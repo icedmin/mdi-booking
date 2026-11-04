@@ -60,8 +60,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .facts{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:8px;font-size:13px;color:var(--muted)}
 .facts b{color:var(--ink);font-weight:800;margin-left:5px;font-variant-numeric:tabular-nums}
 .ph-head .r{flex:none}
-.ph-head .r .btn{padding:11px 22px}
-@media (max-width:640px){.ph-head{position:relative}.ph-head .r{position:absolute;top:18px;right:0}.ph-head .r .btn{padding:8px 14px;font-size:12.5px}.ph-head h2{padding-right:110px}}
+.ph-head .r .btn{padding:7px 14px;font-size:12px;letter-spacing:.02em}
+@media (max-width:640px){.ph-head{position:relative}.ph-head .r{position:absolute;top:18px;right:0}.ph-head .r .btn{padding:5px 9px;font-size:11px;letter-spacing:0}.ph-head h2{padding-right:84px}}
 .btn{display:inline-block;background:var(--ink);color:var(--bg);font-weight:700;font-size:13.5px;letter-spacing:.04em;padding:13px 34px;border:1px solid var(--ink);transition:opacity .15s}
 .btn:hover{opacity:.82}
 .btn.line{background:transparent;color:var(--ink)}
@@ -79,6 +79,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .noimg b{display:block;font-weight:800;font-size:60px;color:var(--ink);opacity:.12;line-height:1;margin-bottom:12px}
 .ex{position:absolute;top:10px;left:10px;background:var(--bg);color:var(--ink);font-size:11px;font-weight:700;padding:3px 8px;letter-spacing:.06em}
 
+.meta{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-top:14px}
+.meta .ml{min-width:0;flex:1 1 auto}
+.meta .mr{flex:none;text-align:right;font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.5;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meta .mr p{margin:0}
+.meta .name,.meta .status,.meta .subline{text-align:left}
+.meta .name{margin:0;word-break:break-word}
 .name{margin:16px 0 0;text-align:center;font-weight:800;font-size:15.5px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);line-height:1.35}
 .status{text-align:center;font-size:12.5px;font-weight:700;margin:3px 0 0;font-variant-numeric:tabular-nums;color:var(--pink);letter-spacing:.03em}
 .status.soon{color:var(--bad)}
@@ -124,6 +130,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .who dd{margin:0;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
 .who .no{color:var(--muted);font-weight:400}
 .by{font-size:12px;color:var(--muted);text-align:center;margin:14px 0 0}
+.by .edit{font-size:12px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:2px;padding:2px 0}
 
 .sec{text-align:left;margin:64px 0 22px;padding-top:22px;border-top:1px solid var(--line);display:flex;align-items:baseline;gap:10px}
 .sec .en{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
@@ -230,7 +237,7 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-zoom{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;display:flex;gap:2px;z-index:2}
 .vw-zoom button{background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;min-width:34px;height:30px;padding:0 8px;font-variant-numeric:tabular-nums}
 .vw-nav,.vw-count{z-index:2}
-.vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;background:var(--bg);color:var(--ink);font-size:22px;opacity:.85;display:grid;place-items:center}
+.vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:64px;background:none;color:#fff;font-size:42px;line-height:1;text-shadow:0 0 4px rgba(0,0,0,.7),0 0 1px rgba(0,0,0,.9);opacity:.9;display:grid;place-items:center}
 .vw-nav:hover{opacity:1}
 .vw-nav.prev{left:max(10px,env(safe-area-inset-left,0px))}.vw-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
 .vw-count{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:var(--bg);color:var(--ink);font-size:12px;font-weight:700;padding:3px 10px;font-variant-numeric:tabular-nums}
@@ -242,10 +249,15 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-split i{position:absolute;left:50%;top:50%;width:2px;height:36px;transform:translate(-50%,-50%);background:var(--muted);border-radius:1px}
 .vw-split:hover,.vw-split:focus-visible,.vw-body.resizing .vw-split{background:var(--muted)}
 .vw-panel{display:grid;grid-template-rows:auto 1fr;min-height:0;min-width:0;background:var(--bg)}
-.vw-ph{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
-.vw-ph label{font-weight:700;color:var(--ink);white-space:nowrap}
-.vw-ph input{flex:1;min-width:60px;accent-color:var(--ink)}
-.vw-ph .sm{font-size:10px}.vw-ph .lg{font-size:16px}
+.vw-ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);min-height:42px}
+.vw-ph .setmain{font-size:12px;font-weight:700;color:var(--ink);border:1px solid var(--ink);padding:4px 10px;white-space:nowrap}
+.vw-ph .setmain:disabled{opacity:.5}
+.vw-sz{display:flex;align-items:center;gap:2px;flex:none;margin-left:auto}
+.vw-sz input{width:80px;flex:none;margin:0;accent-color:var(--ink)}
+.vw-sz button{width:24px;height:24px;font-size:16px;font-weight:700;line-height:1;color:var(--ink);display:grid;place-items:center}
+.vw-grid button.main,.vw-grid button.main[aria-current="true"]{border-color:var(--pink)}
+.vw-tag{position:absolute;top:5px;right:5px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:2px 5px;line-height:1.25;pointer-events:none;z-index:1}
+.vw-main .vw-tag{top:10px;right:max(10px,env(safe-area-inset-right,0px));font-size:11px;padding:3px 7px;z-index:2}
 .vw-grid{overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 18px;display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));gap:6px;align-content:start}
 .vw-grid button{position:relative;display:block;width:100%;height:var(--th,160px);border:2px solid transparent;padding:0;background:var(--tile);overflow:hidden;min-width:0}
 .vw-grid button img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -261,6 +273,10 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 }
 .meas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .reg .meas input{padding:11px 6px;text-align:center}
+.reg .na{display:block;margin-top:4px;font-size:11px;font-weight:700;color:var(--muted);padding:2px 0;text-align:left;letter-spacing:0}
+.reg .meas .na{text-align:center;width:100%}
+.reg .na[aria-pressed="true"]{color:var(--pink)}
+.reg input.isna{color:var(--muted);background:var(--tile)}
 @media (max-width:460px){.meas{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .sizeline{text-align:center;font-size:13.5px;font-weight:700;color:var(--ink);margin:6px 0 0;font-variant-numeric:tabular-nums;letter-spacing:.01em;word-break:keep-all}
 .subline{text-align:center;font-size:12.5px;color:var(--muted);margin:2px 0 0}
@@ -345,7 +361,7 @@ ko:{
  memTitle:"사용자 관리",memDesc:"가입한 사람을 승인해야 보드를 볼 수 있습니다. 승인된 사람은 모두 투표자 명단에 포함됩니다.",
  colName:"이름",colState:"상태",colRole:"권한",colJoined:"가입일",me:" (나)",noName:"(이름 없음)",approved:"승인됨",waiting:"승인 대기",admin:"관리자",member:"일반",
  approve:"승인",revoke:"승인 취소",actFail:"처리하지 못했습니다: ",approvedT:"승인했습니다",revokedT:"승인을 취소했습니다",
- regTitle:"후보 등록",regHint:"모델 링크를 넣으면 메인 사진과 포트폴리오를 자동으로 불러옵니다. 링크가 없으면 사진을 직접 올려 주세요.",
+ regTitle:"후보 등록",editTitle:"후보 정보 수정",editHint:"정보를 고친 뒤 저장하세요. 사진을 더 올리면 포트폴리오에 추가됩니다. 메인 사진은 사진을 눌러 포트폴리오에서 바꿉니다.",editBtn:"수정",saveBtn:"저장",saved:"수정했습니다",regHint:"모델 링크를 넣으면 메인 사진과 포트폴리오를 자동으로 불러옵니다. 링크가 없으면 사진을 직접 올려 주세요.",
  modelLink:"모델 링크",linkPh:"에이전시 보드, 인스타그램 등 https://",rescan:"다시 불러오기",
  drop:"사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능",dropN:"사진 {n}장 선택됨 · 더 추가하려면 누르기",
  modelName:"모델 이름 *",motherAg:"마더에이전시",gLabel:"게런티",gYes:"있음",gNo:"없음",gAmt:"게런티 금액",gAmtPh:"예: 5,000,000원",
@@ -359,7 +375,7 @@ ko:{
  pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
  setTitle:"설정",lang:"언어",close:"닫기",
  vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
- vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",mHeight:"키",mBust:"가슴",mWaist:"허리",mHips:"힙",mShoe:"신발",mNat:"국적",mAge:"나이",ageUnit:"세",sizeTitle:"키 / 가슴 - 허리 - 힙 / 신발",thumbSize:"사진 크기",zIn:"확대",zOut:"축소",zFit:"맞춤",
+ vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",mHeight:"키",mBust:"가슴",mWaist:"허리",mHips:"힙",mShoe:"신발",mNat:"국적",mAge:"나이",ageUnit:"세",naBtn:"정보 없음",naShort:"정보 없음",sizeTitle:"키 / 가슴 - 허리 - 힙 / 신발",thumbSize:"사진 크기",setMain:"메인 사진으로 지정",mainSaving:"지정 중…",mainDone:"메인 사진을 바꿨습니다",mainFail:"메인 사진을 바꾸지 못했습니다: ",zIn:"확대",zOut:"축소",zFit:"맞춤",
  withdraw:"투표에서 내리기",wdAsk:"이 후보를 투표에서 내릴까요?",wdYes:"내리기",wdDone:"투표에서 내렸습니다",wdList:"내린 후보",restore:"다시 올리기",restored:"다시 올렸습니다",wdBy:"내린 사람",wdFail:"처리하지 못했습니다: ",
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
@@ -392,7 +408,7 @@ en:{
  memTitle:"Members",memDesc:"People must be approved before they can see the board. Every approved member appears in the voter list.",
  colName:"Name",colState:"Status",colRole:"Role",colJoined:"Joined",me:" (me)",noName:"(no name)",approved:"Approved",waiting:"Waiting",admin:"Admin",member:"Member",
  approve:"Approve",revoke:"Revoke",actFail:"Couldn't update: ",approvedT:"Approved",revokedT:"Approval revoked",
- regTitle:"Add candidate",regHint:"Paste a model link and the main photo and portfolio load automatically. No link? Upload photos instead.",
+ regTitle:"Add candidate",editTitle:"Edit candidate",editHint:"Change the details and save. Extra photos you upload are added to the portfolio. Change the main photo from the portfolio view.",editBtn:"Edit",saveBtn:"Save",saved:"Saved",regHint:"Paste a model link and the main photo and portfolio load automatically. No link? Upload photos instead.",
  modelLink:"Model link",linkPh:"Agency board, Instagram, etc. https://",rescan:"Reload",
  drop:"Drag photos here or click to choose · multiple allowed",dropN:"{n} photo(s) selected · click to add more",
  modelName:"Model name *",motherAg:"Mother agency",gLabel:"Guarantee",gYes:"Yes",gNo:"No",gAmt:"Guarantee amount",gAmtPh:"e.g. KRW 5,000,000",
@@ -406,7 +422,7 @@ en:{
  pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
  setTitle:"Settings",lang:"Language",close:"Close",
  vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
- vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",mHeight:"Height",mBust:"Bust",mWaist:"Waist",mHips:"Hips",mShoe:"Shoe",mNat:"Nationality",mAge:"Age",ageUnit:"",sizeTitle:"Height / Bust - Waist - Hips / Shoe",thumbSize:"Thumbnail size",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
+ vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",mHeight:"Height",mBust:"Bust",mWaist:"Waist",mHips:"Hips",mShoe:"Shoe",mNat:"Nationality",mAge:"Age",ageUnit:"",naBtn:"No info",naShort:"N/A",sizeTitle:"Height / Bust - Waist - Hips / Shoe",thumbSize:"Thumbnail size",setMain:"Set as main photo",mainSaving:"Saving…",mainDone:"Main photo changed",mainFail:"Couldn't change the main photo: ",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
  withdraw:"Remove from voting",wdAsk:"Remove this candidate from voting?",wdYes:"Remove",wdDone:"Removed from voting",wdList:"Removed candidates",restore:"Restore",restored:"Restored",wdBy:"Removed by",wdFail:"Couldn't update: ",
  fAll:"Show all",fShowing:"Showing:",fNone:"No candidates match"
 }};
@@ -443,18 +459,18 @@ function staticText(){
     <div class="thumbs" id="thumbs"></div>
     <div class="row2">
       <label for="f-name">${T("modelName")}<input id="f-name" required></label>
-      <label for="f-agency">${T("motherAg")}<input id="f-agency"></label>
+      <label for="f-agency">${T("motherAg")}<input id="f-agency" list="agList" autocomplete="off"><datalist id="agList"></datalist></label>
     </div>
     <div class="meas">
-      <label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20" placeholder="177"></label>
-      <label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20" placeholder="33"></label>
-      <label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20" placeholder="24"></label>
-      <label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20" placeholder="35"></label>
-      <label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20" placeholder="250"></label>
+      <label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-height" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-bust" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-waist" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-hips" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-shoe" aria-pressed="false">${T("naBtn")}</button></label>
     </div>
     <div class="row2">
-      <label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60"></label>
-      <label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20"></label>
+      <label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60"><button type="button" class="na" data-na="f-nat" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20"><button type="button" class="na" data-na="f-age" aria-pressed="false">${T("naBtn")}</button></label>
     </div>
     <div><label style="margin-bottom:6px">${T("gLabel")}</label>
       <div class="seg" id="gseg"><button type="button" data-g="" aria-pressed="true">${T("gTbd")}</button><button type="button" data-g="yes" aria-pressed="false">${T("gYes")}</button><button type="button" data-g="no" aria-pressed="false">${T("gNo")}</button></div></div>
@@ -582,15 +598,28 @@ function tabsHtml(){
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
+const NA=v=>v==="N/A";
+const disp=v=>NA(v)?T("naShort"):v;
 function sizeLine(it){
-  const three=[it.bust,it.waist,it.hips].some(Boolean)?[it.bust||"–",it.waist||"–",it.hips||"–"].join(" - "):"";
-  return [it.height,three,it.shoe].filter(Boolean).join(" / ");
+  const b=[it.bust,it.waist,it.hips];
+  const three=b.every(NA)?T("naShort"):b.some(Boolean)?b.map(v=>v?disp(v):"–").join(" - "):"";
+  return [disp(it.height),three,disp(it.shoe)].filter(Boolean).join(" / ");
+}
+/* 카드 오른쪽 아래 치수: 177cm / BWH 33 - 24 - 35 / Shoes 250mm */
+function sizeRows(it){
+  const unit=(v,u)=>/^\d{2,3}(\.\d+)?$/.test(v)&&+v>=100?v+u:v;
+  const rows=[];
+  if(it.height)rows.push(NA(it.height)?T("mHeight")+" "+T("naShort"):unit(it.height,"cm"));
+  const b=[it.bust,it.waist,it.hips];
+  if(b.some(Boolean))rows.push("BWH "+(b.every(NA)?T("naShort"):b.map(v=>v&&!NA(v)?v:"–").join(" - ")));
+  if(it.shoe)rows.push("Shoes "+(NA(it.shoe)?T("naShort"):unit(it.shoe,"mm")));
+  return rows;
 }
 function card(it){
   const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,2).map(p=>photoUrls[p]).filter(Boolean);
-  const total=it.photos.length+(it.gallery?.length||0)+(it.snaps?.length||0);
+  const total=((it.gallery?.length||0)+(it.snaps?.length||0)+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
   const scls=isClosed?"done":(rem<12*H?"soon":"");
@@ -601,10 +630,12 @@ function card(it){
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
     <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="wdx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}">×</button>`):""}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
-    <p class="name">${esc(it.name)}</p>
-    ${sizeLine(it)?`<p class="sizeline" title="${T("sizeTitle")}">${esc(sizeLine(it))}</p>`:""}
-    ${(it.nationality||it.age)?`<p class="subline">${[it.nationality,it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
-    <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
+    <div class="meta">
+      <div class="ml"><p class="name">${esc(it.name)}</p>
+        <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
+        ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}</div>
+      ${sizeRows(it).length?`<div class="mr" title="${T("sizeTitle")}">${sizeRows(it).map(r=>`<p>${esc(r)}</p>`).join("")}</div>`:""}
+    </div>
     <dl class="info">
       <dt>${T("agency")}</dt><dd>${esc(it.agency||T("notEntered"))}</dd>
       <dt>${T("guarantee")}</dt><dd>${g}</dd>
@@ -624,7 +655,7 @@ function card(it){
       <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
-    <p class="by">${T("regBy")} ${esc(name(it.created_by))} · ${fmt(it.created_at)}</p>
+    <p class="by">${T("regBy")} ${esc(name(it.created_by))} · ${fmt(it.created_at)}${it.created_by===me.id||profile.role==="admin"?` · <button type="button" class="edit" data-edit="${it.id}">${T("editBtn")}</button>`:""}</p>
   </article>`;
 }
 
@@ -672,7 +703,8 @@ function render(){
   }
   root.innerHTML=html;
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
-  const o=document.getElementById("openReg");if(o)o.onclick=openReg;
+  const o=document.getElementById("openReg");if(o)o.onclick=()=>openReg();
+  root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();openReg(items.find(x=>x.id===b.dataset.edit))});
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
   root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;render()});
   root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=e=>{e.stopPropagation();wdAsk.add(b.dataset.wd);render()});
@@ -733,14 +765,34 @@ function drawPick(box,images,sel,onChange){
 /* ---------- 등록 ---------- */
 const dlg=document.getElementById("dlg");
 let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],scannedLink="",scanning=null;
+/* 한 번 쓴 마더에이전시 이름: 등록된 후보들 + 이 기기에서 입력한 이름 */
+function agencyNames(){let mine=[];try{mine=JSON.parse(localStorage.getItem("mdi-agencies")||"[]")}catch(e){}
+  const seen=new Map();for(const a of [...mine,...items.map(i=>i.agency)]){const t=(a||"").trim();if(t&&!seen.has(t.toLowerCase()))seen.set(t.toLowerCase(),t)}
+  return [...seen.values()].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"}))}
+function rememberAgency(a){a=(a||"").trim();if(!a)return;try{const l=JSON.parse(localStorage.getItem("mdi-agencies")||"[]").filter(x=>x.toLowerCase()!==a.toLowerCase());l.unshift(a);localStorage.setItem("mdi-agencies",JSON.stringify(l.slice(0,100)))}catch(e){}}
 function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
-function openReg(){
+let editId=null;
+function setNA(id,on){const el=document.getElementById(id),b=document.querySelector(`#regForm [data-na="${id}"]`);
+  el.dataset.na=on?"1":"";el.classList.toggle("isna",on);el.readOnly=on;if(on){el.dataset.prev=el.dataset.prev||"";el.value=T("naShort")}if(b)b.setAttribute("aria-pressed",on)}
+function openReg(it){
+  editId=it&&it.id?it.id:null;
   staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];linkSnaps=[];scannedLink="";scanning=null;gtype="";
+  const dl=document.getElementById("agList");if(dl)dl.innerHTML=agencyNames().map(a=>`<option value="${esc(a)}">`).join("");
+  if(editId){
+    const q=s=>document.querySelector(s);
+    q("#regForm h3").textContent=T("editTitle");q("#regForm .hint").textContent=T("editHint");
+    q("#scanBtn").hidden=true;q("#regSubmit").textContent=T("saveBtn");
+    const f={"f-link":it.link,"f-name":it.name,"f-agency":it.agency,"f-height":it.height,"f-bust":it.bust,"f-waist":it.waist,"f-hips":it.hips,"f-shoe":it.shoe,"f-nat":it.nationality,"f-age":it.age,"f-gamt":it.gamt,"f-memo":it.memo};
+    for(const [id,v] of Object.entries(f)){const el=document.getElementById(id);if(v==="N/A")setNA(id,true);else el.value=v||""}
+    document.getElementById("f-name").dataset.dirty="1";
+    scannedLink=it.link||"";setG(it.gtype||"");
+  }
   dlg.showModal();
 }
 function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1400,sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext("2d").drawImage(img,0,0,c.width,c.height);c.toBlob(b=>res(b?{blob:b,preview:URL.createObjectURL(b)}:null),"image/jpeg",.85)};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
 async function runScan(quiet){
   const link=document.getElementById("f-link").value.trim(),msg=document.getElementById("pickMsg"),box=document.getElementById("pick");
+  if(editId)return;
   if(quiet&&(!/^https?:\/\/\S+\.\S+/i.test(link)||link===scannedLink))return;
   scannedLink=link;
   if(!/^https?:\/\//i.test(link)){msg.textContent=T("needLink");msg.className="pickmsg err";msg.hidden=false;return}
@@ -773,6 +825,9 @@ function bindReg(){
   drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
   form.addEventListener("input",()=>{err.hidden=true});
   document.getElementById("f-name").addEventListener("input",e=>{e.target.dataset.dirty="1"});
+  document.querySelectorAll("#regForm [data-na]").forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.na),on=el.dataset.na!=="1";
+    el.dataset.na=on?"1":"";el.classList.toggle("isna",on);el.readOnly=on;if(on){el.dataset.prev=el.value;el.value=T("naShort")}else{el.value=el.dataset.prev||""}
+    b.setAttribute("aria-pressed",on)});
   document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
   const linkInput=document.getElementById("f-link");
   linkInput.addEventListener("change",()=>{scanning=runScan(true)});
@@ -782,18 +837,38 @@ function bindReg(){
     e.preventDefault();
     const link=document.getElementById("f-link").value.trim(),nm=document.getElementById("f-name").value.trim(),msg=[];
     if(!nm)msg.push(T("errName"));
-    if(!link&&!pending.length)msg.push(T("errLinkOrPhoto"));
+    const editing=editId?items.find(x=>x.id===editId):null;
+    if(!link&&!pending.length&&!(editing&&editing.photos.length))msg.push(T("errLinkOrPhoto"));
     if(link&&!/^https?:\/\//i.test(link))msg.push(T("errLinkFmt"));
     if(msg.length){err.textContent=msg.join(" ");err.hidden=false;return}
     const btn=document.getElementById("regSubmit");btn.disabled=true;btn.textContent=T("uploading");
     try{
-      const paths=[];
+      const paths=[];let mainUrl=null;
+      if(editing){
+        for(const p of pending){
+          const path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+          const {error}=await sb.storage.from(BUCKET).upload(path,p.blob,{contentType:"image/jpeg"});
+          if(error)throw new Error(T("upFail")+error.message);
+          paths.push(path);
+        }
+        const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim()};
+        const patch={name:nm,agency:V("f-agency"),link,height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),gtype,
+          gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim()};
+        if(paths.length)patch.photos=editing.photos.concat(paths);
+        if((link||"")!==(editing.link||"")){patch.gallery=[];patch.snaps=[];patch.main_url=null}   // 링크가 바뀌면 포트폴리오는 새 링크에서 다시 읽음
+        const {error}=await sb.from("candidates").update(patch).eq("id",editing.id);
+        if(error)throw new Error(T("regFail")+error.message);
+        rememberAgency(patch.agency);
+        dlg.close();toast(T("saved"));editId=null;
+        await loadAll();render();return;
+      }
       if(link&&link!==scannedLink){btn.textContent=T("linkFinding");scanning=runScan(true)}
       if(scanning){try{await scanning}catch(e){}}
       if(linkSel.length){
         btn.textContent=T("linkImporting");
         const r=await importImages(linkSel,linkPage||link);
         paths.push(...r.paths);
+        const okSel=linkSel.filter(u=>!r.failed.includes(u));if(r.paths.length&&okSel.length)mainUrl=okSel[0];
         if(r.failed.length)toast(T("linkPartFail",{n:r.failed.length}));
         btn.textContent=T("uploading");
       }
@@ -803,14 +878,15 @@ function bindReg(){
         if(error)throw new Error(T("upFail")+error.message);
         paths.push(path);
       }
-      const V=id=>document.getElementById(id).value.trim();
-      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],gtype,
+      const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim()};
+      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
+      rememberAgency(document.getElementById("f-agency").value);
       dlg.close();tab="cand";toast(T("regDone"));
       await loadAll();render();
     }catch(ex){err.textContent=ex.message;err.hidden=false}
-    finally{btn.disabled=false;btn.textContent=T("submit")}
+    finally{btn.disabled=false;btn.textContent=editId?T("saveBtn"):T("submit")}
   };
 }
 
@@ -848,26 +924,77 @@ function bindPick(){
 /* ---------- 포트폴리오 보기 ---------- */
 const viewer=document.getElementById("viewer"),vw=document.getElementById("vw");
 let vList=[],vIdx=0,vIt=null;
+/* 같은 사진 판별: Cloudflare Images 서명 주소는 서명·만료값이 바뀌어도 같은 사진 */
+const mkey=u=>{try{const x=new URL(u);return /(^|\.)imagedelivery\.net$/.test(x.hostname)?x.origin+x.pathname:u}catch(e){return u}};
+const canEdit=it=>it&&(it.created_by===me.id||profile.role==="admin");
+/* 포트폴리오 목록: 링크 사진(포트폴리오→스냅) + 직접 올린 사진. 메인 사진은 표시만 하고 따로 두지 않음 */
+function buildList(it,g,sn){
+  const remote=g.map(u=>({u,k:"p"})).concat(sn.map(u=>({u,k:"s"})));
+  const own=it.photos.map((path,i)=>({u:photoUrls[path],path,k:"p",own:true,i})).filter(x=>x.u);
+  const uploads=own.filter(x=>!/\/link-/.test(x.path));
+  const first=own.find(x=>x.i===0);
+  let mainHit=null;
+  if(first&&!/\/link-/.test(first.path))mainHit=first;
+  else if(it.main_url){const k=mkey(it.main_url);mainHit=remote.find(x=>mkey(x.u)===k)||null}
+  let lead=[];
+  if(!mainHit&&first){lead=[first];mainHit=first}   // 예전에 등록된 후보: 메인 사진이 포트폴리오 안에서 확인되지 않으면 맨 앞에 한 장만 표시
+  if(mainHit)mainHit.main=true;
+  const ups=uploads.filter(x=>x!==lead[0]);
+  return lead.concat(ups.filter(x=>x.main),remote.filter(x=>x.k==="p"),ups.filter(x=>!x.main),remote.filter(x=>x.k==="s"));
+}
+/* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
+function needRescan(it){
+  if(!it.link)return false;
+  const g=it.gallery||[],sn=it.snaps||[];
+  if(!g.length&&!sn.length)return true;
+  if(g.length<=2)return true;
+  const soon=Date.now()+10*60*1000;
+  return g.concat(sn).some(u=>{const m=/[?&]exp=(\d{9,})/.exec(u);return m&&+m[1]*1000<soon});
+}
 async function openViewer(it){
   if(!it)return;vIt=it;vIdx=0;
   await signPaths(it.photos);
-  const saved=it.photos.map(p=>photoUrls[p]).filter(Boolean).map(u=>({u,own:true}));
-  vList=saved.concat((it.gallery||[]).map(u=>({u,own:false,k:"p"})),(it.snaps||[]).map(u=>({u,own:false,k:"s"})));
+  vList=buildList(it,it.gallery||[],it.snaps||[]);
   drawViewer();viewer.showModal();
-  if(!it.gallery?.length&&!it.snaps?.length&&it.link){
-    setVwMsg(T("vwLoading"));
+  if(needRescan(it)){
+    if(!vList.length)setVwMsg(T("vwLoading"));
     try{
       const r=await scanLink(it.link);
       const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200);
       if(vIt!==it)return;
-      vList=saved.concat(g.map(u=>({u,own:false,k:"p"})),sn.map(u=>({u,own:false,k:"s"})));
-      if((g.length||sn.length)&&(it.created_by===me.id||profile.role==="admin")){
-        const {error}=await sb.from("candidates").update({gallery:g,snaps:sn}).eq("id",it.id);
-        if(!error){it.gallery=g;it.snaps=sn}
+      if(g.length||sn.length){
+        if(canEdit(it)){const {error}=await sb.from("candidates").update({gallery:g,snaps:sn}).eq("id",it.id);if(!error){it.gallery=g;it.snaps=sn}}
+        const cur=vList[vIdx];
+        vList=buildList(it,g,sn);
+        const k=cur?vList.findIndex(x=>mkey(x.u)===mkey(cur.u)):-1;vIdx=k>=0?k:0;
       }
       drawViewer();
-    }catch(e){if(vIt===it){drawViewer();setVwMsg(T("vwFail")+e.message)}}
+    }catch(e){if(vIt===it&&!vList.length){drawViewer();setVwMsg(T("vwFail")+e.message)}}
   }
+}
+/* 지금 보고 있는 사진을 메인 사진으로 지정 (등록자·관리자) */
+async function setMain(){
+  const it=vIt,x=vList[vIdx];if(!it||!x||x.main||!canEdit(it))return;
+  const btn=document.getElementById("vwSetMain");if(btn){btn.disabled=true;btn.textContent=T("mainSaving")}
+  try{
+    let path=x.path;
+    if(!path){
+      const r=await importImages([x.u],it.link||"");
+      if(!r.paths.length)throw new Error("import");
+      path=r.paths[0];
+    }
+    const old=it.photos[0];
+    const photos=[path,...it.photos.filter(p=>p!==path&&!(p===old&&/\/link-/.test(p)))];
+    const main_url=x.own?null:x.u;
+    const {error}=await sb.from("candidates").update({photos,main_url}).eq("id",it.id);
+    if(error)throw error;
+    it.photos=photos;it.main_url=main_url;
+    await signPaths(photos);
+    const k=mkey(x.u);
+    vList=buildList(it,it.gallery||[],it.snaps||[]);
+    const ni=vList.findIndex(y=>y.main);vIdx=ni>=0?ni:vList.findIndex(y=>mkey(y.u)===k);if(vIdx<0)vIdx=0;
+    drawViewer();toast(T("mainDone"));scheduleReload();
+  }catch(e){toast(T("mainFail")+(e.message==="import"?"":e.message));if(btn){btn.disabled=false;btn.textContent=T("setMain")}}
 }
 function setVwMsg(m){const el=document.getElementById("vwMsg");if(el){el.textContent=m;el.hidden=false}}
 /* 캡쳐원식 보기: 왼쪽 큰 사진(확대·축소), 오른쪽 사진 그리드(크기 슬라이더, 패널 폭 조절에 맞춰 자동 배열) */
@@ -876,17 +1003,17 @@ const saveVS=()=>{try{localStorage.setItem("mdi-vw",JSON.stringify(VS))}catch(e)
 const narrow=()=>window.matchMedia("(max-width:760px)").matches;
 function drawViewer(){
   const it=vIt,n=vList.length;
-  const secLab=(x,i)=>i===0&&x.own?T("vwSaved"):(!x.own&&(i===0||vList[i-1].own||vList[i-1].k!==x.k)?(x.k==="s"?T("vwSnaps"):T("vwPortfolio")):"");
-  const cnt=k=>vList.filter(x=>k==="o"?x.own:(!x.own&&x.k===k)).length;
-  const grid=vList.map((x,i)=>{const l=secLab(x,i);const c=l?(x.own?cnt("o"):cnt(x.k)):0;return `${l?`<div class="vw-sec">${l}<span>${c}</span></div>`:""}<button type="button" data-k="${i}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer"></button>`}).join("");
+  const secLab=(x,i)=>(i===0||vList[i-1].k!==x.k)?(x.k==="s"?T("vwSnaps"):T("vwPortfolio")):"";
+  const cnt=k=>vList.filter(x=>x.k===k).length;
+  const grid=vList.map((x,i)=>{const l=secLab(x,i);return `${l?`<div class="vw-sec">${l}<span>${cnt(x.k)}</span></div>`:""}<button type="button" data-k="${i}" class="${x.main?"main":""}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
   vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
-      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer">${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
+      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><span class="vw-tag" id="vwMainTag" hidden>MAIN</span>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
         <p class="vw-msg" id="vwMsg" ${n?"hidden":""}>${n?"":T("vwNone")}</p></div>
       <div class="vw-split" id="vwSplit" role="separator" aria-orientation="${narrow()?"horizontal":"vertical"}" tabindex="0" aria-label="resize"><i></i></div>
       <div class="vw-panel">
-        <div class="vw-ph"><label for="vwSize">${T("thumbSize")}</label><span class="sm">▫</span><input type="range" id="vwSize" min="60" max="360" step="2" value="${VS.ts}"><span class="lg">◻</span></div>
+        <div class="vw-ph">${canEdit(it)&&n?`<button type="button" class="setmain" id="vwSetMain" hidden>${T("setMain")}</button>`:""}<div class="vw-sz" id="vwSz"><button type="button" id="szDn" aria-label="${T("zOut")}">−</button><input type="range" id="vwSize" min="60" max="360" step="2" value="${VS.ts}" aria-label="${T("thumbSize")}"><button type="button" id="szUp" aria-label="${T("zIn")}">+</button></div></div>
         <div class="vw-grid" id="vwGrid" style="--ts:${VS.ts}px">${grid}</div>
       </div>
     </div>`;
@@ -903,13 +1030,18 @@ function drawViewer(){
   layoutGrid=layout;
   if(window.ResizeObserver){new ResizeObserver(layout).observe(gridEl)}
   layout();
+  const setTs=v=>{VS.ts=Math.min(360,Math.max(60,Math.round(v)));size.value=VS.ts;layout();saveVS()};
   size.oninput=()=>{VS.ts=+size.value;layout()};size.onchange=saveVS;
-  // 사진 영역을 Ctrl+휠로도 크기 조절 (캡쳐원처럼)
-  gridEl.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();VS.ts=Math.min(360,Math.max(60,VS.ts-Math.sign(e.deltaY)*10));size.value=VS.ts;layout();saveVS()},{passive:false});
+  document.getElementById("szDn").onclick=()=>setTs(VS.ts-20);
+  document.getElementById("szUp").onclick=()=>setTs(VS.ts+20);
+  // 슬라이더 위에서 마우스 휠로 조절, 사진 영역은 Ctrl+휠로 조절 (캡쳐원처럼)
+  document.getElementById("vwSz").addEventListener("wheel",e=>{e.preventDefault();setTs(VS.ts-Math.sign(e.deltaY||-e.deltaX)*10)},{passive:false});
+  gridEl.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();setTs(VS.ts-Math.sign(e.deltaY)*10)},{passive:false});
+  const sm=document.getElementById("vwSetMain");if(sm)sm.onclick=setMain;
   setupSplit();setupZoom();showCurrent();
 }
 function dropBroken(k){
-  if(!vList[k]||vList[k].own)return;
+  if(!vList[k]||vList[k].own||vList[k].main)return;
   vList.splice(k,1);if(vIdx>=vList.length)vIdx=Math.max(0,vList.length-1);
   if(vIdx>k)vIdx--;
   drawViewer();
@@ -919,6 +1051,8 @@ function showCurrent(){
   img.onerror=()=>dropBroken(vIdx);
   img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
   const c=document.getElementById("vwCount");if(c)c.textContent=`${vIdx+1} / ${vList.length}`;
+  const tg=document.getElementById("vwMainTag");if(tg)tg.hidden=!cur.main;
+  const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
   const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
   resetZoom&&resetZoom();
@@ -1013,7 +1147,7 @@ async function autoFill(){
       if(!r.suggested)continue;
       const im=await importImages([r.suggested],r.url||it.link);
       const patch={};
-      if(im.paths.length)patch.photos=im.paths;
+      if(im.paths.length){patch.photos=im.paths;patch.main_url=r.suggested}
       if(!it.gallery?.length&&r.gallery?.length)patch.gallery=r.gallery.slice(0,200);
       if(!it.snaps?.length&&r.snaps?.length)patch.snaps=r.snaps.slice(0,200);
       if(Object.keys(patch).length)await sb.from("candidates").update(patch).eq("id",it.id);
