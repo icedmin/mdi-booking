@@ -462,15 +462,15 @@ function staticText(){
       <label for="f-agency">${T("motherAg")}<input id="f-agency" list="agList" autocomplete="off"><datalist id="agList"></datalist></label>
     </div>
     <div class="meas">
-      <label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-height" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-bust" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-waist" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-hips" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20"><button type="button" class="na" data-na="f-shoe" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-height" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-bust" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-waist" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-hips" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-shoe" aria-pressed="false">${T("naBtn")}</button></label>
     </div>
     <div class="row2">
-      <label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60"><button type="button" class="na" data-na="f-nat" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20"><button type="button" class="na" data-na="f-age" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60" list="natList" autocomplete="off"><datalist id="natList"></datalist><button type="button" class="na" data-na="f-nat" aria-pressed="false">${T("naBtn")}</button></label>
+      <label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-age" aria-pressed="false">${T("naBtn")}</button></label>
     </div>
     <div><label style="margin-bottom:6px">${T("gLabel")}</label>
       <div class="seg" id="gseg"><button type="button" data-g="" aria-pressed="true">${T("gTbd")}</button><button type="button" data-g="yes" aria-pressed="false">${T("gYes")}</button><button type="button" data-g="no" aria-pressed="false">${T("gNo")}</button></div></div>
@@ -766,10 +766,12 @@ function drawPick(box,images,sel,onChange){
 const dlg=document.getElementById("dlg");
 let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],scannedLink="",scanning=null;
 /* 한 번 쓴 마더에이전시 이름: 등록된 후보들 + 이 기기에서 입력한 이름 */
-function agencyNames(){let mine=[];try{mine=JSON.parse(localStorage.getItem("mdi-agencies")||"[]")}catch(e){}
-  const seen=new Map();for(const a of [...mine,...items.map(i=>i.agency)]){const t=(a||"").trim();if(t&&!seen.has(t.toLowerCase()))seen.set(t.toLowerCase(),t)}
+function agencyNames(){return knownNames("mdi-agencies","agency")}
+function knownNames(store,field){let mine=[];try{mine=JSON.parse(localStorage.getItem(store)||"[]")}catch(e){}
+  const seen=new Map();for(const a of [...mine,...items.map(i=>i[field])]){if(a==="N/A")continue;const t=(a||"").trim();if(t&&!seen.has(t.toLowerCase()))seen.set(t.toLowerCase(),t)}
   return [...seen.values()].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"}))}
-function rememberAgency(a){a=(a||"").trim();if(!a)return;try{const l=JSON.parse(localStorage.getItem("mdi-agencies")||"[]").filter(x=>x.toLowerCase()!==a.toLowerCase());l.unshift(a);localStorage.setItem("mdi-agencies",JSON.stringify(l.slice(0,100)))}catch(e){}}
+function rememberAgency(a){remember("mdi-agencies",a)}
+function remember(store,a){a=(a||"").trim();if(!a||a==="N/A")return;try{const l=JSON.parse(localStorage.getItem(store)||"[]").filter(x=>x.toLowerCase()!==a.toLowerCase());l.unshift(a);localStorage.setItem(store,JSON.stringify(l.slice(0,100)))}catch(e){}}
 function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
 let editId=null;
 function setNA(id,on){const el=document.getElementById(id),b=document.querySelector(`#regForm [data-na="${id}"]`);
@@ -778,6 +780,7 @@ function openReg(it){
   editId=it&&it.id?it.id:null;
   staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];linkSnaps=[];scannedLink="";scanning=null;gtype="";
   const dl=document.getElementById("agList");if(dl)dl.innerHTML=agencyNames().map(a=>`<option value="${esc(a)}">`).join("");
+  const nl=document.getElementById("natList");if(nl)nl.innerHTML=knownNames("mdi-nats","nationality").map(a=>`<option value="${esc(a)}">`).join("");
   if(editId){
     const q=s=>document.querySelector(s);
     q("#regForm h3").textContent=T("editTitle");q("#regForm .hint").textContent=T("editHint");
@@ -858,7 +861,7 @@ function bindReg(){
         if((link||"")!==(editing.link||"")){patch.gallery=[];patch.snaps=[];patch.main_url=null}   // 링크가 바뀌면 포트폴리오는 새 링크에서 다시 읽음
         const {error}=await sb.from("candidates").update(patch).eq("id",editing.id);
         if(error)throw new Error(T("regFail")+error.message);
-        rememberAgency(patch.agency);
+        rememberAgency(patch.agency);remember("mdi-nats",patch.nationality);
         dlg.close();toast(T("saved"));editId=null;
         await loadAll();render();return;
       }
@@ -882,7 +885,7 @@ function bindReg(){
       const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
-      rememberAgency(document.getElementById("f-agency").value);
+      rememberAgency(document.getElementById("f-agency").value);remember("mdi-nats",V("f-nat"));
       dlg.close();tab="cand";toast(T("regDone"));
       await loadAll();render();
     }catch(ex){err.textContent=ex.message;err.hidden=false}
