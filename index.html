@@ -482,6 +482,8 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null, authMode="login";
 const openWho=new Set();let filter="all";const wdAsk=new Set();
+/* '내가 아직 안 한 투표'에서 한 번 보인 후보는 투표해도 새로고침 전까지 남겨 둠 (점수 바로 고칠 수 있게) */
+const todoKeep=new Set();
 
 /* ---------- 정적 영역(언어 바뀔 때 다시 그림) ---------- */
 function staticText(){
@@ -745,7 +747,8 @@ function render(){
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
     const notMine=open.filter(it=>!vOf(it.id).some(v=>v.user_id===me.id)).length;
     const isSoon=it=>deadline(it)-Date.now()<24*H, isTodo=it=>!vOf(it.id).some(v=>v.user_id===me.id);
-    const shown=filter==="soon"?open.filter(isSoon):filter==="todo"?open.filter(isTodo):open;
+    const shown=filter==="soon"?open.filter(isSoon):filter==="todo"?open.filter(it=>isTodo(it)||todoKeep.has(it.id)):open;
+    if(filter==="todo")shown.forEach(it=>todoKeep.add(it.id));
     const fb=(k,label,n)=>`<button type="button" data-filter="${k}" aria-pressed="${filter===k}">${label}<b>${n}</b></button>`;
     const wds=items.filter(it=>it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin"));
     html+=head("cand",T("candDesc"),
@@ -766,7 +769,7 @@ function render(){
   const o=document.getElementById("openReg");if(o)o.onclick=()=>openReg();
   root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();openReg(items.find(x=>x.id===b.dataset.edit))});
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
-  root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;render()});
+  root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;todoKeep.clear();render()});
   root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=e=>{e.stopPropagation();wdAsk.add(b.dataset.wd);render()});
   root.querySelectorAll("[data-wdno]").forEach(b=>b.onclick=e=>{e.stopPropagation();wdAsk.delete(b.dataset.wdno);render()});
   root.querySelectorAll("[data-wdyes]").forEach(b=>b.onclick=async e=>{e.stopPropagation();
