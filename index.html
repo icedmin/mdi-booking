@@ -13,20 +13,21 @@
 /* Layout: 모델 에이전시 사이트형. 흰 고정 헤더(굵은 대문자 워드마크) · 가운데 단계 탭 · 큰 세로 사진 + 가운데 대문자 이름 + 'Label - value' 정보줄 */
 :root{
   --bg:#ffffff; --fg:#1b1b1b; --ink:#000000; --muted:#767676; --line:#e5e5e5; --tile:#f3f3f3;
-  --pink:#d9609a; --ok:#1f7a4d; --bad:#c0392b;
+  --pink:#d9609a; --ok:#1f7a4d; --bad:#c0392b; --acc:#a8476f; --accbg:#f7e6ee; --accbg2:#f1d5e2;
   --font:"Nanum Gothic","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; color-scheme:dark}}
+  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; --acc:#f4a6c8; --accbg:rgba(240,140,187,.14); --accbg2:rgba(240,140,187,.22); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; color-scheme:dark}
+  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; --acc:#f4a6c8; --accbg:rgba(240,140,187,.14); --accbg2:rgba(240,140,187,.22); color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased;word-break:keep-all}
 p,h2,h3{text-wrap:pretty}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+dialog:focus{outline:none}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .gut{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 .inner{max-width:1240px;margin:0 auto}
@@ -60,7 +61,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .facts{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:8px;font-size:13px;color:var(--muted)}
 .facts b{color:var(--ink);font-weight:800;margin-left:5px;font-variant-numeric:tabular-nums}
 .ph-head .r{flex:none}
-.ph-head .r .btn{padding:7px 14px;font-size:12px;letter-spacing:.02em}
+.ph-head .r .btn{padding:7px 14px;font-size:12px;letter-spacing:.02em;background:var(--accbg);color:var(--acc);border-color:transparent}
+.ph-head .r .btn:hover{opacity:1;background:var(--accbg2)}
 @media (max-width:640px){.ph-head{position:relative}.ph-head .r{position:absolute;top:18px;right:0}.ph-head .r .btn{padding:5px 9px;font-size:11px;letter-spacing:0}.ph-head h2{padding-right:84px}}
 .btn{display:inline-block;background:var(--ink);color:var(--bg);font-weight:700;font-size:13.5px;letter-spacing:.04em;padding:13px 34px;border:1px solid var(--ink);transition:opacity .15s}
 .btn:hover{opacity:.82}
@@ -79,9 +81,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .noimg b{display:block;font-weight:800;font-size:60px;color:var(--ink);opacity:.12;line-height:1;margin-bottom:12px}
 .ex{position:absolute;top:10px;left:10px;background:var(--bg);color:var(--ink);font-size:11px;font-weight:700;padding:3px 8px;letter-spacing:.06em}
 
-.meta{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-top:14px}
-.meta .ml{min-width:0;flex:1 1 auto}
-.meta .mr{flex:none;text-align:right;font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.5;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* 남은 시간 줄은 항상 치수 3번째 줄(Shoes)과 같은 높이: 왼쪽 칸 최소 높이 = 치수 3줄, 두 칸 모두 아래 정렬 */
+.meta{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:14px}
+.meta .ml{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;min-height:57px}
+.meta .ml .status{margin:auto 0 0;line-height:19px}
+.meta .ml .subline{margin:0;line-height:17px}
+.meta .ml .name{line-height:21px}
+.meta .mr{flex:none;min-height:57px;text-align:right;font-size:12.5px;font-weight:700;color:var(--ink);line-height:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .meta .mr p{margin:0}
 .meta .name,.meta .status,.meta .subline{text-align:left}
 .meta .name{margin:0;word-break:break-word}
@@ -122,9 +128,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .who summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:11px 0 4px;font-size:13px;font-weight:700;color:var(--ink)}
 .who summary::-webkit-details-marker{display:none}
 .who summary .c{font-weight:400;color:var(--muted);margin-left:6px}
-.who summary .pm{font-size:18px;font-weight:400;line-height:1}
-.who summary .pm::before{content:"+"}
-.who[open] summary .pm::before{content:"−"}
+.who summary .pm{width:18px;height:18px;display:grid;place-items:center;flex:none}
+.who summary .pm::before{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+.who[open] summary .pm::before{transform:translateY(2px) rotate(-135deg)}
 .who dl{margin:6px 0 0;display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:13px}
 .who dt{color:var(--fg)}
 .who dd{margin:0;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -220,6 +226,8 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 #setDlg h3{margin:0;font-size:18px;font-weight:800;color:var(--ink)}
 #setDlg .lbl{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px}
 #setDlg .seg{grid-template-columns:repeat(2,1fr)}
+#setDlg .seg.seg3{grid-template-columns:repeat(3,1fr)}
+#setDlg .note{font-size:11.5px;color:var(--muted);margin:6px 0 0;line-height:1.5}
 #viewer{margin:0;width:100vw;max-width:100vw;height:100%;max-height:100%;border:0;padding:0;background:var(--bg);color:var(--fg)}
 #viewer::backdrop{background:rgba(0,0,0,.6)}
 .vw{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -255,17 +263,25 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-sz{display:flex;align-items:center;gap:2px;flex:none;margin-left:auto}
 .vw-sz input{width:80px;flex:none;margin:0;accent-color:var(--ink)}
 .vw-sz button{width:24px;height:24px;font-size:16px;font-weight:700;line-height:1;color:var(--ink);display:grid;place-items:center}
-.vw-grid button.main,.vw-grid button.main[aria-current="true"]{border-color:var(--pink)}
+.vw-grid button[data-k].main,.vw-grid button[data-k].main[aria-current="true"]{border-color:var(--pink)}
 .vw-tag{position:absolute;top:5px;right:5px;background:var(--pink);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:2px 5px;line-height:1.25;pointer-events:none;z-index:1}
 .vw-main .vw-tag{top:10px;right:max(10px,env(safe-area-inset-right,0px));font-size:11px;padding:3px 7px;z-index:2}
 .vw-grid{overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 18px;display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));gap:6px;align-content:start}
-.vw-grid button{position:relative;display:block;width:100%;height:var(--th,160px);border:2px solid transparent;padding:0;background:var(--tile);overflow:hidden;min-width:0}
-.vw-grid button img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.vw-grid button[aria-current="true"]{border-color:var(--ink)}
-.vw-grid button:hover{border-color:var(--muted)}
+.vw-grid button[data-k]{position:relative;display:block;width:100%;height:var(--th,160px);border:2px solid transparent;padding:0;background:var(--tile);overflow:hidden;min-width:0}
+.vw-grid button[data-k] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.vw-grid button[data-k][aria-current="true"]{border-color:var(--ink)}
+.vw-grid button[data-k]:hover{border-color:var(--muted)}
 .vw-sec{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;font-size:12px;font-weight:800;color:var(--ink);letter-spacing:.04em;padding:8px 0 2px;text-transform:uppercase}
 .vw-sec:not(:first-child){border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
 .vw-sec span{font-weight:400;color:var(--muted)}
+button.vw-sec.tg{width:100%;text-align:left;align-items:center;cursor:pointer;color:var(--ink);text-transform:none;letter-spacing:.02em;font-size:13px;padding-bottom:6px}
+button.vw-sec.tg i{width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .15s;flex:none;margin-right:2px}
+button.vw-sec.tg[aria-expanded="true"] i{transform:rotate(45deg) translate(-1px,-1px)}
+button.vw-sec.tg:hover{color:var(--acc)}
+.vw-play{position:absolute;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(0,0,0,.55);pointer-events:none}
+.vw-play::after{content:"";position:absolute;left:13px;top:10px;border-left:11px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.vw-video{position:absolute;inset:0;background:#000;z-index:1}
+.vw-video iframe{width:100%;height:100%;border:0;display:block}
 @media (max-width:760px){
   .vw-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(120px,1fr) 10px minmax(110px,var(--ph))}
   .vw-split{cursor:row-resize}
@@ -273,10 +289,12 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 }
 .meas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .reg .meas input{padding:11px 6px;text-align:center}
-.reg .na{display:block;margin-top:4px;font-size:11px;font-weight:700;color:var(--muted);padding:2px 0;text-align:left;letter-spacing:0}
-.reg .meas .na{text-align:center;width:100%}
-.reg .na[aria-pressed="true"]{color:var(--pink)}
-.reg input.isna{color:var(--muted);background:var(--tile)}
+.reg .fld{display:flex;flex-direction:column;min-width:0}
+.reg label.na{flex-direction:row;align-items:center;gap:5px;margin-top:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none}
+.reg label.na input{width:14px;height:14px;padding:0;margin:0;flex:none;accent-color:var(--acc);cursor:pointer}
+.reg label.na:has(input:checked){color:var(--acc)}
+.reg input.isna{background:var(--tile);border-style:dashed}
+.reg input.isna::placeholder{color:var(--muted)}
 @media (max-width:460px){.meas{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .sizeline{text-align:center;font-size:13.5px;font-weight:700;color:var(--ink);margin:6px 0 0;font-variant-numeric:tabular-nums;letter-spacing:.01em;word-break:keep-all}
 .subline{text-align:center;font-size:12.5px;color:var(--muted);margin:2px 0 0}
@@ -298,7 +316,9 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .wd button:hover{color:var(--bad);border-color:var(--bad)}
 .wd .q{font-size:12.5px;color:var(--bad);font-weight:700;width:100%;text-align:center}
 .wd .yes{color:var(--bad);font-weight:700;border-color:var(--bad)}
-.wdlist summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);list-style:none;padding:10px 0}
+.wdlist summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);list-style:none;padding:10px 0;display:flex;align-items:center;gap:8px}
+.wdlist summary .pm::before{content:"";display:block;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.wdlist[open] summary .pm::before{transform:translateY(1px) rotate(-135deg)}
 .wdlist summary::-webkit-details-marker{display:none}
 .wdlist ul{list-style:none;margin:0;padding:0}
 .wdlist li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
@@ -352,7 +372,7 @@ ko:{
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
- voting:"투표 중",soon24:"24시간 내 마감",myTodo:"내가 아직 안 한 투표",addCand:"+ 후보 등록",
+ voting:"투표 중",soon24:"24시간 내 마감",myTodo:"내가 아직 안 한 투표",addCand:"+ 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
  closedFail:"마감 · 미통과",
  contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
@@ -373,9 +393,9 @@ ko:{
  scanFail:"불러오지 못했습니다: ",scanFailTail:" — 사진을 직접 올려 주세요.",
  pdTitle:"링크에서 사진 가져오기",pdPick:"사진 {n}장을 찾았습니다. 쓸 사진을 고르세요 (최대 6장, 먼저 고른 사진이 메인).",pdNone:"이 링크에서 사진을 찾지 못했습니다.",pdSave:"선택한 사진 저장",saving:"저장 중…",
  pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
- setTitle:"설정",lang:"언어",close:"닫기",
+ setTitle:"설정",lang:"언어",close:"닫기",unitThree:"쓰리사이즈 단위",unitShoe:"신발 사이즈 단위",shoeNote:"US·EU 환산: Nike 여성 신발 사이즈표 기준 (남성표와 0.5~1 사이즈 차이 있음)",
  vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
- vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",mHeight:"키",mBust:"가슴",mWaist:"허리",mHips:"힙",mShoe:"신발",mNat:"국적",mAge:"나이",ageUnit:"세",naBtn:"정보 없음",naShort:"정보 없음",sizeTitle:"키 / 가슴 - 허리 - 힙 / 신발",thumbSize:"사진 크기",setMain:"메인 사진으로 지정",mainSaving:"지정 중…",mainDone:"메인 사진을 바꿨습니다",mainFail:"메인 사진을 바꾸지 못했습니다: ",zIn:"확대",zOut:"축소",zFit:"맞춤",
+ vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",videoN:"영상 {n}",mHeight:"키",mBust:"가슴",mWaist:"허리",mHips:"힙",mShoe:"신발",mNat:"국적",mAge:"나이",ageUnit:"세",sizeNA:"쓰리사이즈 정보 없음",naBtn:"정보 없음",naShort:"정보 없음",sizeTitle:"키 / 가슴 - 허리 - 힙 / 신발",thumbSize:"사진 크기",setMain:"메인 사진으로 지정",mainSaving:"지정 중…",mainDone:"메인 사진을 바꿨습니다",mainFail:"메인 사진을 바꾸지 못했습니다: ",zIn:"확대",zOut:"축소",zFit:"맞춤",
  withdraw:"투표에서 내리기",wdAsk:"이 후보를 투표에서 내릴까요?",wdYes:"내리기",wdDone:"투표에서 내렸습니다",wdList:"내린 후보",restore:"다시 올리기",restored:"다시 올렸습니다",wdBy:"내린 사람",wdFail:"처리하지 못했습니다: ",
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
@@ -399,7 +419,7 @@ en:{
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
- voting:"Voting",soon24:"Closing in 24h",myTodo:"Waiting for my vote",addCand:"+ Add candidate",
+ voting:"Voting",soon24:"Closing in 24h",myTodo:"Waiting for my vote",addCand:"+ Add",
  emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
  closedFail:"Closed · not passed",
  contactDesc:"Models that passed the vote · moving to the next stage will be added once the rules are set",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
@@ -420,13 +440,14 @@ en:{
  scanFail:"Couldn't load: ",scanFailTail:" — please upload photos.",
  pdTitle:"Get photos from link",pdPick:"Found {n} photos. Choose the ones to use (up to 6, first picked is the main photo).",pdNone:"No photos found on this link.",pdSave:"Save selected",saving:"Saving…",
  pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
- setTitle:"Settings",lang:"Language",close:"Close",
+ setTitle:"Settings",lang:"Language",close:"Close",unitThree:"Measurements unit",unitShoe:"Shoe size unit",shoeNote:"US/EU conversion: Nike women's footwear chart (men's chart differs by 0.5–1 size)",
  vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
- vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",mHeight:"Height",mBust:"Bust",mWaist:"Waist",mHips:"Hips",mShoe:"Shoe",mNat:"Nationality",mAge:"Age",ageUnit:"",naBtn:"No info",naShort:"N/A",sizeTitle:"Height / Bust - Waist - Hips / Shoe",thumbSize:"Thumbnail size",setMain:"Set as main photo",mainSaving:"Saving…",mainDone:"Main photo changed",mainFail:"Couldn't change the main photo: ",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
+ vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",videoN:"{n} video",mHeight:"Height",mBust:"Bust",mWaist:"Waist",mHips:"Hips",mShoe:"Shoe",mNat:"Nationality",mAge:"Age",ageUnit:"",sizeNA:"Measurements N/A",naBtn:"No info",naShort:"N/A",sizeTitle:"Height / Bust - Waist - Hips / Shoe",thumbSize:"Thumbnail size",setMain:"Set as main photo",mainSaving:"Saving…",mainDone:"Main photo changed",mainFail:"Couldn't change the main photo: ",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
  withdraw:"Remove from voting",wdAsk:"Remove this candidate from voting?",wdYes:"Remove",wdDone:"Removed from voting",wdList:"Removed candidates",restore:"Restore",restored:"Restored",wdBy:"Removed by",wdFail:"Couldn't update: ",
  fAll:"Show all",fShowing:"Showing:",fNone:"No candidates match"
 }};
 let LANG="ko";try{LANG=localStorage.getItem("mdi-lang")||"ko"}catch(e){}
+let U={three:"in",shoe:"mm"};try{Object.assign(U,JSON.parse(localStorage.getItem("mdi-units")||"{}"))}catch(e){}
 if(!I18N[LANG])LANG="ko";
 const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
 const SN=s=>T("st_"+s);
@@ -442,6 +463,8 @@ document.documentElement.lang=LANG;
 
 if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>${T("loadFailSub")}</div>`;return}
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+/* 창을 열 때 첫 버튼(×)에 초점 테두리가 생기지 않도록 창 자체에 초점을 둠 */
+{const _sm=HTMLDialogElement.prototype.showModal;HTMLDialogElement.prototype.showModal=function(){this.setAttribute("tabindex","-1");_sm.call(this);try{this.focus({preventScroll:true})}catch(e){}}}
 
 let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null, authMode="login";
 const openWho=new Set();let filter="all";const wdAsk=new Set();
@@ -462,15 +485,15 @@ function staticText(){
       <label for="f-agency">${T("motherAg")}<input id="f-agency" list="agList" autocomplete="off"><datalist id="agList"></datalist></label>
     </div>
     <div class="meas">
-      <label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-height" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-bust" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-waist" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-hips" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-shoe" aria-pressed="false">${T("naBtn")}</button></label>
+      <div class="fld"><label for="f-height">${T("mHeight")}<input id="f-height" inputmode="decimal" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-height">${T("naBtn")}</label></div>
+      <div class="fld"><label for="f-bust">${T("mBust")}<input id="f-bust" inputmode="decimal" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-bust">${T("naBtn")}</label></div>
+      <div class="fld"><label for="f-waist">${T("mWaist")}<input id="f-waist" inputmode="decimal" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-waist">${T("naBtn")}</label></div>
+      <div class="fld"><label for="f-hips">${T("mHips")}<input id="f-hips" inputmode="decimal" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-hips">${T("naBtn")}</label></div>
+      <div class="fld"><label for="f-shoe">${T("mShoe")}<input id="f-shoe" inputmode="decimal" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-shoe">${T("naBtn")}</label></div>
     </div>
     <div class="row2">
-      <label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60" list="natList" autocomplete="off"><datalist id="natList"></datalist><button type="button" class="na" data-na="f-nat" aria-pressed="false">${T("naBtn")}</button></label>
-      <label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20" autocomplete="off"><button type="button" class="na" data-na="f-age" aria-pressed="false">${T("naBtn")}</button></label>
+      <div class="fld"><label for="f-nat">${T("mNat")}<input id="f-nat" maxlength="60" list="natList" autocomplete="off"><datalist id="natList"></datalist></label><label class="na"><input type="checkbox" data-na="f-nat">${T("naBtn")}</label></div>
+      <div class="fld"><label for="f-age">${T("mAge")}<input id="f-age" inputmode="numeric" maxlength="20" autocomplete="off"></label><label class="na"><input type="checkbox" data-na="f-age">${T("naBtn")}</label></div>
     </div>
     <div><label style="margin-bottom:6px">${T("gLabel")}</label>
       <div class="seg" id="gseg"><button type="button" data-g="" aria-pressed="true">${T("gTbd")}</button><button type="button" data-g="yes" aria-pressed="false">${T("gYes")}</button><button type="button" data-g="no" aria-pressed="false">${T("gNo")}</button></div></div>
@@ -492,12 +515,19 @@ function openSettings(){
   f.innerHTML=`<h3>${T("setTitle")}</h3>
     <div><div class="lbl">${T("lang")}</div><div class="seg" id="langSeg">
       <button type="button" data-l="ko" aria-pressed="${LANG==="ko"}">한국어</button><button type="button" data-l="en" aria-pressed="${LANG==="en"}">English</button></div></div>
+    <div><div class="lbl">${T("unitThree")}</div><div class="seg">
+      <button type="button" data-u="three:in" aria-pressed="${U.three==="in"}">inch</button><button type="button" data-u="three:cm" aria-pressed="${U.three==="cm"}">cm</button></div></div>
+    <div><div class="lbl">${T("unitShoe")}</div><div class="seg seg3">
+      <button type="button" data-u="shoe:mm" aria-pressed="${U.shoe==="mm"}">mm</button><button type="button" data-u="shoe:us" aria-pressed="${U.shoe==="us"}">US</button><button type="button" data-u="shoe:eu" aria-pressed="${U.shoe==="eu"}">EU</button></div>
+      <p class="note">${T("shoeNote")}</p></div>
     <button class="btn line" type="button" id="setClose">${T("close")}</button>`;
   f.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
     LANG=b.dataset.l;try{localStorage.setItem("mdi-lang",LANG)}catch(e){}
     document.documentElement.lang=LANG;staticText();openSettings();
     if(me&&profile?.approved)render();else if(me)pendingView();else authView(authMode);
   });
+  f.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.u.split(":");U[k]=v;try{localStorage.setItem("mdi-units",JSON.stringify(U))}catch(e){}
+    openSettings();if(me&&profile?.approved&&tab!=="admin")render()});
   document.getElementById("setClose").onclick=()=>document.getElementById("setDlg").close();
   const d=document.getElementById("setDlg");if(!d.open)d.showModal();
 }
@@ -606,20 +636,36 @@ function sizeLine(it){
   return [disp(it.height),three,disp(it.shoe)].filter(Boolean).join(" / ");
 }
 /* 카드 오른쪽 아래 치수: 177cm / BWH 33 - 24 - 35 / Shoes 250mm */
+/* 신발 환산표: Nike 여성 신발 사이즈표 https://www.nike.com/size-fit/womens-footwear (CM/JP, US-W, US-M, EU) 2026-11-04 확인 */
+const SHOE=[[21,4,2.5,34.5],[21.5,4.5,3,35],[22,5,3.5,35.5],[22.5,5.5,4,36],[23,6,4.5,36.5],[23.5,6.5,5,37.5],[24,7,5.5,38],[24.5,7.5,6,38.5],[25,8,6.5,39],[25.5,8.5,7,40],[26,9,7.5,40.5],[26.5,9.5,8,41],[27,10,8.5,42],[27.5,10.5,9,42.5],[28,11,9.5,43],[28.5,11.5,10,44],[29,12,10.5,44.5],[29.5,12.5,11,45],[30,13,11.5,45.5],[30.5,13.5,12,46],[31,14,12.5,47]];
+const num=v=>{const m=/^\s*(\d+(?:\.\d+)?)\s*$/.exec(v||"");return m?+m[1]:null};
+const r05=x=>Math.round(x*2)/2;
+/* 쓰리사이즈: 50 미만은 인치, 50 이상은 cm로 입력된 것으로 봄 */
+function threeVal(v){const n=num(v);if(n==null)return v;const isIn=n<50;
+  if(U.three==="cm")return String(isIn?Math.round(n*2.54):n);
+  return String(isIn?n:r05(n/2.54))}
+/* 신발: 100 이상은 mm, 30~60은 EU, 그 밖은 US로 입력된 것으로 봄 (US는 남녀 구분이 없어 환산하지 않음) */
+function shoeVal(v){const n=num(v);if(n==null)return v;
+  let row=null,kind=n>=100?"mm":(n>=30&&n<=60?"eu":"us");
+  if(kind==="mm"){const cm=n/10;row=SHOE.reduce((a,b)=>Math.abs(b[0]-cm)<Math.abs(a[0]-cm)?b:a);if(Math.abs(row[0]-cm)>0.5)row=null}
+  else if(kind==="eu"){row=SHOE.find(r=>r[3]===n)||null}
+  if(U.shoe==="mm")return kind==="mm"?n+"mm":row?Math.round(row[0]*10)+"mm":(kind==="eu"?"EU ":"US ")+n;
+  if(U.shoe==="eu")return kind==="eu"?"EU "+n:row?"EU "+row[3]:(kind==="mm"?n+"mm":"US "+n);
+  return kind==="us"?"US "+n:row?`US W${row[1]} · M${row[2]}`:(kind==="mm"?n+"mm":"EU "+n);
+}
 function sizeRows(it){
-  const unit=(v,u)=>/^\d{2,3}(\.\d+)?$/.test(v)&&+v>=100?v+u:v;
   const rows=[];
-  if(it.height)rows.push(NA(it.height)?T("mHeight")+" "+T("naShort"):unit(it.height,"cm"));
+  if(it.height)rows.push(NA(it.height)?T("mHeight")+" "+T("naShort"):(/^\d{3}(\.\d+)?$/.test(it.height)?it.height+"cm":it.height));
   const b=[it.bust,it.waist,it.hips];
-  if(b.some(Boolean))rows.push("BWH "+(b.every(NA)?T("naShort"):b.map(v=>v&&!NA(v)?v:"–").join(" - ")));
-  if(it.shoe)rows.push("Shoes "+(NA(it.shoe)?T("naShort"):unit(it.shoe,"mm")));
+  if(b.some(Boolean))rows.push(b.every(NA)?T("sizeNA"):b.map(v=>v&&!NA(v)?threeVal(v):"–").join(" - ")+(b.some(v=>num(v)!=null)?(U.three==="cm"?" cm":" in"):""));
+  if(it.shoe)rows.push("Shoes "+(NA(it.shoe)?T("naShort"):shoeVal(it.shoe)));
   return rows;
 }
 function card(it){
   const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,2).map(p=>photoUrls[p]).filter(Boolean);
-  const total=((it.gallery?.length||0)+(it.snaps?.length||0)+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
+  const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
   const scls=isClosed?"done":(rem<12*H?"soon":"");
@@ -632,8 +678,8 @@ function card(it){
     <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="wdx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}">×</button>`):""}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
-        <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
-        ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}</div>
+        ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
+        <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p></div>
       ${sizeRows(it).length?`<div class="mr" title="${T("sizeTitle")}">${sizeRows(it).map(r=>`<p>${esc(r)}</p>`).join("")}</div>`:""}
     </div>
     <dl class="info">
@@ -694,7 +740,7 @@ function render(){
       (filter!=="all"?`<p class="fnote">${T("fShowing")} ${filter==="soon"?T("soon24"):T("myTodo")} · ${shown.length}<button type="button" data-filter="all">${T("fAll")}</button></p>`:"")+
       (shown.length?`<div class="grid">${shown.map(card).join("")}</div>`:(open.length?`<div class="empty"><b>${T("fNone")}</b></div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`))+
       (fail.length&&filter==="all"?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"")+
-      (wds.length&&filter==="all"?`<details class="wdlist sec" style="display:block"><summary>${T("wdList")} ${wds.length} +</summary><ul>${wds.map(it=>`<li><span><b>${esc(it.name)}</b> · ${esc(it.agency||"")}</span><span>${T("wdBy")} ${esc(name(it.withdrawn_by))} · ${fmt(it.withdrawn_at)}</span><button class="btn line" style="padding:6px 12px;font-size:12px" data-restore="${it.id}">${T("restore")}</button></li>`).join("")}</ul></details>`:"");
+      (wds.length&&filter==="all"?`<details class="wdlist sec" style="display:block"><summary>${T("wdList")} ${wds.length}<span class="pm" aria-hidden="true"></span></summary><ul>${wds.map(it=>`<li><span><b>${esc(it.name)}</b> · ${esc(it.agency||"")}</span><span>${T("wdBy")} ${esc(name(it.withdrawn_by))} · ${fmt(it.withdrawn_at)}</span><button class="btn line" style="padding:6px 12px;font-size:12px" data-restore="${it.id}">${T("restore")}</button></li>`).join("")}</ul></details>`:"");
   }else if(tab==="contact"){
     html+=head("contact",T("contactDesc"))+
       (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
@@ -764,7 +810,7 @@ function drawPick(box,images,sel,onChange){
 
 /* ---------- 등록 ---------- */
 const dlg=document.getElementById("dlg");
-let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],scannedLink="",scanning=null;
+let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],linkFolders=null,scannedLink="",scanning=null;
 /* 한 번 쓴 마더에이전시 이름: 등록된 후보들 + 이 기기에서 입력한 이름 */
 function agencyNames(){return knownNames("mdi-agencies","agency")}
 function knownNames(store,field){let mine=[];try{mine=JSON.parse(localStorage.getItem(store)||"[]")}catch(e){}
@@ -774,11 +820,15 @@ function rememberAgency(a){remember("mdi-agencies",a)}
 function remember(store,a){a=(a||"").trim();if(!a||a==="N/A")return;try{const l=JSON.parse(localStorage.getItem(store)||"[]").filter(x=>x.toLowerCase()!==a.toLowerCase());l.unshift(a);localStorage.setItem(store,JSON.stringify(l.slice(0,100)))}catch(e){}}
 function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
 let editId=null;
+/* '정보 없음' 체크: 입력칸을 비우고 잠금, 해제하면 이전 값 복원 */
 function setNA(id,on){const el=document.getElementById(id),b=document.querySelector(`#regForm [data-na="${id}"]`);
-  el.dataset.na=on?"1":"";el.classList.toggle("isna",on);el.readOnly=on;if(on){el.dataset.prev=el.dataset.prev||"";el.value=T("naShort")}if(b)b.setAttribute("aria-pressed",on)}
+  if(on&&el.dataset.na!=="1")el.dataset.prev=el.value;
+  el.dataset.na=on?"1":"";el.classList.toggle("isna",on);el.disabled=on;
+  if(on){el.value="";el.placeholder=T("naShort")}else{el.value=el.dataset.prev||"";el.placeholder=""}
+  if(b)b.checked=on}
 function openReg(it){
   editId=it&&it.id?it.id:null;
-  staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];linkSnaps=[];scannedLink="";scanning=null;gtype="";
+  staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];linkSnaps=[];linkFolders=null;scannedLink="";scanning=null;gtype="";
   const dl=document.getElementById("agList");if(dl)dl.innerHTML=agencyNames().map(a=>`<option value="${esc(a)}">`).join("");
   const nl=document.getElementById("natList");if(nl)nl.innerHTML=knownNames("mdi-nats","nationality").map(a=>`<option value="${esc(a)}">`).join("");
   if(editId){
@@ -799,9 +849,9 @@ async function runScan(quiet){
   if(quiet&&(!/^https?:\/\/\S+\.\S+/i.test(link)||link===scannedLink))return;
   scannedLink=link;
   if(!/^https?:\/\//i.test(link)){msg.textContent=T("needLink");msg.className="pickmsg err";msg.hidden=false;return}
-  msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];linkSnaps=[];
+  msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];linkSnaps=[];linkFolders=null;
   try{
-    const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];linkSnaps=r.snaps||[];
+    const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];linkSnaps=r.snaps||[];linkFolders=r.folders||null;
     const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title;
     if(!r.images.length){msg.textContent=T("noImgFound");msg.className="pickmsg err";return}
     if(r.suggested)linkSel=[r.suggested];
@@ -828,9 +878,7 @@ function bindReg(){
   drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
   form.addEventListener("input",()=>{err.hidden=true});
   document.getElementById("f-name").addEventListener("input",e=>{e.target.dataset.dirty="1"});
-  document.querySelectorAll("#regForm [data-na]").forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.na),on=el.dataset.na!=="1";
-    el.dataset.na=on?"1":"";el.classList.toggle("isna",on);el.readOnly=on;if(on){el.dataset.prev=el.value;el.value=T("naShort")}else{el.value=el.dataset.prev||""}
-    b.setAttribute("aria-pressed",on)});
+  document.querySelectorAll("#regForm [data-na]").forEach(b=>b.onchange=()=>setNA(b.dataset.na,b.checked));
   document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
   const linkInput=document.getElementById("f-link");
   linkInput.addEventListener("change",()=>{scanning=runScan(true)});
@@ -858,7 +906,7 @@ function bindReg(){
         const patch={name:nm,agency:V("f-agency"),link,height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),gtype,
           gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim()};
         if(paths.length)patch.photos=editing.photos.concat(paths);
-        if((link||"")!==(editing.link||"")){patch.gallery=[];patch.snaps=[];patch.main_url=null}   // 링크가 바뀌면 포트폴리오는 새 링크에서 다시 읽음
+        if((link||"")!==(editing.link||"")){patch.gallery=[];patch.snaps=[];patch.folders=null;patch.main_url=null}   // 링크가 바뀌면 포트폴리오는 새 링크에서 다시 읽음
         const {error}=await sb.from("candidates").update(patch).eq("id",editing.id);
         if(error)throw new Error(T("regFail")+error.message);
         rememberAgency(patch.agency);remember("mdi-nats",patch.nationality);
@@ -882,7 +930,7 @@ function bindReg(){
         paths.push(path);
       }
       const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim()};
-      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],gtype,
+      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],folders:link&&linkFolders?.length?linkFolders:null,gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
       rememberAgency(document.getElementById("f-agency").value);remember("mdi-nats",V("f-nat"));
@@ -926,13 +974,17 @@ function bindPick(){
 
 /* ---------- 포트폴리오 보기 ---------- */
 const viewer=document.getElementById("viewer"),vw=document.getElementById("vw");
-let vList=[],vIdx=0,vIt=null;
+let vList=[],vIdx=0,vIt=null,vOpen=new Set();
 /* 같은 사진 판별: Cloudflare Images 서명 주소는 서명·만료값이 바뀌어도 같은 사진 */
 const mkey=u=>{try{const x=new URL(u);return /(^|\.)imagedelivery\.net$/.test(x.hostname)?x.origin+x.pathname:u}catch(e){return u}};
 const canEdit=it=>it&&(it.created_by===me.id||profile.role==="admin");
 /* 포트폴리오 목록: 링크 사진(포트폴리오→스냅) + 직접 올린 사진. 메인 사진은 표시만 하고 따로 두지 않음 */
-function buildList(it,g,sn){
-  const remote=g.map(u=>({u,k:"p"})).concat(sn.map(u=>({u,k:"s"})));
+const isDrive=u=>/(^|\.)drive\.google\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
+const dThumb=id=>`https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1600`;
+function buildList(it,g,sn,fo){
+  const remote=fo&&fo.length
+    ?fo.flatMap((grp,gi)=>(grp.i||[]).map(x=>/^v:/.test(x)?{u:dThumb(x.slice(2)),vid:x.slice(2),k:"f"+gi,f:grp.n||""}:{u:x,k:"f"+gi,f:grp.n||""}))
+    :g.map(u=>({u,k:"p"})).concat(sn.map(u=>({u,k:"s"})));
   const own=it.photos.map((path,i)=>({u:photoUrls[path],path,k:"p",own:true,i})).filter(x=>x.u);
   const uploads=own.filter(x=>!/\/link-/.test(x.path));
   const first=own.find(x=>x.i===0);
@@ -943,11 +995,13 @@ function buildList(it,g,sn){
   if(!mainHit&&first){lead=[first];mainHit=first}   // 예전에 등록된 후보: 메인 사진이 포트폴리오 안에서 확인되지 않으면 맨 앞에 한 장만 표시
   if(mainHit)mainHit.main=true;
   const ups=uploads.filter(x=>x!==lead[0]);
+  if(fo&&fo.length)return lead.concat(ups.filter(x=>x.main),remote,ups.filter(x=>!x.main));
   return lead.concat(ups.filter(x=>x.main),remote.filter(x=>x.k==="p"),ups.filter(x=>!x.main),remote.filter(x=>x.k==="s"));
 }
 /* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
 function needRescan(it){
   if(!it.link)return false;
+  if(isDrive(it.link)&&/\/folders\//.test(it.link))return !it.folders?.length;   // 웹하드: 폴더 구조가 없을 때만 다시 읽음 (드라이브 주소는 만료 없음)
   const g=it.gallery||[],sn=it.snaps||[];
   if(!g.length&&!sn.length)return true;
   if(g.length<=2)return true;
@@ -955,20 +1009,21 @@ function needRescan(it){
   return g.concat(sn).some(u=>{const m=/[?&]exp=(\d{9,})/.exec(u);return m&&+m[1]*1000<soon});
 }
 async function openViewer(it){
-  if(!it)return;vIt=it;vIdx=0;
+  if(!it)return;vIt=it;vIdx=0;vOpen=new Set();
   await signPaths(it.photos);
-  vList=buildList(it,it.gallery||[],it.snaps||[]);
+  vList=buildList(it,it.gallery||[],it.snaps||[],it.folders);
+  vIdx=Math.max(0,vList.findIndex(x=>x.main));
   drawViewer();viewer.showModal();
   if(needRescan(it)){
     if(!vList.length)setVwMsg(T("vwLoading"));
     try{
       const r=await scanLink(it.link);
-      const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200);
+      const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
       if(vIt!==it)return;
-      if(g.length||sn.length){
-        if(canEdit(it)){const {error}=await sb.from("candidates").update({gallery:g,snaps:sn}).eq("id",it.id);if(!error){it.gallery=g;it.snaps=sn}}
+      if(g.length||sn.length||fo){
+        if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){it.gallery=g;it.snaps=sn;if(fo)it.folders=fo}}
         const cur=vList[vIdx];
-        vList=buildList(it,g,sn);
+        vList=buildList(it,g,sn,fo||it.folders);
         const k=cur?vList.findIndex(x=>mkey(x.u)===mkey(cur.u)):-1;vIdx=k>=0?k:0;
       }
       drawViewer();
@@ -977,7 +1032,7 @@ async function openViewer(it){
 }
 /* 지금 보고 있는 사진을 메인 사진으로 지정 (등록자·관리자) */
 async function setMain(){
-  const it=vIt,x=vList[vIdx];if(!it||!x||x.main||!canEdit(it))return;
+  const it=vIt,x=vList[vIdx];if(!it||!x||x.main||x.vid||!canEdit(it))return;
   const btn=document.getElementById("vwSetMain");if(btn){btn.disabled=true;btn.textContent=T("mainSaving")}
   try{
     let path=x.path;
@@ -994,7 +1049,7 @@ async function setMain(){
     it.photos=photos;it.main_url=main_url;
     await signPaths(photos);
     const k=mkey(x.u);
-    vList=buildList(it,it.gallery||[],it.snaps||[]);
+    vList=buildList(it,it.gallery||[],it.snaps||[],it.folders);
     const ni=vList.findIndex(y=>y.main);vIdx=ni>=0?ni:vList.findIndex(y=>mkey(y.u)===k);if(vIdx<0)vIdx=0;
     drawViewer();toast(T("mainDone"));scheduleReload();
   }catch(e){toast(T("mainFail")+(e.message==="import"?"":e.message));if(btn){btn.disabled=false;btn.textContent=T("setMain")}}
@@ -1006,13 +1061,17 @@ const saveVS=()=>{try{localStorage.setItem("mdi-vw",JSON.stringify(VS))}catch(e)
 const narrow=()=>window.matchMedia("(max-width:760px)").matches;
 function drawViewer(){
   const it=vIt,n=vList.length;
-  const secLab=(x,i)=>(i===0||vList[i-1].k!==x.k)?(x.k==="s"?T("vwSnaps"):T("vwPortfolio")):"";
+  const fold=x=>/^f/.test(x.k)&&x.f;   // 웹하드 하위 폴더 → 접기·펴기
+  const secLab=(x,i)=>(i===0||vList[i-1].k!==x.k)?(/^f/.test(x.k)?(x.f||""):(x.k==="s"?T("vwSnaps"):T("vwPortfolio"))):"";
   const cnt=k=>vList.filter(x=>x.k===k).length;
-  const grid=vList.map((x,i)=>{const l=secLab(x,i);return `${l?`<div class="vw-sec">${l}<span>${cnt(x.k)}</span></div>`:""}<button type="button" data-k="${i}" class="${x.main?"main":""}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
+  const vc=k=>vList.filter(x=>x.k===k&&x.vid).length;
+  const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k);
+    const head=l?(fold(x)?`<button type="button" class="vw-sec tg" data-g="${x.k}" aria-expanded="${!closed}"><i aria-hidden="true"></i>${esc(l)}<span>${cnt(x.k)}${vc(x.k)?` · ${T("videoN",{n:vc(x.k)})}`:""}</span></button>`:`<div class="vw-sec">${esc(l)}<span>${cnt(x.k)}</span></div>`):"";
+    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">${x.vid?`<span class="vw-play" aria-hidden="true"></span>`:""}${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
   vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
-      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><span class="vw-tag" id="vwMainTag" hidden>MAIN</span>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
+      <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><span class="vw-tag" id="vwMainTag" hidden>MAIN</span><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
         <p class="vw-msg" id="vwMsg" ${n?"hidden":""}>${n?"":T("vwNone")}</p></div>
       <div class="vw-split" id="vwSplit" role="separator" aria-orientation="${narrow()?"horizontal":"vertical"}" tabindex="0" aria-label="resize"><i></i></div>
       <div class="vw-panel">
@@ -1041,6 +1100,8 @@ function drawViewer(){
   document.getElementById("vwSz").addEventListener("wheel",e=>{e.preventDefault();setTs(VS.ts-Math.sign(e.deltaY||-e.deltaX)*10)},{passive:false});
   gridEl.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();setTs(VS.ts-Math.sign(e.deltaY)*10)},{passive:false});
   const sm=document.getElementById("vwSetMain");if(sm)sm.onclick=setMain;
+  gridEl.querySelectorAll("[data-g]").forEach(h=>h.onclick=()=>{const k=h.dataset.g,open=!vOpen.has(k);if(open)vOpen.add(k);else vOpen.delete(k);
+    h.setAttribute("aria-expanded",open);gridEl.querySelectorAll(`[data-gk="${k}"]`).forEach(b=>b.hidden=!open)});
   setupSplit();setupZoom();showCurrent();
 }
 function dropBroken(k){
@@ -1053,9 +1114,13 @@ function showCurrent(){
   const cur=vList[vIdx],img=document.getElementById("vwImg");if(!cur||!img)return;
   img.onerror=()=>dropBroken(vIdx);
   img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
+  // 영상: 구글 드라이브 재생 화면을 큰 사진 자리에 띄움
+  const vb=document.getElementById("vwVideo");
+  if(vb){if(cur.vid){vb.innerHTML=`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`;vb.hidden=false;img.hidden=true}
+    else{if(!vb.hidden){vb.innerHTML="";vb.hidden=true}img.hidden=false}}
   const c=document.getElementById("vwCount");if(c)c.textContent=`${vIdx+1} / ${vList.length}`;
   const tg=document.getElementById("vwMainTag");if(tg)tg.hidden=!cur.main;
-  const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main;
+  const sm=document.getElementById("vwSetMain");if(sm)sm.hidden=!!cur.main||!!cur.vid;
   document.querySelectorAll("#vwGrid [data-k]").forEach(b=>b.setAttribute("aria-current",+b.dataset.k===vIdx));
   const act=document.querySelector('#vwGrid [aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"nearest"});
   resetZoom&&resetZoom();
@@ -1153,6 +1218,7 @@ async function autoFill(){
       if(im.paths.length){patch.photos=im.paths;patch.main_url=r.suggested}
       if(!it.gallery?.length&&r.gallery?.length)patch.gallery=r.gallery.slice(0,200);
       if(!it.snaps?.length&&r.snaps?.length)patch.snaps=r.snaps.slice(0,200);
+      if(!it.folders&&r.folders?.length)patch.folders=r.folders;
       if(Object.keys(patch).length)await sb.from("candidates").update(patch).eq("id",it.id);
     }catch(e){console.warn("autofill",it.id,e.message)}
   }
