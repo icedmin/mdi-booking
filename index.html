@@ -297,6 +297,8 @@ button.vw-sec.tg:hover{color:var(--acc)}
 .reg label.na{flex-direction:row;align-items:center;gap:5px;margin-top:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none}
 .reg label.na input{width:14px;height:14px;padding:0;margin:0;flex:none;accent-color:var(--acc);cursor:pointer}
 .reg label.na:has(input:checked){color:var(--acc)}
+.reg input.upper{text-transform:uppercase}
+.reg input.upper::placeholder{text-transform:none}
 .reg input.isna{background:var(--tile);border-style:dashed}
 .reg input.isna::placeholder{color:var(--muted)}
 @media (max-width:460px){.meas{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -819,7 +821,7 @@ let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],linkF
 function agencyNames(){return knownNames("mdi-agencies","agency")}
 function knownNames(store,field){let mine=[];try{mine=JSON.parse(localStorage.getItem(store)||"[]")}catch(e){}
   const seen=new Map();for(const a of [...mine,...items.map(i=>i[field])]){if(a==="N/A")continue;const t=(a||"").trim();if(t&&!seen.has(t.toLowerCase()))seen.set(t.toLowerCase(),t)}
-  return [...seen.values()].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"}))}
+  return [...new Set([...seen.values()].map(x=>x.toUpperCase()))].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"}))}
 function rememberAgency(a){remember("mdi-agencies",a)}
 function remember(store,a){a=(a||"").trim();if(!a||a==="N/A")return;try{const l=JSON.parse(localStorage.getItem(store)||"[]").filter(x=>x.toLowerCase()!==a.toLowerCase());l.unshift(a);localStorage.setItem(store,JSON.stringify(l.slice(0,100)))}catch(e){}}
 function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
@@ -840,7 +842,8 @@ function openReg(it){
     q("#regForm h3").textContent=T("editTitle");q("#regForm .hint").textContent=T("editHint");
     q("#scanBtn").hidden=true;q("#regSubmit").textContent=T("saveBtn");
     const f={"f-link":it.link,"f-name":it.name,"f-agency":it.agency,"f-height":it.height,"f-bust":it.bust,"f-waist":it.waist,"f-hips":it.hips,"f-shoe":it.shoe,"f-nat":it.nationality,"f-age":it.age,"f-gamt":it.gamt,"f-memo":it.memo};
-    for(const [id,v] of Object.entries(f)){const el=document.getElementById(id);if(v==="N/A")setNA(id,true);else el.value=v||""}
+    const UP=["f-name","f-agency","f-height","f-bust","f-waist","f-hips","f-shoe","f-nat","f-age"];
+    for(const [id,v] of Object.entries(f)){const el=document.getElementById(id);if(v==="N/A")setNA(id,true);else el.value=UP.includes(id)?(v||"").toUpperCase():(v||"")}
     document.getElementById("f-name").dataset.dirty="1";
     scannedLink=it.link||"";setG(it.gtype||"");
   }
@@ -856,7 +859,7 @@ async function runScan(quiet){
   msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];linkSnaps=[];linkFolders=null;
   try{
     const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];linkSnaps=r.snaps||[];linkFolders=r.folders||null;
-    const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title;
+    const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title.toUpperCase();
     if(!r.images.length){msg.textContent=T("noImgFound");msg.className="pickmsg err";return}
     if(r.suggested)linkSel=[r.suggested];
     msg.textContent=T("autoPicked",{n:r.images.length});
@@ -883,6 +886,10 @@ function bindReg(){
   form.addEventListener("input",()=>{err.hidden=true});
   document.getElementById("f-name").addEventListener("input",e=>{e.target.dataset.dirty="1"});
   document.querySelectorAll("#regForm [data-na]").forEach(b=>b.onchange=()=>setNA(b.dataset.na,b.checked));
+  /* 모델 정보 칸은 대문자만 (링크·게런티 금액·메모는 그대로) */
+  const toUp=el=>{const v=el.value,u=v.toUpperCase();if(v===u)return;const a=el.selectionStart,b=el.selectionEnd;el.value=u;try{el.setSelectionRange(a,b)}catch(e){}};
+  ["f-name","f-agency","f-height","f-bust","f-waist","f-hips","f-shoe","f-nat","f-age"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.classList.add("upper");
+    el.addEventListener("input",e=>{if(!e.isComposing)toUp(el)});el.addEventListener("compositionend",()=>toUp(el));el.addEventListener("change",()=>toUp(el))});
   document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
   const linkInput=document.getElementById("f-link");
   linkInput.addEventListener("change",()=>{scanning=runScan(true)});
@@ -890,7 +897,7 @@ function bindReg(){
   linkInput.addEventListener("input",()=>{clearTimeout(linkInput._t);linkInput._t=setTimeout(()=>{scanning=runScan(true)},900)});
   form.onsubmit=async e=>{
     e.preventDefault();
-    const link=document.getElementById("f-link").value.trim(),nm=document.getElementById("f-name").value.trim(),msg=[];
+    const link=document.getElementById("f-link").value.trim(),nm=document.getElementById("f-name").value.trim().toUpperCase(),msg=[];
     if(!nm)msg.push(T("errName"));
     const editing=editId?items.find(x=>x.id===editId):null;
     if(!link&&!pending.length&&!(editing&&editing.photos.length))msg.push(T("errLinkOrPhoto"));
@@ -906,7 +913,7 @@ function bindReg(){
           if(error)throw new Error(T("upFail")+error.message);
           paths.push(path);
         }
-        const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim()};
+        const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim().toUpperCase()};
         const patch={name:nm,agency:V("f-agency"),link,height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),gtype,
           gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim()};
         if(paths.length)patch.photos=editing.photos.concat(paths);
@@ -933,8 +940,8 @@ function bindReg(){
         if(error)throw new Error(T("upFail")+error.message);
         paths.push(path);
       }
-      const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim()};
-      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],folders:link&&linkFolders?.length?linkFolders:null,gtype,
+      const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim().toUpperCase()};
+      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:nm,agency:V("f-agency"),link,photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],folders:link&&linkFolders?.length?linkFolders:null,gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
       rememberAgency(document.getElementById("f-agency").value);remember("mdi-nats",V("f-nat"));
