@@ -710,6 +710,7 @@ async function loadAll(){
   ]);
   if(c.error||v.error||p.error)throw (c.error||v.error||p.error);
   items=c.data;votes=v.data;members=p.data;applyPending(t0);
+  for(const it of items){const sc=scanCache.get(it.id);if(sc)Object.assign(it,sc)}   // 이번 접속에서 새로 읽은 포트폴리오(저장 권한이 없어도 화면에는 반영)
   await signPaths(items.flatMap(i=>i.photos.slice(0,2)));
 }
 let reloadT=null;
@@ -1132,8 +1133,9 @@ function parseItem(s){
   const q=new URLSearchParams(s.slice(h+1)),u=s.slice(0,h);return {s,u,t:q.get("t")||u};
 }
 const isDbx=u=>/(^|\.)dropbox\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
-const dbxFresh=new Set();
+const dbxFresh=new Set(),fresh=new Set(),scanCache=new Map();
 const isPf=u=>/(^|\.)picflow\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
+const isYx=u=>/(^|\.)(disk\.yandex\.[a-z.]+|yadi\.sk)$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
 const isMs=u=>/(^|\.)mediaslide\.com$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
 /* 링크에서 읽은 치수(키·가슴·허리·힙·신발) — 비어 있는 칸만 채움 */
 const INFO_MAP={height:"f-height",bust:"f-bust",waist:"f-waist",hips:"f-hips",shoe:"f-shoe"};
@@ -1161,8 +1163,9 @@ function buildList(it,g,sn,fo){
 /* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
 function needRescan(it){
   if(!it.link||isMega(it.link))return false;
+  if(fresh.has(it.id))return false;   // 이번 접속에서 이미 링크를 새로 읽음 (보드 자동 갱신)
   if((isMs(it.link)||isPf(it.link))&&!it.folders?.length)return true;   // 앨범·영상 구조가 아직 없음   // mediaslide: 앨범·영상 구조가 아직 없음
-  if(isDbx(it.link))return !dbxFresh.has(it.id)||!it.folders?.length;   // 드롭박스 사진 주소는 만료될 수 있어 세션마다 1번 다시 읽음
+  if(isDbx(it.link)||isYx(it.link))return !dbxFresh.has(it.id)||!it.folders?.length;   // 드롭박스·얀덱스 사진 주소는 만료돼 세션마다 1번 다시 읽음   // 드롭박스 사진 주소는 만료될 수 있어 세션마다 1번 다시 읽음
   if(isDrive(it.link)&&/\/folders\//.test(it.link))return !it.folders?.length;   // 웹하드: 폴더 구조가 없을 때만 다시 읽음 (드라이브 주소는 만료 없음)
   const g=it.gallery||[],sn=it.snaps||[];
   if(!g.length&&!sn.length)return true;
@@ -1180,10 +1183,11 @@ async function openViewer(it){
     if(!vList.length)setVwMsg(T("vwLoading"));
     try{
       const r=await scanLink(it.link);
-      if(isDbx(it.link))dbxFresh.add(it.id);
+      if(isDbx(it.link)||isYx(it.link))dbxFresh.add(it.id);fresh.add(it.id);
       const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
       if(vIt!==it)return;
       if(g.length||sn.length||fo){
+        scanCache.set(it.id,{gallery:g,snaps:sn,folders:fo||it.folders});Object.assign(it,{gallery:g,snaps:sn},fo?{folders:fo}:{});
         if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;
           for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!it[k])patch[k]=String(r.info[k]).slice(0,20);const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){Object.assign(it,patch)}}
         const cur=vList[vIdx];
@@ -1483,6 +1487,32 @@ async function autoFill(){
     }catch(e){console.warn("autofill",it.id,e.message)}
   }
   if(targets.length){try{await loadAll();if(tab!=="admin")render()}catch(e){}}
+  bgRefresh();
+}
+/* 보드를 열면 링크가 있는 후보 전부를 뒤에서 한 번씩 다시 읽어 포트폴리오를 최신으로 (사진 창을 열지 않아도).
+   저장은 등록자·관리자만 가능하고, 그 밖의 사람은 이번 화면에만 반영 */
+let bgRunning=false;
+async function bgRefresh(){
+  if(bgRunning)return;bgRunning=true;
+  try{
+    const list=items.filter(it=>!it.withdrawn_at&&it.link&&!isMega(it.link)&&!fresh.has(it.id));
+    let pool=list.slice();
+    const worker=async()=>{for(let it;(it=pool.shift());){
+      try{
+        const r=await scanLink(it.link);fresh.add(it.id);if(isDbx(it.link)||isYx(it.link))dbxFresh.add(it.id);
+        const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
+        if(!g.length&&!sn.length&&!fo)continue;
+        const cur=items.find(x=>x.id===it.id)||it;
+        const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;
+        for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!cur[k])patch[k]=String(r.info[k]).slice(0,20);
+        const same=JSON.stringify([cur.gallery,cur.snaps,cur.folders])===JSON.stringify([g,sn,fo||cur.folders]);
+        Object.assign(cur,patch);scanCache.set(cur.id,{gallery:g,snaps:sn,folders:fo||cur.folders});
+        if(!same&&canEdit(cur))await sb.from("candidates").update(patch).eq("id",cur.id);
+        if(!same&&tab!=="admin"&&!viewer.open)render();
+      }catch(e){console.warn("refresh",it.id,e.message)}
+    }};
+    await Promise.all([worker(),worker()]);   // 동시에 2개씩
+  }finally{bgRunning=false}
 }
 let lastUid;
 sb.auth.onAuthStateChange((ev,session)=>{
