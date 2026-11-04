@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex">
+<script>/* 화면 모드: auto(기기 설정 따라감) · light · dark — 그리기 전에 적용해 깜빡임 방지 */
+try{var t=localStorage.getItem("mdi-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <title>MDI 부킹 보드</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +24,7 @@
 :root[data-theme="dark"]{
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
   --pink:#e8370b; --red:#e8370b; --go:#2fd36f; --ok:#ffffff; --bad:#ffffff; --acc:#e8370b; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased;word-break:keep-all}
 p,h2,h3{text-wrap:pretty}
@@ -496,7 +499,7 @@ ko:{
  megaNo:"MEGA 링크는 파일이 암호화돼 있어 사진을 자동으로 불러올 수 없습니다",scanFail:"불러오지 못했습니다: ",scanFailTail:" — 사진을 직접 올려 주세요.",
  pdTitle:"링크에서 사진 가져오기",pdPick:"사진 {n}장을 찾았습니다. 쓸 사진을 고르세요 (최대 6장, 먼저 고른 사진이 메인).",pdNone:"이 링크에서 사진을 찾지 못했습니다.",pdSave:"선택한 사진 저장",saving:"저장 중…",
  pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
- setTitle:"설정",lang:"언어",close:"닫기",unitThree:"쓰리사이즈 단위",unitShoe:"신발 사이즈 단위",shoeNote:"US·EU 환산: Nike 여성 신발 사이즈표 기준 (남성표와 0.5~1 사이즈 차이 있음)",
+ setTitle:"설정",lang:"언어",theme:"화면",thAuto:"자동",thLight:"라이트",thDark:"다크",thNote:"자동은 폰·컴퓨터의 라이트/다크 설정을 따라갑니다",close:"닫기",unitThree:"쓰리사이즈 단위",unitShoe:"신발 사이즈 단위",shoeNote:"US·EU 환산: Nike 여성 신발 사이즈표 기준 (남성표와 0.5~1 사이즈 차이 있음)",
  vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
  vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",videoN:"영상 {n}",mHeight:"키",mBust:"가슴",mWaist:"허리",mHips:"힙",mShoe:"신발",mNat:"국적",mAge:"나이",ageUnit:"세",sizeNA:"쓰리사이즈 정보 없음",naBtn:"정보 없음",naShort:"정보 없음",sizeTitle:"키 / 가슴 - 허리 - 힙 / 신발",thumbSize:"사진 크기",setMain:"메인 사진으로 지정",mainSaving:"지정 중…",mainDone:"메인 사진을 바꿨습니다",mainFail:"메인 사진을 바꾸지 못했습니다: ",zIn:"확대",zOut:"축소",zFit:"맞춤",
  withdraw:"투표에서 내리기",wdAsk:"이 후보를 투표에서 내릴까요?",wdYes:"내리기",wdDone:"투표에서 내렸습니다",wdList:"내린 후보",restore:"다시 올리기",restored:"다시 올렸습니다",wdBy:"내린 사람",wdFail:"처리하지 못했습니다: ",
@@ -543,7 +546,7 @@ en:{
  megaNo:"MEGA links are encrypted, so photos can't be loaded automatically",scanFail:"Couldn't load: ",scanFailTail:" — please upload photos.",
  pdTitle:"Get photos from link",pdPick:"Found {n} photos. Choose the ones to use (up to 6, first picked is the main photo).",pdNone:"No photos found on this link.",pdSave:"Save selected",saving:"Saving…",
  pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
- setTitle:"Settings",lang:"Language",close:"Close",unitThree:"Measurements unit",unitShoe:"Shoe size unit",shoeNote:"US/EU conversion: Nike women's footwear chart (men's chart differs by 0.5–1 size)",
+ setTitle:"Settings",lang:"Language",theme:"Display",thAuto:"Auto",thLight:"Light",thDark:"Dark",thNote:"Auto follows your phone/computer light or dark setting",close:"Close",unitThree:"Measurements unit",unitShoe:"Shoe size unit",shoeNote:"US/EU conversion: Nike women's footwear chart (men's chart differs by 0.5–1 size)",
  vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
  vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",videoN:"{n} video",mHeight:"Height",mBust:"Bust",mWaist:"Waist",mHips:"Hips",mShoe:"Shoe",mNat:"Nationality",mAge:"Age",ageUnit:"",sizeNA:"Measurements N/A",naBtn:"No info",naShort:"N/A",sizeTitle:"Height / Bust - Waist - Hips / Shoe",thumbSize:"Thumbnail size",setMain:"Set as main photo",mainSaving:"Saving…",mainDone:"Main photo changed",mainFail:"Couldn't change the main photo: ",zIn:"Zoom in",zOut:"Zoom out",zFit:"Fit",
  withdraw:"Remove from voting",wdAsk:"Remove this candidate from voting?",wdYes:"Remove",wdDone:"Removed from voting",wdList:"Removed candidates",restore:"Restore",restored:"Restored",wdBy:"Removed by",wdFail:"Couldn't update: ",
@@ -616,10 +619,14 @@ function staticText(){
 }
 
 /* ---------- 설정 ---------- */
+let THEME=(()=>{try{const t=localStorage.getItem("mdi-theme");return t==="light"||t==="dark"?t:"auto"}catch(e){return "auto"}})();
+function setTheme(t){THEME=t;try{localStorage.setItem("mdi-theme",t)}catch(e){}
+  if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
 function openSettings(){
   const f=document.getElementById("setForm"),d=document.getElementById("setDlg");
   const seg=(attr,opts,cur)=>`<div class="sg">${opts.map(([v,l])=>`<button type="button" ${attr}="${v}" aria-pressed="${cur===v.split(":").pop()}">${l}</button>`).join("")}</div>`;
   f.innerHTML=`${me?`<div class="pv-id"><b>${esc(profile?.display_name||me.email)}</b><span>${esc(me.email||"")}</span></div>`:""}
+    <div class="pv-row"><span>${T("theme")}</span>${seg("data-th",[["auto",T("thAuto")],["light",T("thLight")],["dark",T("thDark")]],THEME)}</div>
     <div class="pv-row"><span>${T("lang")}</span>${seg("data-l",[["ko","한국어"],["en","English"]],LANG)}</div>
     <div class="pv-row"><span>${T("unitThree")}</span>${seg("data-u",[["three:in","inch"],["three:cm","cm"]],U.three)}</div>
     <div class="pv-row"><span>${T("unitShoe")}</span>${seg("data-u",[["shoe:mm","mm"],["shoe:us","US"],["shoe:eu","EU"]],U.shoe)}</div>
@@ -631,6 +638,7 @@ function openSettings(){
     if(me&&profile?.approved)render();else if(me)pendingView();else authView(authMode);
     openSettings();
   });
+  f.querySelectorAll("[data-th]").forEach(b=>b.onclick=()=>{setTheme(b.dataset.th);openSettings()});
   f.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.u.split(":");U[k]=v;try{localStorage.setItem("mdi-units",JSON.stringify(U))}catch(e){}
     if(me&&profile?.approved&&tab!=="admin")render();openSettings()});
   const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();sb.auth.signOut()};
@@ -1519,7 +1527,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.3";
+const APP_VER="2026-11-04.4";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
