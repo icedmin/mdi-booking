@@ -849,7 +849,26 @@ async function boot(session){
   if(!profile?.approved)return pendingView();
   root.innerHTML=`<div class="loading">${T("loading")}</div>`;
   try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
-  subscribe();render();
+  subscribe();render();autoFill();
+}
+/* 링크만 있고 사진이 없는 내 후보(관리자는 전체)는 메인 사진·포트폴리오를 자동으로 채움 — 세션당 1회 */
+const autoTried=new Set();
+async function autoFill(){
+  const targets=items.filter(it=>!it.withdrawn_at&&it.link&&!it.photos.length&&!autoTried.has(it.id)&&(it.created_by===me.id||profile.role==="admin"));
+  for(const it of targets){
+    autoTried.add(it.id);
+    try{
+      const r=await scanLink(it.link);
+      if(!r.suggested)continue;
+      const im=await importImages([r.suggested],r.url||it.link);
+      const patch={};
+      if(im.paths.length)patch.photos=im.paths;
+      if(!it.gallery?.length&&r.gallery?.length)patch.gallery=r.gallery.slice(0,200);
+      if(!it.snaps?.length&&r.snaps?.length)patch.snaps=r.snaps.slice(0,200);
+      if(Object.keys(patch).length)await sb.from("candidates").update(patch).eq("id",it.id);
+    }catch(e){console.warn("autofill",it.id,e.message)}
+  }
+  if(targets.length){try{await loadAll();if(tab!=="admin")render()}catch(e){}}
 }
 let lastUid;
 sb.auth.onAuthStateChange((ev,session)=>{
