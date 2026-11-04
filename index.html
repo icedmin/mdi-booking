@@ -964,6 +964,15 @@ function megaUrl(s){   // 같은 사진은 한 번만, 동시에 4장까지
   const pr=new Promise((ok,no)=>{mgQueue.push({s,ok,no});mgPump()});
   mgCache.set(s,pr);pr.catch(()=>mgCache.delete(s));return pr;
 }
+/* MEGA 사진 한 장을 풀어서 저장소에 올림 (서버를 거치지 않음) → 저장 경로 */
+async function megaUpload(s){
+  const url=await megaUrl(s);const blob=await (await fetch(url)).blob();
+  if(blob.size<2000)throw new Error("mega image");
+  const path=`${me.id}/link-${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+  const {error}=await sb.storage.from(BUCKET).upload(path,blob,{contentType:"image/jpeg"});
+  if(error)throw new Error(T("upFail")+error.message);
+  return path;
+}
 function mgPump(){while(mgActive<4&&mgQueue.length){const t=mgQueue.shift();mgActive++;mgFetch(t.s).then(t.ok,t.no).finally(()=>{mgActive--;mgPump()})}}
 /* 화면에 보이는 MEGA 사진만 풀어서 채움 (img[data-mg]) */
 function fillMega(root,onUrl){
@@ -1150,7 +1159,9 @@ function bindReg(){
       if(scanning){try{await scanning}catch(e){}}
       if(linkSel.length){
         btn.textContent=T("linkImporting");
-        const r=await importImages(linkSel,linkPage||link);
+        const mgSel=linkSel.filter(u=>/^m:/.test(u)),webSel=linkSel.filter(u=>!/^m:/.test(u));
+        const r=webSel.length?await importImages(webSel,linkPage||link):{paths:[],failed:[]};
+        for(const u of mgSel){try{r.paths.unshift(await megaUpload(u))}catch(e){r.failed.push(u)}}   // MEGA는 화면에서 풀어 바로 저장
         paths.push(...r.paths);
         const okSel=linkSel.filter(u=>!r.failed.includes(u));if(r.paths.length&&okSel.length)mainUrl=okSel[0];
         if(r.failed.length)toast(T("linkPartFail",{n:r.failed.length}));
@@ -1193,7 +1204,9 @@ function bindPick(){
   document.getElementById("pdOk").onclick=async()=>{
     const ok=document.getElementById("pdOk"),msg=document.getElementById("pdMsg");ok.disabled=true;ok.textContent=T("saving");
     try{
-      const r=await importImages(pdSel,pickTarget._page);
+      const mg=pdSel.filter(u=>/^m:/.test(u)),web=pdSel.filter(u=>!/^m:/.test(u));
+      const r=web.length?await importImages(web,pickTarget._page):{paths:[],failed:[]};
+      for(const u of mg){try{r.paths.push(await megaUpload(u))}catch(e){r.failed.push(u)}}
       if(!r.paths.length)throw new Error(T("pdNoImport"));
       const patch={photos:r.paths};if(!pickTarget.gallery?.length&&pdGallery.length)patch.gallery=pdGallery.slice(0,200);if(!pickTarget.snaps?.length&&pickTarget._snaps?.length)patch.snaps=pickTarget._snaps.slice(0,200);
       const {error}=await sb.from("candidates").update(patch).eq("id",pickTarget.id);
@@ -1307,8 +1320,9 @@ async function setMain(){
   const btn=document.getElementById("vwSetMain");if(btn){btn.disabled=true;btn.textContent=T("mainSaving")}
   try{
     let path=x.path;
+    if(!path&&x.mg)path=await megaUpload(x.mg);   // MEGA: 화면에서 이미 풀어 둔 사진을 바로 저장
     if(!path){
-      const r=await importImages([x.mg||x.u],it.link||"");
+      const r=await importImages([x.u],it.link||"");
       if(!r.paths.length)throw new Error("import");
       path=r.paths[0];
     }
@@ -1561,7 +1575,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.8";
+const APP_VER="2026-11-04.9";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
@@ -1600,6 +1614,9 @@ async function bgRefresh(){
           const cur=items.find(x=>x.id===it.id)||it;
           const before=JSON.stringify([cur.gallery,cur.snaps,cur.folders,cur.photos]);
           Object.assign(cur,patch);scanCache.delete(cur.id);
+          // MEGA 메인 사진: 서버가 못 넣었으면 등록자·관리자 화면에서 첫 사진을 풀어 저장
+          if(!cur.photos.length&&canEdit(cur)){const first=(cur.folders||[]).flatMap(g=>g.i||[]).find(x=>/^m:/.test(x));
+            if(first){try{const path=await megaUpload(first);const up={photos:[path],main_url:first};const {error}=await sb.from("candidates").update(up).eq("id",cur.id);if(!error){Object.assign(cur,up);patch.photos=up.photos}}catch(e){console.warn("mega main",e.message)}}}
           if(patch.photos)await signPaths(patch.photos);
           if(before!==JSON.stringify([cur.gallery,cur.snaps,cur.folders,cur.photos])&&tab!=="admin"&&!viewer.open)render();
         }catch(e){console.warn("refresh",it.id,e.message)}
