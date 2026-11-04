@@ -196,7 +196,23 @@ body{letter-spacing:-.005em}
 .score .avg small{font-size:12px}
 .score .st{font-weight:500;font-size:12px;color:var(--muted)}.score .st.ok{color:var(--ink)}
 .score .st{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
-.score .st .dot{width:8px;height:8px;border-radius:50%;flex:none}.score .st .dot.go{background:var(--go)}.score .st .dot.no{background:var(--red)}
+/* 통과 표시등: 켜진 불빛(하이라이트 + 번짐), 상태가 바뀌면 깜빡이며 켜지거나 색이 바뀜 */
+.score .st .dot{--off:#d4d4d4;width:9px;height:9px;border-radius:50%;flex:none;background-color:var(--c,var(--off));
+  background-image:radial-gradient(circle at 34% 30%,rgba(255,255,255,.85) 0,rgba(255,255,255,.25) 28%,rgba(255,255,255,0) 58%);
+  box-shadow:0 0 0 .5px rgba(0,0,0,.06),0 0 5px 1px var(--g),0 0 13px 3px var(--g2)}
+.score .st .dot.go{--c:var(--go);--g:rgba(22,194,90,.6);--g2:rgba(22,194,90,.22)}
+.score .st .dot.no{--c:var(--red);--g:rgba(232,55,11,.6);--g2:rgba(232,55,11,.22)}
+.score .st .dot.off{--c:var(--off);background-image:radial-gradient(circle at 34% 30%,rgba(255,255,255,.6) 0,rgba(255,255,255,0) 55%);box-shadow:inset 0 1px 1.5px rgba(0,0,0,.22)}
+.score .st .dot.f-go{--fc:var(--go);--fg:rgba(22,194,90,.6)}.score .st .dot.f-no{--fc:var(--red);--fg:rgba(232,55,11,.6)}
+.score .st .dot.a-on{animation:lampOn .9s ease-out both}
+.score .st .dot.a-sw{animation:lampSw .85s ease-out both}
+.score .st .dot.a-out{animation:lampOut .5s ease-in both}
+@keyframes lampOn{0%{background-color:var(--off);box-shadow:none}16%{background-color:var(--c);box-shadow:0 0 9px 3px var(--g),0 0 20px 6px var(--g2)}28%{background-color:var(--off);box-shadow:none}46%{background-color:var(--c);box-shadow:0 0 12px 4px var(--g),0 0 26px 9px var(--g2)}100%{}}
+@keyframes lampSw{0%{background-color:var(--fc);box-shadow:0 0 5px 1px var(--fg)}32%{background-color:var(--off);box-shadow:none}55%{background-color:var(--c);box-shadow:0 0 12px 4px var(--g),0 0 26px 9px var(--g2)}100%{}}
+@keyframes lampOut{0%{background-color:var(--fc);box-shadow:0 0 5px 1px var(--fg)}100%{}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .score .st .dot{--off:#3a3a3a}}
+:root[data-theme="dark"] .score .st .dot{--off:#3a3a3a}
+@media (prefers-reduced-motion:reduce){.score .st .dot{animation:none!important}}
 .bar{height:1px;margin-top:14px;background:#d8d8d8}
 .bar i,.bar i.ok{top:-.5px;bottom:auto;height:2px;background:var(--ink)}
 .bar .cut{width:2px;height:11px;top:-5px;background:var(--red)}
@@ -751,7 +767,7 @@ function card(it){
       ${it.memo?`<dt>${T("memo")}</dt><dd>${esc(it.memo)}</dd>`:""}
     </dl>
     <div class="score">
-      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}%<i class="dot ${ok?"go":"no"}" role="img" aria-label="${ok?T("passUp"):T("passDown")}" title="${ok?T("passUp"):T("passDown")}"></i>`:T("noVotes")}</span></div>
+      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}%`:T("noVotes")}${lamp(it.id,s.n?(ok?"go":"no"):"off")}</span></div>
       <div class="bar" title="${T("passLine")}"><i class="${ok?"ok":""}" style="width:${Math.min(100,s.pct*100)}%"></i><span class="cut"></span></div>
       <div class="bar-lab"><span>0</span><span class="c">6.0</span><span>10</span></div>
     </div>
@@ -1043,6 +1059,18 @@ function bindPick(){
   };
 }
 
+/* 통과 표시등: 카드마다 마지막 상태를 기억해 두고, 바뀌었을 때만 켜짐/전환 애니메이션.
+   카드가 애니메이션 중에 다시 그려져도(실시간 갱신) 이어서 재생되도록 시작 시각을 기억 */
+const lampMem=new Map();
+function lamp(id,st){
+  const m=lampMem.get(id),now=Date.now();let a="",from="",t0=now;
+  if(m&&m.st!==st){from=m.st;a=st==="off"?"a-out":from==="off"?"a-on":"a-sw"}
+  else if(m&&m.a&&now-m.t0<900){a=m.a;from=m.from;t0=m.t0}
+  lampMem.set(id,{st,a,from,t0});
+  const lab=st==="go"?T("passUp"):st==="no"?T("passDown"):T("noVotes");
+  const delay=a&&now>t0?` style="animation-delay:-${now-t0}ms"`:"";
+  return `<i class="dot ${st}${a?" "+a:""}${from&&from!=="off"?" f-"+from:""}" role="img" aria-label="${lab}" title="${lab}"${delay}></i>`;
+}
 /* ---------- 포트폴리오 보기 ---------- */
 const viewer=document.getElementById("viewer"),vw=document.getElementById("vw");
 let vList=[],vIdx=0,vIt=null,vOpen=new Set();
@@ -1102,7 +1130,7 @@ async function openViewer(it){
   await signPaths(it.photos);
   vList=buildList(it,it.gallery||[],it.snaps||[],it.folders);
   vIdx=Math.max(0,vList.findIndex(x=>x.main));
-  drawViewer();viewer.showModal();
+  drawViewer();vwPush();viewer.showModal();
   if(needRescan(it)){
     if(!vList.length)setVwMsg(T("vwLoading"));
     try{
@@ -1325,7 +1353,41 @@ document.addEventListener("keydown",e=>{if(!viewer.open||e.target.closest?.("inp
   if(!/^Arrow(Up|Down|Left|Right)$/.test(e.key))return;
   if(e.target.closest?.("#vwGrid")){e.preventDefault();gridMove(e.key);return}
   if(e.key==="ArrowRight"){e.preventDefault();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();go(-1)}});
-viewer.addEventListener("close",()=>{vIt=null});
+/* 폰 뒤로가기 버튼·뒤로 스와이프로 사진 창 닫기: 창을 열 때 기록을 하나 넣고, 뒤로가기가 오면 창만 닫음 */
+let vwHist=false,vwSkipPop=false;
+function vwPush(){if(vwHist)return;try{history.pushState({mdiVw:1},"");vwHist=true}catch(e){}}
+window.addEventListener("popstate",()=>{if(vwSkipPop){vwSkipPop=false;return}if(!vwHist)return;vwHist=false;if(viewer.open)viewer.close()});
+viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.style.transform="";if(vwHist){vwHist=false;vwSkipPop=true;history.back()}});
+/* 사진 영역 밖에서 오른쪽으로 밀면 창이 손가락을 따라 밀려나며 닫힘 (사진 위 스와이프는 사진 넘기기) */
+(()=>{
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  let t=null;
+  viewer.addEventListener("touchstart",e=>{
+    t=null;if(e.touches.length!==1)return;
+    const x=e.touches[0];
+    if(e.target.closest("#vwMain,input,textarea,select,#vwSplit"))return;
+    if(!standalone&&x.clientX<24)return;   // 브라우저 자체 가장자리 뒤로가기와 겹치지 않게 (겹치면 두 번 뒤로 감)
+    t={x:x.clientX,y:x.clientY,on:false,dx:0,lt:e.timeStamp,lx:x.clientX,v:0};
+  },{passive:true});
+  viewer.addEventListener("touchmove",e=>{
+    if(!t)return;const x=e.touches[0],dx=x.clientX-t.x,dy=x.clientY-t.y;
+    if(!t.on){
+      if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){t=null;return}   // 세로 스크롤
+      if(dx>10&&dx>Math.abs(dy)*1.2){t.on=true;viewer.style.transition="none"}else return;
+    }
+    e.preventDefault();
+    const dt=e.timeStamp-t.lt;if(dt>0){t.v=(x.clientX-t.lx)/dt;t.lt=e.timeStamp;t.lx=x.clientX}
+    t.dx=Math.max(0,dx);viewer.style.transform=`translateX(${t.dx}px)`;
+  },{passive:false});
+  const end=()=>{
+    if(!t||!t.on){t=null;return}
+    const W=viewer.clientWidth||innerWidth,go=t.dx>W*0.3||t.v>0.5;t=null;
+    viewer.style.transition="transform .22s ease-out";
+    if(go){viewer.style.transform=`translateX(${W}px)`;setTimeout(()=>{if(viewer.open)viewer.close()},220)}
+    else{viewer.style.transform="translateX(0)";setTimeout(()=>{viewer.style.transition="";viewer.style.transform=""},230)}
+  };
+  viewer.addEventListener("touchend",end);viewer.addEventListener("touchcancel",end);
+})();
 
 /* ---------- 시작 ---------- */
 staticText();
