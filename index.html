@@ -204,43 +204,54 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 #pickDlg form{padding:24px;display:flex;flex-direction:column;gap:14px}
 #pickDlg h3{margin:0;font-size:18px;font-weight:800;color:var(--ink)}
 </style>
+<style>
+/* 설정창 · 포트폴리오 보기 */
+.iconbtn{display:inline-flex;align-items:center;gap:6px}
+.iconbtn svg{width:15px;height:15px}
+#setDlg form{padding:26px;display:flex;flex-direction:column;gap:18px;min-width:min(360px,calc(100vw - 32px))}
+#setDlg{margin:auto;height:auto;width:auto;border:1px solid var(--line)}
+#setDlg h3{margin:0;font-size:18px;font-weight:800;color:var(--ink)}
+#setDlg .lbl{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px}
+#setDlg .seg{grid-template-columns:repeat(2,1fr)}
+#viewer{margin:0;width:100vw;max-width:100vw;height:100%;max-height:100%;border:0;padding:0;background:var(--bg);color:var(--fg)}
+#viewer::backdrop{background:rgba(0,0,0,.6)}
+.vw{display:grid;grid-template-rows:auto 1fr auto;height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.vw-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px max(20px,env(safe-area-inset-right,0px)) 14px max(20px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.vw-top .t{min-width:0}
+.vw-top .t b{display:block;font-size:16px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.02em}
+.vw-top .t span{font-size:12.5px;color:var(--muted)}
+.vw-top .acts{display:flex;align-items:center;gap:14px;font-size:13px;flex:none}
+.vw-top .acts a{color:var(--ink);font-weight:700}
+.vw-top .x{font-size:26px;line-height:1;color:var(--ink)}
+.vw-main{position:relative;min-height:0;display:grid;place-items:center;background:var(--tile);overflow:hidden}
+.vw-main img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.vw-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;background:var(--bg);color:var(--ink);font-size:22px;opacity:.85;display:grid;place-items:center}
+.vw-nav:hover{opacity:1}
+.vw-nav.prev{left:max(10px,env(safe-area-inset-left,0px))}.vw-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
+.vw-count{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:var(--bg);color:var(--ink);font-size:12px;font-weight:700;padding:3px 10px;font-variant-numeric:tabular-nums}
+.vw-msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+.vw-strip{display:flex;gap:4px;overflow-x:auto;padding:10px max(20px,env(safe-area-inset-right,0px)) 12px max(20px,env(safe-area-inset-left,0px));border-top:1px solid var(--line)}
+.vw-strip button{flex:none;width:56px;height:70px;border:2px solid transparent;padding:0;background:var(--tile)}
+.vw-strip button img{width:100%;height:100%;object-fit:cover;display:block}
+.vw-strip button[aria-current="true"]{border-color:var(--ink)}
+.vw-strip .lab{flex:none;align-self:center;font-size:11px;font-weight:700;color:var(--muted);padding:0 6px;writing-mode:horizontal-tb;white-space:nowrap}
+.pic{cursor:pointer}
+.pic .more{position:absolute;right:8px;bottom:8px;background:var(--bg);color:var(--ink);font-size:11.5px;font-weight:700;padding:3px 8px}
+</style>
 
 <header class="hd gut"><div class="inner">
   <h1 class="mark">MDI<span>BOOKING</span></h1>
   <div class="right" id="hdRight"></div>
 </div></header>
 
-<main class="gut"><div class="inner" id="root"><div class="loading">불러오는 중…</div></div></main>
-<footer class="gut"><div class="inner"><b>MDI MODEL MANAGEMENT</b><span>후보 · 컨택 중 · 진행 중 · 체류 중 · 불발 리스트</span></div></footer>
+<main class="gut"><div class="inner" id="root"><div class="loading">…</div></div></main>
+<footer class="gut"><div class="inner"><b>MDI MODEL MANAGEMENT</b><span id="ftStages"></span></div></footer>
 <div class="toast" id="toast" hidden></div>
 
-<dialog id="dlg">
-  <form class="reg" id="regForm" novalidate>
-    <div class="top"><h3>후보 등록</h3><button type="button" class="x" id="cancelReg" aria-label="닫기">×</button></div>
-    <p class="hint">모델 링크를 넣으면 메인 사진을 자동으로 불러옵니다. 링크가 없으면 사진을 직접 올려 주세요.</p>
-    <div class="linkrow"><label for="f-link">모델 링크<input id="f-link" type="url" placeholder="에이전시 보드, 인스타그램 등 https://"></label><button type="button" class="btn line" id="scanBtn">다시 불러오기</button></div>
-    <p class="pickmsg" id="pickMsg" hidden></p>
-    <div class="pick" id="pick"></div>
-    <label class="drop" id="drop" for="f-photos"><span id="dropTxt">사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능</span><input id="f-photos" type="file" accept="image/*" multiple></label>
-    <div class="thumbs" id="thumbs"></div>
-    <div class="row2">
-      <label for="f-name">모델 이름 *<input id="f-name" required></label>
-      <label for="f-agency">마더에이전시<input id="f-agency"></label>
-    </div>
-    <div><label style="margin-bottom:6px">게런티</label>
-      <div class="seg" id="gseg"><button type="button" data-g="" aria-pressed="true">미정</button><button type="button" data-g="yes" aria-pressed="false">있음</button><button type="button" data-g="no" aria-pressed="false">없음</button></div></div>
-    <label for="f-gamt" id="gamtWrap" hidden>게런티 금액<input id="f-gamt" placeholder="예: 5,000,000원"></label>
-    <label for="f-memo">정보·메모<textarea id="f-memo" rows="3" placeholder="치수, 경력, 가능 일정 등"></textarea></label>
-    <p class="err" id="regErr" hidden></p>
-    <div class="actions"><button type="button" class="btn line" id="cancelReg2">취소</button><button type="submit" class="btn" id="regSubmit">등록하고 투표 시작</button></div>
-  </form>
-</dialog>
-<dialog id="pickDlg"><form method="dialog" id="pickForm">
-  <h3>링크에서 사진 가져오기</h3>
-  <p class="pickmsg" id="pdMsg">불러오는 중…</p>
-  <div class="pick" id="pdPick"></div>
-  <div class="actions" style="display:grid;grid-template-columns:1fr 2fr;gap:8px"><button type="button" class="btn line" id="pdCancel">취소</button><button type="button" class="btn" id="pdOk" disabled>선택한 사진 저장</button></div>
-</form></dialog>
+<dialog id="dlg"><form class="reg" id="regForm" novalidate></form></dialog>
+<dialog id="pickDlg"><form method="dialog" id="pickForm"></form></dialog>
+<dialog id="setDlg"><form method="dialog" id="setForm"></form></dialog>
+<dialog id="viewer"><div class="vw" id="vw"></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
 <script>
@@ -249,33 +260,181 @@ const SUPABASE_URL="https://cpiaqmjqyizefmjgkilp.supabase.co";
 const SUPABASE_KEY="sb_publishable_SCJLKokAn9NjJ8y6KPcaPA_T736cg1v"; // 공개용 키 (데이터는 로그인·승인 규칙으로 보호)
 const BUCKET="candidate-photos";
 const PASS=0.6, H=3600e3;
-const STAGES=["후보","컨택 중","진행 중","체류 중","불발 리스트"];
-const EN={"후보":"CANDIDATES","컨택 중":"CONTACTING","진행 중":"IN PROGRESS","체류 중":"IN TOWN","불발 리스트":"MISSED"};
+const STAGES=["cand","contact","prog","town","missed"];
+
+/* ---------- 언어 ---------- */
+const I18N={
+ko:{
+ st_cand:"후보",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
+ loadFail:"연결 도구를 불러오지 못했습니다",loadFailSub:"인터넷 연결을 확인하고 새로고침해 주세요.",
+ login:"로그인",signup:"가입",loginSub:"MDI 부킹 보드는 승인된 사내 인원만 사용할 수 있습니다.",signupSub:"가입 후 관리자가 승인하면 사용할 수 있습니다.",
+ nameOrTitle:"이름 또는 직함",email:"이메일",password:"비밀번호",doLogin:"로그인",doSignup:"가입하기",
+ firstTime:"처음이신가요?",haveAcct:"이미 계정이 있나요?",
+ needEmailPw:"이메일과 비밀번호를 입력하세요.",notConfirmed:"이메일 인증이 아직 안 됐습니다. 메일함의 인증 링크를 먼저 눌러 주세요.",badLogin:"이메일 또는 비밀번호가 맞지 않습니다.",
+ needName:"이름 또는 직함을 입력하세요.",pwShort:"비밀번호는 6자 이상이어야 합니다.",signupFail:"가입하지 못했습니다: ",signupDone:"가입 완료. 메일함의 인증 링크를 누른 뒤 로그인해 주세요.",
+ pending:"승인 대기 중",pendingSub:"관리자가 가입을 승인하면 사용할 수 있습니다. 승인 후 새로고침해 주세요.",reload:"새로고침",
+ logout:"로그아웃",settings:"설정",members:"사용자 관리",toBoard:"보드로",unknown:"알 수 없음",
+ loading:"불러오는 중…",infoFail:"정보를 불러오지 못했습니다",dataFail:"데이터를 불러오지 못했습니다",
+ left:"남은 시간",closedAt:"마감",day:"일 ",
+ agency:"Agency",guarantee:"Guarantee",link:"Link",memo:"Memo",open:"열기 ↗",notEntered:"미입력",gNone:"없음",gTbd:"미정",gNoAmt:"금액 미입력",
+ noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"분홍 선이 통과선 6.0점(60%)",
+ resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
+ myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",
+ photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
+ getPic:"링크에서 사진 가져오기",
+ candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
+ voting:"투표 중",soon24:"24시간 내 마감",myTodo:"내가 아직 안 한 투표",addCand:"+ 후보 등록",
+ emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
+ closedFail:"마감 · 미통과",
+ contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
+ soonTitle:"준비 중",soonSub:"화면은 다음 단계에서 만듭니다.",
+ voteFail:"투표가 저장되지 않았습니다: ",
+ memTitle:"사용자 관리",memDesc:"가입한 사람을 승인해야 보드를 볼 수 있습니다. 승인된 사람은 모두 투표자 명단에 포함됩니다.",
+ colName:"이름",colState:"상태",colRole:"권한",colJoined:"가입일",me:" (나)",noName:"(이름 없음)",approved:"승인됨",waiting:"승인 대기",admin:"관리자",member:"일반",
+ approve:"승인",revoke:"승인 취소",actFail:"처리하지 못했습니다: ",approvedT:"승인했습니다",revokedT:"승인을 취소했습니다",
+ regTitle:"후보 등록",regHint:"모델 링크를 넣으면 메인 사진과 포트폴리오를 자동으로 불러옵니다. 링크가 없으면 사진을 직접 올려 주세요.",
+ modelLink:"모델 링크",linkPh:"에이전시 보드, 인스타그램 등 https://",rescan:"다시 불러오기",
+ drop:"사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능",dropN:"사진 {n}장 선택됨 · 더 추가하려면 누르기",
+ modelName:"모델 이름 *",motherAg:"마더에이전시",gLabel:"게런티",gYes:"있음",gNo:"없음",gAmt:"게런티 금액",gAmtPh:"예: 5,000,000원",
+ info:"정보·메모",infoPh:"치수, 경력, 가능 일정 등",cancel:"취소",submit:"등록하고 투표 시작",uploading:"올리는 중…",linkImporting:"링크 사진 가져오는 중…",linkFinding:"링크 사진 찾는 중…",
+ errName:"모델 이름을 입력하세요.",errLinkOrPhoto:"모델 링크나 사진 중 하나는 넣어야 합니다.",errLinkFmt:"링크는 http:// 또는 https:// 로 시작해야 합니다.",
+ upFail:"사진 업로드 실패: ",regFail:"등록 실패: ",regDone:"등록했습니다. 3일 투표가 시작됐습니다.",linkPartFail:"링크 사진 {n}장은 가져오지 못했습니다",
+ needLink:"http:// 또는 https:// 로 시작하는 링크를 먼저 넣어 주세요.",scanning:"링크에서 사진을 찾는 중…",
+ noImgFound:"이 링크에서 사진을 찾지 못했습니다. 사진을 직접 올려 주세요.",autoPicked:"메인 사진을 자동으로 골랐습니다(✓). 틀렸으면 다른 사진을 눌러 바꾸세요. 찾은 사진 {n}장 · 최대 6장 · 먼저 고른 사진이 메인",
+ scanFail:"불러오지 못했습니다: ",scanFailTail:" — 사진을 직접 올려 주세요.",
+ pdTitle:"링크에서 사진 가져오기",pdPick:"사진 {n}장을 찾았습니다. 쓸 사진을 고르세요 (최대 6장, 먼저 고른 사진이 메인).",pdNone:"이 링크에서 사진을 찾지 못했습니다.",pdSave:"선택한 사진 저장",saving:"저장 중…",
+ pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
+ setTitle:"설정",lang:"언어",close:"닫기",
+ vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
+ vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오"
+},
+en:{
+ st_cand:"Candidates",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
+ loadFail:"Couldn't load the connection library",loadFailSub:"Check your internet connection and refresh.",
+ login:"Log in",signup:"Sign up",loginSub:"MDI Booking Board is for approved staff only.",signupSub:"You can use the board once an admin approves your account.",
+ nameOrTitle:"Name or title",email:"Email",password:"Password",doLogin:"Log in",doSignup:"Sign up",
+ firstTime:"New here?",haveAcct:"Already have an account?",
+ needEmailPw:"Enter your email and password.",notConfirmed:"Your email isn't verified yet. Click the link in the verification email first.",badLogin:"Wrong email or password.",
+ needName:"Enter your name or title.",pwShort:"Password must be at least 6 characters.",signupFail:"Couldn't sign up: ",signupDone:"Signed up. Click the link in the verification email, then log in.",
+ pending:"Waiting for approval",pendingSub:"You can use the board once an admin approves you. Refresh after approval.",reload:"Refresh",
+ logout:"Log out",settings:"Settings",members:"Members",toBoard:"Board",unknown:"Unknown",
+ loading:"Loading…",infoFail:"Couldn't load your profile",dataFail:"Couldn't load data",
+ left:"Time left",closedAt:"Closed",day:"d ",
+ agency:"Agency",guarantee:"Guarantee",link:"Link",memo:"Memo",open:"Open ↗",notEntered:"Not entered",gNone:"None",gTbd:"TBD",gNoAmt:"Amount not entered",
+ noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Pink line = pass line 6.0 (60%)",
+ resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
+ myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",
+ photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
+ getPic:"Get photos from link",
+ candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
+ voting:"Voting",soon24:"Closing in 24h",myTodo:"Waiting for my vote",addCand:"+ Add candidate",
+ emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
+ closedFail:"Closed · not passed",
+ contactDesc:"Models that passed the vote · moving to the next stage will be added once the rules are set",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
+ soonTitle:"Coming soon",soonSub:"This screen will be built in a later step.",
+ voteFail:"Your vote wasn't saved: ",
+ memTitle:"Members",memDesc:"People must be approved before they can see the board. Every approved member appears in the voter list.",
+ colName:"Name",colState:"Status",colRole:"Role",colJoined:"Joined",me:" (me)",noName:"(no name)",approved:"Approved",waiting:"Waiting",admin:"Admin",member:"Member",
+ approve:"Approve",revoke:"Revoke",actFail:"Couldn't update: ",approvedT:"Approved",revokedT:"Approval revoked",
+ regTitle:"Add candidate",regHint:"Paste a model link and the main photo and portfolio load automatically. No link? Upload photos instead.",
+ modelLink:"Model link",linkPh:"Agency board, Instagram, etc. https://",rescan:"Reload",
+ drop:"Drag photos here or click to choose · multiple allowed",dropN:"{n} photo(s) selected · click to add more",
+ modelName:"Model name *",motherAg:"Mother agency",gLabel:"Guarantee",gYes:"Yes",gNo:"No",gAmt:"Guarantee amount",gAmtPh:"e.g. KRW 5,000,000",
+ info:"Info · memo",infoPh:"Measurements, experience, availability…",cancel:"Cancel",submit:"Add and start vote",uploading:"Uploading…",linkImporting:"Importing link photos…",linkFinding:"Finding link photos…",
+ errName:"Enter the model's name.",errLinkOrPhoto:"Add a model link or at least one photo.",errLinkFmt:"Links must start with http:// or https://.",
+ upFail:"Photo upload failed: ",regFail:"Couldn't add: ",regDone:"Added. The 3‑day vote has started.",linkPartFail:"{n} link photo(s) couldn't be imported",
+ needLink:"Enter a link starting with http:// or https:// first.",scanning:"Finding photos on the link…",
+ noImgFound:"No photos found on this link. Please upload photos.",autoPicked:"Main photo picked automatically (✓). If it's wrong, tap another photo. {n} found · up to 6 · first picked is the main photo",
+ scanFail:"Couldn't load: ",scanFailTail:" — please upload photos.",
+ pdTitle:"Get photos from link",pdPick:"Found {n} photos. Choose the ones to use (up to 6, first picked is the main photo).",pdNone:"No photos found on this link.",pdSave:"Save selected",saving:"Saving…",
+ pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
+ setTitle:"Settings",lang:"Language",close:"Close",
+ vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
+ vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio"
+}};
+let LANG="ko";try{LANG=localStorage.getItem("mdi-lang")||"ko"}catch(e){}
+if(!I18N[LANG])LANG="ko";
+const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
+const SN=s=>T("st_"+s);
+const EN={cand:"CANDIDATES",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
 
 const root=document.getElementById("root"),hdRight=document.getElementById("hdRight");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmt=t=>new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+const fmt=t=>new Date(t).toLocaleString(LANG==="en"?"en-US":"ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
-let tab="후보";try{tab=localStorage.getItem("mdi-tab")||"후보"}catch(e){}
+let tab="cand";try{tab=localStorage.getItem("mdi-tab2")||"cand"}catch(e){}
+if(!STAGES.includes(tab)&&tab!=="admin")tab="cand";
+document.documentElement.lang=LANG;
 
-if(!window.supabase){root.innerHTML=`<div class="empty"><b>연결 도구를 불러오지 못했습니다</b>인터넷 연결을 확인하고 새로고침해 주세요.</div>`;return}
+if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>${T("loadFailSub")}</div>`;return}
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null;
+let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null, authMode="login";
 const openWho=new Set();
+
+/* ---------- 정적 영역(언어 바뀔 때 다시 그림) ---------- */
+function staticText(){
+  document.getElementById("ftStages").textContent=STAGES.map(SN).join(" · ");
+  document.getElementById("regForm").innerHTML=`
+    <div class="top"><h3>${T("regTitle")}</h3><button type="button" class="x" id="cancelReg" aria-label="${T("close")}">×</button></div>
+    <p class="hint">${T("regHint")}</p>
+    <div class="linkrow"><label for="f-link">${T("modelLink")}<input id="f-link" type="url" placeholder="${T("linkPh")}"></label><button type="button" class="btn line" id="scanBtn">${T("rescan")}</button></div>
+    <p class="pickmsg" id="pickMsg" hidden></p>
+    <div class="pick" id="pick"></div>
+    <label class="drop" id="drop" for="f-photos"><span id="dropTxt">${T("drop")}</span><input id="f-photos" type="file" accept="image/*" multiple></label>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row2">
+      <label for="f-name">${T("modelName")}<input id="f-name" required></label>
+      <label for="f-agency">${T("motherAg")}<input id="f-agency"></label>
+    </div>
+    <div><label style="margin-bottom:6px">${T("gLabel")}</label>
+      <div class="seg" id="gseg"><button type="button" data-g="" aria-pressed="true">${T("gTbd")}</button><button type="button" data-g="yes" aria-pressed="false">${T("gYes")}</button><button type="button" data-g="no" aria-pressed="false">${T("gNo")}</button></div></div>
+    <label for="f-gamt" id="gamtWrap" hidden>${T("gAmt")}<input id="f-gamt" placeholder="${T("gAmtPh")}"></label>
+    <label for="f-memo">${T("info")}<textarea id="f-memo" rows="3" placeholder="${T("infoPh")}"></textarea></label>
+    <p class="err" id="regErr" hidden></p>
+    <div class="actions"><button type="button" class="btn line" id="cancelReg2">${T("cancel")}</button><button type="submit" class="btn" id="regSubmit">${T("submit")}</button></div>`;
+  document.getElementById("pickForm").innerHTML=`
+    <h3>${T("pdTitle")}</h3>
+    <p class="pickmsg" id="pdMsg">${T("loading")}</p>
+    <div class="pick" id="pdPick"></div>
+    <div class="actions" style="display:grid;grid-template-columns:1fr 2fr;gap:8px"><button type="button" class="btn line" id="pdCancel">${T("cancel")}</button><button type="button" class="btn" id="pdOk" disabled>${T("pdSave")}</button></div>`;
+  bindReg();bindPick();
+}
+
+/* ---------- 설정 ---------- */
+function openSettings(){
+  const f=document.getElementById("setForm");
+  f.innerHTML=`<h3>${T("setTitle")}</h3>
+    <div><div class="lbl">${T("lang")}</div><div class="seg" id="langSeg">
+      <button type="button" data-l="ko" aria-pressed="${LANG==="ko"}">한국어</button><button type="button" data-l="en" aria-pressed="${LANG==="en"}">English</button></div></div>
+    <button class="btn line" type="button" id="setClose">${T("close")}</button>`;
+  f.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
+    LANG=b.dataset.l;try{localStorage.setItem("mdi-lang",LANG)}catch(e){}
+    document.documentElement.lang=LANG;staticText();openSettings();
+    if(me&&profile?.approved)render();else if(me)pendingView();else authView(authMode);
+  });
+  document.getElementById("setClose").onclick=()=>document.getElementById("setDlg").close();
+  const d=document.getElementById("setDlg");if(!d.open)d.showModal();
+}
+const gear=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"/></svg>`;
+function setBtnHtml(){return `<button id="openSet" class="iconbtn">${gear}${T("settings")}</button>`}
+function bindSetBtn(){const b=document.getElementById("openSet");if(b)b.onclick=openSettings}
 
 /* ---------- 인증 ---------- */
 function authView(mode="login",msg=""){
-  hdRight.innerHTML="";
+  authMode=mode;
+  hdRight.innerHTML=setBtnHtml();bindSetBtn();
   root.innerHTML=`<form class="auth" id="authForm" novalidate>
-    <h2>${mode==="login"?"로그인":"가입"}</h2>
-    <p class="sub">${mode==="login"?"MDI 부킹 보드는 승인된 사내 인원만 사용할 수 있습니다.":"가입 후 관리자가 승인하면 사용할 수 있습니다."}</p>
-    ${mode==="signup"?`<label for="a-name">이름 또는 직함<input id="a-name" autocomplete="name" required></label>`:""}
-    <label for="a-email">이메일<input id="a-email" type="email" autocomplete="email" required></label>
-    <label for="a-pw">비밀번호<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
+    <h2>${mode==="login"?T("login"):T("signup")}</h2>
+    <p class="sub">${mode==="login"?T("loginSub"):T("signupSub")}</p>
+    ${mode==="signup"?`<label for="a-name">${T("nameOrTitle")}<input id="a-name" autocomplete="name" required></label>`:""}
+    <label for="a-email">${T("email")}<input id="a-email" type="email" autocomplete="email" required></label>
+    <label for="a-pw">${T("password")}<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
-    <button class="btn" type="submit">${mode==="login"?"로그인":"가입하기"}</button>
-    <p class="switch">${mode==="login"?`처음이신가요? <button type="button" id="aSwitch">가입하기</button>`:`이미 계정이 있나요? <button type="button" id="aSwitch">로그인</button>`}</p>
+    <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
+    <p class="switch">${mode==="login"?`${T("firstTime")} <button type="button" id="aSwitch">${T("doSignup")}</button>`:`${T("haveAcct")} <button type="button" id="aSwitch">${T("doLogin")}</button>`}</p>
   </form>`;
   document.getElementById("aSwitch").onclick=()=>authView(mode==="login"?"signup":"login");
   const f=document.getElementById("authForm"),m=document.getElementById("aMsg");
@@ -283,42 +442,48 @@ function authView(mode="login",msg=""){
   f.onsubmit=async e=>{
     e.preventDefault();
     const email=document.getElementById("a-email").value.trim(),pw=document.getElementById("a-pw").value;
-    if(!email||!pw)return say("이메일과 비밀번호를 입력하세요.");
+    if(!email||!pw)return say(T("needEmailPw"));
     const btn=f.querySelector("button[type=submit]");btn.disabled=true;
     if(mode==="login"){
       const {error}=await sb.auth.signInWithPassword({email,password:pw});
       btn.disabled=false;
-      if(error)say(/confirm/i.test(error.message)?"이메일 인증이 아직 안 됐습니다. 메일함의 인증 링크를 먼저 눌러 주세요.":"이메일 또는 비밀번호가 맞지 않습니다.");
+      if(error)say(/confirm/i.test(error.message)?T("notConfirmed"):T("badLogin"));
     }else{
       const name=document.getElementById("a-name").value.trim();
-      if(!name){btn.disabled=false;return say("이름 또는 직함을 입력하세요.")}
-      if(pw.length<6){btn.disabled=false;return say("비밀번호는 6자 이상이어야 합니다.")}
+      if(!name){btn.disabled=false;return say(T("needName"))}
+      if(pw.length<6){btn.disabled=false;return say(T("pwShort"))}
       const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name},emailRedirectTo:location.origin+location.pathname}});
       btn.disabled=false;
-      if(error)return say("가입하지 못했습니다: "+error.message);
-      if(!data.session)authView("login","가입 완료. 메일함의 인증 링크를 누른 뒤 로그인해 주세요.");
+      if(error)return say(T("signupFail")+error.message);
+      if(!data.session)authView("login",T("signupDone"));
     }
   };
 }
 function pendingView(){
-  hdRight.innerHTML=`<span class="who">${esc(profile?.display_name||me.email)}</span><button id="logout">로그아웃</button>`;
-  document.getElementById("logout").onclick=()=>sb.auth.signOut();
-  root.innerHTML=`<div class="auth"><h2>승인 대기 중</h2><p class="sub">관리자가 가입을 승인하면 사용할 수 있습니다. 승인 후 새로고침해 주세요.</p>
-    <button class="btn line" id="reload">새로고침</button></div>`;
+  hdRight.innerHTML=`${setBtnHtml()}<span class="who">${esc(profile?.display_name||me.email)}</span><button id="logout">${T("logout")}</button>`;
+  bindSetBtn();document.getElementById("logout").onclick=()=>sb.auth.signOut();
+  root.innerHTML=`<div class="auth"><h2>${T("pending")}</h2><p class="sub">${T("pendingSub")}</p>
+    <button class="btn line" id="reload">${T("reload")}</button></div>`;
   document.getElementById("reload").onclick=()=>location.reload();
 }
 
 /* ---------- 데이터 ---------- */
-const name=uid=>members.find(m=>m.id===uid)?.display_name||"알 수 없음";
+const name=uid=>members.find(m=>m.id===uid)?.display_name||T("unknown");
 const approvedMembers=()=>members.filter(m=>m.approved);
 function vOf(cid){return votes.filter(v=>v.candidate_id===cid)}
 function stats(it){const v=vOf(it.id).map(x=>x.score);const n=v.length;const avg=n?v.reduce((a,b)=>a+b,0)/n:0;return {n,avg,pct:avg/10}}
 const deadline=it=>new Date(it.deadline).getTime();
 const closed=it=>Date.now()>=deadline(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
-function stageOf(it){if(!closed(it))return "후보";return passed(it)?"컨택 중":"후보"}
-function left(ms){if(ms<=0)return "마감";const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+"일 ":"")+p(h)+":"+p(m)+":"+p(x)}
+function stageOf(it){if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
+function left(ms){if(ms<=0)return T("closedAt");const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+T("day"):"")+p(h)+":"+p(m)+":"+p(x)}
 
+async function signPaths(paths){
+  const need=[...new Set(paths)].filter(x=>!photoUrls[x]);
+  if(!need.length)return;
+  const {data}=await sb.storage.from(BUCKET).createSignedUrls(need,60*60*6);
+  (data||[]).forEach(d=>{if(d.signedUrl)photoUrls[d.path]=d.signedUrl});
+}
 async function loadAll(){
   const [c,v,p]=await Promise.all([
     sb.from("candidates").select("*").order("created_at",{ascending:false}),
@@ -327,11 +492,7 @@ async function loadAll(){
   ]);
   if(c.error||v.error||p.error)throw (c.error||v.error||p.error);
   items=c.data;votes=v.data;members=p.data;
-  const paths=[...new Set(items.flatMap(i=>i.photos.slice(0,2)))].filter(x=>!photoUrls[x]);
-  if(paths.length){
-    const {data}=await sb.storage.from(BUCKET).createSignedUrls(paths,60*60*6);
-    (data||[]).forEach(d=>{if(d.signedUrl)photoUrls[d.path]=d.signedUrl});
-  }
+  await signPaths(items.flatMap(i=>i.photos.slice(0,2)));
 }
 let reloadT=null;
 function scheduleReload(){clearTimeout(reloadT);reloadT=setTimeout(async()=>{try{await loadAll();render()}catch(e){console.error(e)}},300)}
@@ -343,95 +504,99 @@ function subscribe(){
 
 /* ---------- 화면 ---------- */
 function header(){
-  hdRight.innerHTML=`${profile.role==="admin"?`<button id="toAdmin">${tab==="관리"?"보드로":"사용자 관리"}</button>`:""}<span class="who">${esc(profile.display_name||me.email)}</span><button id="logout">로그아웃</button>`;
+  hdRight.innerHTML=`${profile.role==="admin"?`<button id="toAdmin">${tab==="admin"?T("toBoard"):T("members")}</button>`:""}${setBtnHtml()}<span class="who">${esc(profile.display_name||me.email)}</span><button id="logout">${T("logout")}</button>`;
+  bindSetBtn();
   document.getElementById("logout").onclick=()=>sb.auth.signOut();
-  const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{tab=tab==="관리"?"후보":"관리";render()};
+  const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{tab=tab==="admin"?"cand":"admin";render()};
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>c[stageOf(it)]++);
-  return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${s}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
+  return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
 }
-function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${stage}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
+function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
 function card(it){
   const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,2).map(p=>photoUrls[p]).filter(Boolean);
-  const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)} 사진" data-full="${esc(u)}">`).join("")}</div>`
-    :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?"사진 불러오는 중":(it.link?"링크로 등록 · 사진 없음":"사진 없음")}</div></div>`;
+  const total=it.photos.length+(it.gallery?.length||0);
+  const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
+    :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
   const scls=isClosed?"done":(rem<12*H?"soon":"");
-  const g=it.gtype==="yes"?esc(it.gamt||"금액 미입력"):it.gtype==="no"?"없음":"미정";
+  const g=it.gtype==="yes"?esc(it.gamt||T("gNoAmt")):it.gtype==="no"?T("gNone"):T("gTbd");
   const voters=approvedMembers();
   const vmap=Object.fromEntries(vOf(it.id).map(v=>[v.user_id,v.score]));
+  const P=n=>n+T("pts");
+  const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic">${media}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
     <p class="name">${esc(it.name)}</p>
-    <p class="status ${scls}" data-timer="${it.id}">${isClosed?`마감 ${fmt(dl)}`:`남은 시간 <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
+    <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p>
     <dl class="info">
-      <dt>Agency</dt><dd>${esc(it.agency||"미입력")}</dd>
-      <dt>Guarantee</dt><dd>${g}</dd>
-      ${it.link?`<dt>Link</dt><dd><a href="${esc(it.link)}" target="_blank" rel="noopener">열기 ↗</a></dd>`:""}
-      ${it.memo?`<dt>Memo</dt><dd>${esc(it.memo)}</dd>`:""}
+      <dt>${T("agency")}</dt><dd>${esc(it.agency||T("notEntered"))}</dd>
+      <dt>${T("guarantee")}</dt><dd>${g}</dd>
+      ${it.link?`<dt>${T("link")}</dt><dd><a href="${esc(it.link)}" target="_blank" rel="noopener">${T("open")}</a></dd>`:""}
+      ${it.memo?`<dt>${T("memo")}</dt><dd>${esc(it.memo)}</dd>`:""}
     </dl>
     <div class="score">
-      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}% · ${ok?"통과선 이상":"통과선 미만"}`:"투표 없음"}</span></div>
-      <div class="bar" title="분홍 선이 통과선 6.0점(60%)"><i class="${ok?"ok":""}" style="width:${Math.min(100,s.pct*100)}%"></i><span class="cut"></span></div>
+      <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}% · ${ok?T("passUp"):T("passDown")}`:T("noVotes")}</span></div>
+      <div class="bar" title="${T("passLine")}"><i class="${ok?"ok":""}" style="width:${Math.min(100,s.pct*100)}%"></i><span class="cut"></span></div>
       <div class="bar-lab"><span>0</span><span class="c">6.0</span><span>10</span></div>
     </div>
-    ${isClosed?`<div class="result ${ok?"pass":"fail"}"><span>${ok?"통과 → 컨택 중":"미통과"}</span><span>${s.n?s.avg.toFixed(1)+"점":"투표 없음"}</span></div>`
-      :`<div class="vote" role="group" aria-label="${esc(it.name)} 점수">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}점">${n}</button>`).join("")}</div>
-        <p class="mine">${mine?`내 점수 <b>${mine}점</b> · 다시 누르면 변경`:"아직 투표하지 않았습니다"}</p>`}
+    ${isClosed?`<div class="result ${ok?"pass":"fail"}"><span>${ok?T("resPass"):T("resFail")}</span><span>${s.n?s.avg.toFixed(1)+T("pts"):T("noVotes")}</span></div>`
+      :`<div class="vote" role="group" aria-label="${esc(it.name)}">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}">${n}</button>`).join("")}</div>
+        <p class="mine">${mine?`${T("myScore")} <b>${P(mine)}</b> · ${T("changeHint")}`:T("notVoted")}</p>`}
     <details class="who" data-whobox="${it.id}" ${openWho.has(it.id)?"open":""}>
-      <summary><span>투표자 명단<span class="c">${s.n}/${voters.length}명</span></span><span class="pm" aria-hidden="true"></span></summary>
-      <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${vmap[m.id]}점</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">미투표</dd>`).join("")}</dl>
+      <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="pm" aria-hidden="true"></span></summary>
+      <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
     </details>
-    ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">링크에서 사진 가져오기</button>`:""}
-    <p class="by">등록 ${esc(name(it.created_by))} · ${fmt(it.created_at)}</p>
+    ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
+    <p class="by">${T("regBy")} ${esc(name(it.created_by))} · ${fmt(it.created_at)}</p>
   </article>`;
 }
 
 function adminView(){
-  root.innerHTML=`<section class="ph-head"><div class="l"><h2>사용자 관리<span class="en">MEMBERS</span></h2><p>가입한 사람을 승인해야 보드를 볼 수 있습니다. 승인된 사람은 모두 투표자 명단에 포함됩니다.</p></div></section>
-  <div class="admin"><div class="tw"><table><thead><tr><th>이름</th><th>상태</th><th>권한</th><th>가입일</th><th></th></tr></thead><tbody>
-  ${members.map(m=>`<tr><td>${esc(m.display_name||"(이름 없음)")}${m.id===me.id?" (나)":""}</td><td>${m.approved?"승인됨":"<b style=\"color:var(--pink)\">승인 대기</b>"}</td><td>${m.role==="admin"?"관리자":"일반"}</td><td>${fmt(m.created_at)}</td>
-    <td>${m.id===me.id?"":(m.approved?`<button class="btn line" data-act="revoke" data-uid="${m.id}">승인 취소</button>`:`<button class="btn" data-act="approve" data-uid="${m.id}">승인</button>`)}</td></tr>`).join("")}
+  root.innerHTML=`<section class="ph-head"><div class="l"><h2>${T("memTitle")}<span class="en">MEMBERS</span></h2><p>${T("memDesc")}</p></div></section>
+  <div class="admin"><div class="tw"><table><thead><tr><th>${T("colName")}</th><th>${T("colState")}</th><th>${T("colRole")}</th><th>${T("colJoined")}</th><th></th></tr></thead><tbody>
+  ${members.map(m=>`<tr><td>${esc(m.display_name||T("noName"))}${m.id===me.id?T("me"):""}</td><td>${m.approved?T("approved"):`<b style="color:var(--pink)">${T("waiting")}</b>`}</td><td>${m.role==="admin"?T("admin"):T("member")}</td><td>${fmt(m.created_at)}</td>
+    <td>${m.id===me.id?"":(m.approved?`<button class="btn line" data-act="revoke" data-uid="${m.id}">${T("revoke")}</button>`:`<button class="btn" data-act="approve" data-uid="${m.id}">${T("approve")}</button>`)}</td></tr>`).join("")}
   </tbody></table></div></div>`;
   root.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
     b.disabled=true;
     const {error}=await sb.from("profiles").update({approved:b.dataset.act==="approve"}).eq("id",b.dataset.uid);
-    if(error)toast("처리하지 못했습니다: "+error.message);else toast(b.dataset.act==="approve"?"승인했습니다":"승인을 취소했습니다");
+    if(error)toast(T("actFail")+error.message);else toast(b.dataset.act==="approve"?T("approvedT"):T("revokedT"));
     await loadAll();render();
   });
 }
 
 function render(){
   header();
-  try{localStorage.setItem("mdi-tab",tab)}catch(e){}
-  if(tab==="관리")return adminView();
+  try{localStorage.setItem("mdi-tab2",tab)}catch(e){}
+  if(tab==="admin")return adminView();
   const list=items.filter(it=>stageOf(it)===tab);
   let html=tabsHtml();
-  if(tab==="후보"){
+  if(tab==="cand"){
     const open=list.filter(it=>!closed(it)).sort((a,b)=>deadline(a)-deadline(b));
     const fail=list.filter(it=>closed(it));
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
     const notMine=open.filter(it=>!vOf(it.id).some(v=>v.user_id===me.id)).length;
-    html+=head("후보","전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
-        `<div class="facts"><span>투표 중<b>${open.length}</b></span><span>24시간 내 마감<b>${soon}</b></span><span>내가 아직 안 한 투표<b>${notMine}</b></span></div>`,
-        `<button class="btn" id="openReg">+ 후보 등록</button>`)+
-      (open.length?`<div class="grid">${open.map(card).join("")}</div>`:`<div class="empty"><b>투표 중인 후보가 없습니다</b>오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.</div>`)+
-      (fail.length?`<div class="sec"><h3>마감 · 미통과 ${fail.length}명</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"");
-  }else if(tab==="컨택 중"){
-    html+=head("컨택 중","투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가")+
-      (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>아직 통과한 모델이 없습니다</b>후보 투표가 마감되면 통과한 모델이 여기로 옵니다.</div>`);
+    html+=head("cand",T("candDesc"),
+        `<div class="facts"><span>${T("voting")}<b>${open.length}</b></span><span>${T("soon24")}<b>${soon}</b></span><span>${T("myTodo")}<b>${notMine}</b></span></div>`,
+        `<button class="btn" id="openReg">${T("addCand")}</button>`)+
+      (open.length?`<div class="grid">${open.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`)+
+      (fail.length?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"");
+  }else if(tab==="contact"){
+    html+=head("contact",T("contactDesc"))+
+      (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
   }else{
-    html+=head(tab,"")+`<div class="empty"><b>준비 중</b>${tab} 화면은 다음 단계에서 만듭니다.</div>`;
+    html+=head(tab,"")+`<div class="empty"><b>${T("soonTitle")}</b>${SN(tab)} · ${T("soonSub")}</div>`;
   }
   root.innerHTML=html;
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
   const o=document.getElementById("openReg");if(o)o.onclick=openReg;
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
-  root.querySelectorAll("img[data-full]").forEach(i=>i.onclick=()=>window.open(i.dataset.full,"_blank","noopener"));
+  root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{
     const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
     const score=+b.dataset.v;
@@ -439,7 +604,7 @@ function render(){
     if(prev)prev.score=score;else votes.push({candidate_id:it.id,user_id:me.id,score});
     render();
     const {error}=await sb.from("votes").upsert({candidate_id:it.id,user_id:me.id,score,updated_at:new Date().toISOString()},{onConflict:"candidate_id,user_id"});
-    if(error){toast("투표가 저장되지 않았습니다: "+error.message);await loadAll();render()}
+    if(error){toast(T("voteFail")+error.message);await loadAll();render()}
   });
 }
 
@@ -451,139 +616,196 @@ setInterval(()=>{
     el.textContent=left(rem);
     el.closest(".status").classList.toggle("soon",rem<12*H);
   });
-  if(re&&tab!=="관리")render();
+  if(re&&tab!=="admin")render();
 },1000);
 
-/* ---------- 등록 ---------- */
-const dlg=document.getElementById("dlg"),form=document.getElementById("regForm"),err=document.getElementById("regErr");
-let pending=[],gtype="";
-function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
-document.querySelectorAll("#gseg button").forEach(b=>b.onclick=()=>setG(b.dataset.g));
-function openReg(){form.reset();delete document.getElementById("f-name").dataset.dirty;pending=[];linkSel=[];linkPage="";scannedLink="";scanning=null;document.getElementById("pick").innerHTML="";document.getElementById("pickMsg").hidden=true;setG("");document.getElementById("thumbs").innerHTML="";document.getElementById("dropTxt").textContent="사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능";err.hidden=true;dlg.showModal()}
-document.getElementById("cancelReg").onclick=()=>dlg.close();
-document.getElementById("cancelReg2").onclick=()=>dlg.close();
-function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1400,sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext("2d").drawImage(img,0,0,c.width,c.height);c.toBlob(b=>res(b?{blob:b,preview:URL.createObjectURL(b)}:null),"image/jpeg",.85)};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
-async function addFiles(files){
-  const imgs=[...files].filter(f=>f.type.startsWith("image/"));
-  pending=pending.concat((await Promise.all(imgs.map(shrink))).filter(Boolean));
-  document.getElementById("thumbs").innerHTML=pending.map(p=>`<img src="${p.preview}" alt="미리보기">`).join("");
-  document.getElementById("dropTxt").textContent=pending.length?`사진 ${pending.length}장 선택됨 · 더 추가하려면 누르기`:"사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능";
-  err.hidden=true;
-}
-document.getElementById("f-photos").onchange=e=>addFiles(e.target.files);
-const drop=document.getElementById("drop");
-["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("on")}));
-["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("on")}));
-drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
-form.addEventListener("input",()=>{err.hidden=true});
-/* ---------- 링크 사진 불러오기 ---------- */
-let linkSel=[],linkPage="";
+/* ---------- 링크 사진·포트폴리오 서버 호출 ---------- */
 async function callFn(body){
   const {data,error}=await sb.functions.invoke("link-photo",{body});
   if(error){let m=error.message;try{const j=await error.context.json();if(j.error)m=j.error}catch(e){}throw new Error(m)}
   return data;
 }
-async function scanLink(url){return callFn({action:"scan",url})}
-async function importImages(images,page){return callFn({action:"import",images,page})}
+const scanLink=url=>callFn({action:"scan",url});
+const importImages=(images,page)=>callFn({action:"import",images,page});
 function drawPick(box,images,sel,onChange){
-  box.innerHTML=images.map((u,i)=>`<button type="button" data-i="${i}" aria-pressed="${sel.includes(u)}" title="사진 ${i+1}"><img src="${esc(u)}" alt="후보 사진 ${i+1}" referrerpolicy="no-referrer" loading="lazy"></button>`).join("");
+  box.innerHTML=images.map((u,i)=>`<button type="button" data-i="${i}" aria-pressed="${sel.includes(u)}" title="${i+1}"><img src="${esc(u)}" alt="${i+1}" referrerpolicy="no-referrer" loading="lazy"></button>`).join("");
   box.querySelectorAll("button").forEach(b=>{
     const img=b.querySelector("img");img.onerror=()=>b.remove();
     b.onclick=()=>{const u=images[+b.dataset.i];const k=sel.indexOf(u);if(k>=0)sel.splice(k,1);else if(sel.length<6)sel.push(u);b.setAttribute("aria-pressed",sel.includes(u));onChange&&onChange()};
   });
 }
-let scannedLink="",scanning=null;
+
+/* ---------- 등록 ---------- */
+const dlg=document.getElementById("dlg");
+let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],scannedLink="",scanning=null;
+function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
+function openReg(){
+  staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];scannedLink="";scanning=null;gtype="";
+  dlg.showModal();
+}
+function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1400,sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext("2d").drawImage(img,0,0,c.width,c.height);c.toBlob(b=>res(b?{blob:b,preview:URL.createObjectURL(b)}:null),"image/jpeg",.85)};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
 async function runScan(quiet){
   const link=document.getElementById("f-link").value.trim(),msg=document.getElementById("pickMsg"),box=document.getElementById("pick");
   if(quiet&&(!/^https?:\/\/\S+\.\S+/i.test(link)||link===scannedLink))return;
   scannedLink=link;
-  if(!/^https?:\/\//i.test(link)){msg.textContent="http:// 또는 https:// 로 시작하는 링크를 먼저 넣어 주세요.";msg.className="pickmsg err";msg.hidden=false;return}
-  msg.textContent="링크에서 사진을 찾는 중…";msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];
+  if(!/^https?:\/\//i.test(link)){msg.textContent=T("needLink");msg.className="pickmsg err";msg.hidden=false;return}
+  msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];
   try{
-    const r=await scanLink(link);linkPage=r.url||link;
+    const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];
     const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title;
-    if(!r.images.length){msg.textContent="이 링크에서 사진을 찾지 못했습니다. 사진을 직접 올려 주세요.";msg.className="pickmsg err";return}
+    if(!r.images.length){msg.textContent=T("noImgFound");msg.className="pickmsg err";return}
     if(r.suggested)linkSel=[r.suggested];
-    msg.textContent=`메인 사진을 자동으로 골랐습니다(✓). 틀렸으면 다른 사진을 눌러 바꾸세요. 찾은 사진 ${r.images.length}장 · 최대 6장 · 먼저 고른 사진이 메인`;
+    msg.textContent=T("autoPicked",{n:r.images.length});
     drawPick(box,r.images,linkSel);
-  }catch(e){msg.textContent="불러오지 못했습니다: "+e.message+" — 사진을 직접 올려 주세요.";msg.className="pickmsg err"}
+  }catch(e){msg.textContent=T("scanFail")+e.message+T("scanFailTail");msg.className="pickmsg err"}
 }
-document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
-const linkInput=document.getElementById("f-link");
-document.getElementById("f-name").addEventListener("input",e=>{e.target.dataset.dirty="1"});
-linkInput.addEventListener("change",()=>{scanning=runScan(true)});
-linkInput.addEventListener("paste",()=>setTimeout(()=>{scanning=runScan(true)},0));
-linkInput.addEventListener("input",()=>{clearTimeout(linkInput._t);linkInput._t=setTimeout(()=>{scanning=runScan(true)},900)});
-const pickDlg=document.getElementById("pickDlg");let pickTarget=null,pdSel=[];
-document.getElementById("pdCancel").onclick=()=>pickDlg.close();
+function bindReg(){
+  const form=document.getElementById("regForm"),err=document.getElementById("regErr");
+  document.querySelectorAll("#gseg button").forEach(b=>b.onclick=()=>setG(b.dataset.g));
+  document.getElementById("cancelReg").onclick=()=>dlg.close();
+  document.getElementById("cancelReg2").onclick=()=>dlg.close();
+  async function addFiles(files){
+    const imgs=[...files].filter(f=>f.type.startsWith("image/"));
+    pending=pending.concat((await Promise.all(imgs.map(shrink))).filter(Boolean));
+    document.getElementById("thumbs").innerHTML=pending.map(p=>`<img src="${p.preview}" alt="">`).join("");
+    document.getElementById("dropTxt").textContent=pending.length?T("dropN",{n:pending.length}):T("drop");
+    err.hidden=true;
+  }
+  document.getElementById("f-photos").onchange=e=>addFiles(e.target.files);
+  const drop=document.getElementById("drop");
+  ["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("on")}));
+  ["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("on")}));
+  drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+  form.addEventListener("input",()=>{err.hidden=true});
+  document.getElementById("f-name").addEventListener("input",e=>{e.target.dataset.dirty="1"});
+  document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
+  const linkInput=document.getElementById("f-link");
+  linkInput.addEventListener("change",()=>{scanning=runScan(true)});
+  linkInput.addEventListener("paste",()=>setTimeout(()=>{scanning=runScan(true)},0));
+  linkInput.addEventListener("input",()=>{clearTimeout(linkInput._t);linkInput._t=setTimeout(()=>{scanning=runScan(true)},900)});
+  form.onsubmit=async e=>{
+    e.preventDefault();
+    const link=document.getElementById("f-link").value.trim(),nm=document.getElementById("f-name").value.trim(),msg=[];
+    if(!nm)msg.push(T("errName"));
+    if(!link&&!pending.length)msg.push(T("errLinkOrPhoto"));
+    if(link&&!/^https?:\/\//i.test(link))msg.push(T("errLinkFmt"));
+    if(msg.length){err.textContent=msg.join(" ");err.hidden=false;return}
+    const btn=document.getElementById("regSubmit");btn.disabled=true;btn.textContent=T("uploading");
+    try{
+      const paths=[];
+      if(link&&link!==scannedLink){btn.textContent=T("linkFinding");scanning=runScan(true)}
+      if(scanning){try{await scanning}catch(e){}}
+      if(linkSel.length){
+        btn.textContent=T("linkImporting");
+        const r=await importImages(linkSel,linkPage||link);
+        paths.push(...r.paths);
+        if(r.failed.length)toast(T("linkPartFail",{n:r.failed.length}));
+        btn.textContent=T("uploading");
+      }
+      for(const p of pending){
+        const path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+        const {error}=await sb.storage.from(BUCKET).upload(path,p.blob,{contentType:"image/jpeg"});
+        if(error)throw new Error(T("upFail")+error.message);
+        paths.push(path);
+      }
+      const {error}=await sb.from("candidates").insert({name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,gallery:link?linkGallery.slice(0,60):[],gtype,
+        gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
+      if(error)throw new Error(T("regFail")+error.message);
+      dlg.close();tab="cand";toast(T("regDone"));
+      await loadAll();render();
+    }catch(ex){err.textContent=ex.message;err.hidden=false}
+    finally{btn.disabled=false;btn.textContent=T("submit")}
+  };
+}
+
+/* ---------- 카드의 '링크에서 사진 가져오기' ---------- */
+const pickDlg=document.getElementById("pickDlg");let pickTarget=null,pdSel=[],pdGallery=[];
 async function openPickFor(it){
-  if(!it)return;pickTarget=it;pdSel=[];
+  if(!it)return;pickTarget=it;pdSel=[];pdGallery=[];
   const msg=document.getElementById("pdMsg"),box=document.getElementById("pdPick"),ok=document.getElementById("pdOk");
-  msg.textContent="링크에서 사진을 찾는 중…";msg.className="pickmsg";box.innerHTML="";ok.disabled=true;pickDlg.showModal();
+  msg.textContent=T("scanning");msg.className="pickmsg";box.innerHTML="";ok.disabled=true;pickDlg.showModal();
   try{
-    const r=await scanLink(it.link);pickTarget._page=r.url||it.link;
-    if(!r.images.length){msg.textContent="이 링크에서 사진을 찾지 못했습니다.";msg.className="pickmsg err";return}
+    const r=await scanLink(it.link);pickTarget._page=r.url||it.link;pdGallery=r.gallery||[];
+    if(!r.images.length){msg.textContent=T("pdNone");msg.className="pickmsg err";return}
     if(r.suggested)pdSel=[r.suggested];
-    msg.textContent=`사진 ${r.images.length}장을 찾았습니다. 쓸 사진을 고르세요 (최대 6장, 먼저 고른 사진이 메인).`;
+    msg.textContent=T("pdPick",{n:r.images.length});
     const sync=()=>ok.disabled=!pdSel.length;drawPick(box,r.images,pdSel,sync);sync();
-  }catch(e){msg.textContent="불러오지 못했습니다: "+e.message;msg.className="pickmsg err"}
+  }catch(e){msg.textContent=T("scanFail")+e.message;msg.className="pickmsg err"}
 }
-document.getElementById("pdOk").onclick=async()=>{
-  const ok=document.getElementById("pdOk"),msg=document.getElementById("pdMsg");ok.disabled=true;ok.textContent="저장 중…";
-  try{
-    const r=await importImages(pdSel,pickTarget._page);
-    if(!r.paths.length)throw new Error("사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)");
-    const {error}=await sb.from("candidates").update({photos:r.paths}).eq("id",pickTarget.id);
-    if(error)throw error;
-    pickDlg.close();toast(r.failed.length?`${r.paths.length}장 저장, ${r.failed.length}장 실패`:"사진을 저장했습니다");
-    await loadAll();render();
-  }catch(e){msg.textContent=e.message;msg.className="pickmsg err"}
-  finally{ok.textContent="선택한 사진 저장";ok.disabled=!pdSel.length}
-};
-form.onsubmit=async e=>{
-  e.preventDefault();
-  const link=document.getElementById("f-link").value.trim(),nm=document.getElementById("f-name").value.trim(),msg=[];
-  if(!nm)msg.push("모델 이름을 입력하세요.");
-  if(!link&&!pending.length)msg.push("모델 링크나 사진 중 하나는 넣어야 합니다.");
-  if(link&&!/^https?:\/\//i.test(link))msg.push("링크는 http:// 또는 https:// 로 시작해야 합니다.");
-  if(msg.length){err.textContent=msg.join(" ");err.hidden=false;return}
-  const btn=document.getElementById("regSubmit");btn.disabled=true;btn.textContent="올리는 중…";
-  try{
-    const paths=[];
-    if(link&&link!==scannedLink){btn.textContent="링크 사진 찾는 중…";scanning=runScan(true)}
-    if(scanning){try{await scanning}catch(e){}}
-    if(linkSel.length){
-      btn.textContent="링크 사진 가져오는 중…";
-      const r=await importImages(linkSel,linkPage||link);
-      paths.push(...r.paths);
-      if(r.failed.length)toast(`링크 사진 ${r.failed.length}장은 가져오지 못했습니다`);
-      btn.textContent="올리는 중…";
-    }
-    for(const p of pending){
-      const path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
-      const {error}=await sb.storage.from(BUCKET).upload(path,p.blob,{contentType:"image/jpeg"});
-      if(error)throw new Error("사진 업로드 실패: "+error.message);
-      paths.push(path);
-    }
-    const {error}=await sb.from("candidates").insert({name:nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,gtype,
-      gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
-    if(error)throw new Error("등록 실패: "+error.message);
-    dlg.close();tab="후보";toast("등록했습니다. 3일 투표가 시작됐습니다.");
-    await loadAll();render();
-  }catch(ex){err.textContent=ex.message;err.hidden=false}
-  finally{btn.disabled=false;btn.textContent="등록하고 투표 시작"}
-};
+function bindPick(){
+  document.getElementById("pdCancel").onclick=()=>pickDlg.close();
+  document.getElementById("pdOk").onclick=async()=>{
+    const ok=document.getElementById("pdOk"),msg=document.getElementById("pdMsg");ok.disabled=true;ok.textContent=T("saving");
+    try{
+      const r=await importImages(pdSel,pickTarget._page);
+      if(!r.paths.length)throw new Error(T("pdNoImport"));
+      const patch={photos:r.paths};if(!pickTarget.gallery?.length&&pdGallery.length)patch.gallery=pdGallery.slice(0,60);
+      const {error}=await sb.from("candidates").update(patch).eq("id",pickTarget.id);
+      if(error)throw error;
+      pickDlg.close();toast(r.failed.length?T("pdPartial",{a:r.paths.length,b:r.failed.length}):T("pdSaved"));
+      await loadAll();render();
+    }catch(e){msg.textContent=e.message;msg.className="pickmsg err"}
+    finally{ok.textContent=T("pdSave");ok.disabled=!pdSel.length}
+  };
+}
+
+/* ---------- 포트폴리오 보기 ---------- */
+const viewer=document.getElementById("viewer"),vw=document.getElementById("vw");
+let vList=[],vIdx=0,vIt=null;
+async function openViewer(it){
+  if(!it)return;vIt=it;vIdx=0;
+  await signPaths(it.photos);
+  const saved=it.photos.map(p=>photoUrls[p]).filter(Boolean).map(u=>({u,own:true}));
+  vList=saved.concat((it.gallery||[]).map(u=>({u,own:false})));
+  drawViewer();viewer.showModal();
+  if(!it.gallery?.length&&it.link){
+    setVwMsg(T("vwLoading"));
+    try{
+      const r=await scanLink(it.link);
+      const g=(r.gallery||[]).slice(0,60);
+      if(vIt!==it)return;
+      vList=saved.concat(g.map(u=>({u,own:false})));
+      if(g.length&&(it.created_by===me.id||profile.role==="admin")){
+        const {error}=await sb.from("candidates").update({gallery:g}).eq("id",it.id);
+        if(!error)it.gallery=g;
+      }
+      drawViewer();
+    }catch(e){if(vIt===it){drawViewer();setVwMsg(T("vwFail")+e.message)}}
+  }
+}
+function setVwMsg(m){const el=document.getElementById("vwMsg");if(el){el.textContent=m;el.hidden=false}}
+function drawViewer(){
+  const it=vIt,n=vList.length,cur=vList[vIdx];
+  const strip=vList.map((x,i)=>`${i===0&&x.own?`<span class="lab">${T("vwSaved")}</span>`:""}${!x.own&&(i===0||vList[i-1].own)?`<span class="lab">${T("vwFromLink")}</span>`:""}<button type="button" data-k="${i}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer"></button>`).join("");
+  vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
+    <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
+    <div class="vw-main" id="vwMain">${cur?`<img id="vwImg" src="${esc(cur.u)}" alt="${esc(it.name)} ${vIdx+1}" referrerpolicy="no-referrer">${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count">${vIdx+1} / ${n}</span>`:""}`:""}
+      <p class="vw-msg" id="vwMsg" ${cur?"hidden":""}>${cur?"":T("vwNone")}</p></div>
+    <div class="vw-strip" id="vwStrip">${strip}</div>`;
+  document.getElementById("vwClose").onclick=()=>viewer.close();
+  const p=document.getElementById("vwPrev"),nx=document.getElementById("vwNext");
+  if(p)p.onclick=()=>go(-1);if(nx)nx.onclick=()=>go(1);
+  vw.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{vIdx=+b.dataset.k;drawViewer()};b.querySelector("img").onerror=()=>{const k=+b.dataset.k;if(vList[k]&&!vList[k].own){vList.splice(k,1);if(vIdx>=vList.length)vIdx=Math.max(0,vList.length-1);drawViewer()}}});
+  const img=document.getElementById("vwImg");if(img)img.onerror=()=>{if(cur&&!cur.own){vList.splice(vIdx,1);if(vIdx>=vList.length)vIdx=Math.max(0,vList.length-1);drawViewer()}};
+  const act=vw.querySelector('[aria-current="true"]');if(act)act.scrollIntoView({block:"nearest",inline:"center"});
+  const main=document.getElementById("vwMain");let sx=null;
+  main.ontouchstart=e=>{sx=e.touches[0].clientX};main.ontouchend=e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?1:-1);sx=null};
+}
+function go(d){if(!vList.length)return;vIdx=(vIdx+d+vList.length)%vList.length;drawViewer()}
+document.addEventListener("keydown",e=>{if(!viewer.open)return;if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1)});
+viewer.addEventListener("close",()=>{vIt=null});
 
 /* ---------- 시작 ---------- */
+staticText();
 async function boot(session){
   me=session?.user||null;
   if(!me){if(channel){sb.removeChannel(channel);channel=null}return authView()}
   const {data,error}=await sb.from("profiles").select("*").eq("id",me.id).maybeSingle();
-  if(error){root.innerHTML=`<div class="empty"><b>정보를 불러오지 못했습니다</b>${esc(error.message)}</div>`;return}
+  if(error){root.innerHTML=`<div class="empty"><b>${T("infoFail")}</b>${esc(error.message)}</div>`;return}
   profile=data;
   if(!profile?.approved)return pendingView();
-  root.innerHTML=`<div class="loading">불러오는 중…</div>`;
-  try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>데이터를 불러오지 못했습니다</b>${esc(e.message)}</div>`;return}
+  root.innerHTML=`<div class="loading">${T("loading")}</div>`;
+  try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
   subscribe();render();
 }
 let lastUid;
@@ -594,6 +816,5 @@ sb.auth.onAuthStateChange((ev,session)=>{
 });
 })();
 </script>
-
 </body>
 </html>
