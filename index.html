@@ -943,12 +943,41 @@ async function callFn(body){
 }
 /* MEGA는 파일이 암호화돼 있어 페이지에서 사진을 읽을 수 없음 (읽으면 MEGA 아이콘만 잡힘) */
 const isMega=u=>/(^|\.)mega\.(nz|io|co\.nz)$/i.test((()=>{try{return new URL(u).hostname}catch(e){return ""}})());
-const scanLink=url=>isMega(url)?Promise.reject(new Error(T("megaNo"))):callFn({action:"scan",url});
+const scanLink=url=>callFn({action:"scan",url});
+/* MEGA: 파일이 암호화돼 있어 브라우저에서 미리보기를 받아 풀어서 보여줌 (서버는 목록·키만 만들어 둠) */
+let aesLib=null;const mgCache=new Map(),mgQueue=[];let mgActive=0;
+const loadAes=()=>aesLib=aesLib||new Promise((ok,no)=>{if(window.aesjs)return ok(window.aesjs);const sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.2/index.min.js";sc.onload=()=>ok(window.aesjs);sc.onerror=()=>{aesLib=null;no(new Error("aes"))};document.head.appendChild(sc)});
+const mgB64=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/").replace(/,/g,"");while(s.length%4)s+="=";return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
+const mgPad=u=>{const n=Math.ceil(u.length/16)*16;if(n===u.length)return u;const o=new Uint8Array(n);o.set(u);return o};
+async function mgFetch(s){
+  const h=s.indexOf("#"),q=new URLSearchParams(s.slice(h+1)),n=q.get("n"),k=q.get("k"),fah=q.get("p");
+  const aes=await loadAes();
+  const j=await (await fetch(`https://g.api.mega.co.nz/cs?id=${Math.floor(Math.random()*1e9)}&n=${encodeURIComponent(n)}`,{method:"POST",body:JSON.stringify([{a:"ufa",fah,ssl:2,r:1}])})).json();
+  if(!j||typeof j[0]!=="object"||!j[0].p)throw new Error("mega ufa");
+  const bin=new Uint8Array(await (await fetch(j[0].p+"/0",{method:"POST",body:mgB64(fah)})).arrayBuffer());
+  const len=new DataView(bin.buffer,bin.byteOffset).getUint32(8,true);
+  const out=new aes.ModeOfOperation.cbc(mgB64(k),new Uint8Array(16)).decrypt(mgPad(bin.slice(12,12+len)));
+  return URL.createObjectURL(new Blob([out],{type:"image/jpeg"}));
+}
+function megaUrl(s){   // 같은 사진은 한 번만, 동시에 4장까지
+  if(mgCache.has(s))return mgCache.get(s);
+  const pr=new Promise((ok,no)=>{mgQueue.push({s,ok,no});mgPump()});
+  mgCache.set(s,pr);pr.catch(()=>mgCache.delete(s));return pr;
+}
+function mgPump(){while(mgActive<4&&mgQueue.length){const t=mgQueue.shift();mgActive++;mgFetch(t.s).then(t.ok,t.no).finally(()=>{mgActive--;mgPump()})}}
+/* 화면에 보이는 MEGA 사진만 풀어서 채움 (img[data-mg]) */
+function fillMega(root,onUrl){
+  const imgs=[...root.querySelectorAll("img[data-mg]")];if(!imgs.length)return;
+  const load=im=>{const s=im.dataset.mg;delete im.dataset.mg;megaUrl(s).then(u=>{im.src=u;onUrl&&onUrl(s,u)}).catch(()=>{im.dispatchEvent(new Event("error"))})};
+  if(!("IntersectionObserver" in window)){imgs.forEach(load);return}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);load(e.target)}}),{rootMargin:"300px"});
+  imgs.forEach(im=>io.observe(im));
+}
 /* 한 모델의 링크 여러 개(포트폴리오·스냅이 따로인 경우): 모두 읽어 한 포트폴리오로 합침. 폴더 이름은 링크에 있는 그대로 */
 const itemLinks=it=>[it.link,...(it.links||[])].map(x=>(x||"").trim()).filter(Boolean);
 async function scanMerged(links){
   links=[...new Set(links.map(x=>(x||"").trim()).filter(x=>/^https?:\/\//i.test(x)))];
-  const ok=links.filter(x=>!isMega(x));
+  const ok=links;
   if(!ok.length)throw new Error(links.length?T("megaNo"):T("needLink"));
   if(ok.length===1&&links.length===1)return scanLink(ok[0]);
   const res=await Promise.allSettled(ok.map(scanLink));
@@ -979,11 +1008,12 @@ function fitFolders(fo){
 }
 const importImages=(images,page)=>callFn({action:"import",images,page});
 function drawPick(box,images,sel,onChange){
-  box.innerHTML=images.map((u,i)=>`<button type="button" data-i="${i}" aria-pressed="${sel.includes(u)}" title="${i+1}"><img src="${esc(u)}" alt="${i+1}" referrerpolicy="no-referrer" loading="lazy"></button>`).join("");
+  box.innerHTML=images.map((u,i)=>`<button type="button" data-i="${i}" aria-pressed="${sel.includes(u)}" title="${i+1}">${/^m:/.test(u)?`<img data-mg="${esc(u)}" alt="${i+1}">`:`<img src="${esc(parseItem(u).t||u)}" alt="${i+1}" referrerpolicy="no-referrer" loading="lazy">`}</button>`).join("");
   box.querySelectorAll("button").forEach(b=>{
     const img=b.querySelector("img");img.onerror=()=>b.remove();
     b.onclick=()=>{const u=images[+b.dataset.i];const k=sel.indexOf(u);if(k>=0)sel.splice(k,1);else if(sel.length<6)sel.push(u);b.setAttribute("aria-pressed",sel.includes(u));onChange&&onChange()};
   });
+  fillMega(box);
 }
 
 /* ---------- 등록 ---------- */
@@ -1195,6 +1225,7 @@ const mkey=u=>{u=u||"";const h=u.indexOf("#");if(h>=0){const k=new URLSearchPara
   try{const x=new URL(u);return /(^|\.)imagedelivery\.net$/.test(x.hostname)?x.origin+x.pathname:u}catch(e){return u}};
 /* 저장된 사진 문자열 풀기: "v:ID"(드라이브 영상), "x:주소#t=포스터"(바로 재생되는 영상), "큰사진#t=썸네일&k=고유키"(드롭박스) */
 function parseItem(s){
+  if(/^m:/.test(s))return {s,u:"",t:"",mg:s};
   if(/^v:/.test(s)){const id=s.slice(2);return {s,u:dThumb(id),t:dThumb(id),vid:id}}
   if(/^h:/.test(s)){const h=s.indexOf("#");const po=h<0?"":(new URLSearchParams(s.slice(h+1)).get("t")||"");return {s,u:po,t:po,vsrc:decodeURIComponent(s.slice(2,h<0?undefined:h)),hls:true}}
   if(/^x:/.test(s)){const h=s.indexOf("#");const po=h<0?"":(new URLSearchParams(s.slice(h+1)).get("t")||"");const p2=/dropboxusercontent/.test(po)?"":po;   // 드롭박스 영상 포스터는 32px라 쓰지 않음
@@ -1232,7 +1263,8 @@ function buildList(it,g,sn,fo){
 }
 /* 링크 사진 주소가 만료됐거나(서명 주소) 사진이 거의 없으면 링크를 다시 읽음 */
 function needRescan(it){
-  if(!itemLinks(it).some(x=>!isMega(x)))return false;
+  if(!itemLinks(it).length)return false;
+  if(itemLinks(it).every(isMega))return !it.folders?.length;   // MEGA: 키로 여는 주소라 만료 없음 — 폴더 구조가 없을 때만
   if((it.links||[]).length&&!it.folders?.length)return true;   // 링크가 여러 개: 합친 폴더 구조가 아직 없음
   if(fresh.has(it.id))return false;   // 이번 접속에서 이미 링크를 새로 읽음 (보드 자동 갱신)
   if((isMs(it.link)||isPf(it.link))&&!it.folders?.length)return true;   // 앨범·영상 구조가 아직 없음   // mediaslide: 앨범·영상 구조가 아직 없음
@@ -1276,7 +1308,7 @@ async function setMain(){
   try{
     let path=x.path;
     if(!path){
-      const r=await importImages([x.u],it.link||"");
+      const r=await importImages([x.mg||x.u],it.link||"");
       if(!r.paths.length)throw new Error("import");
       path=r.paths[0];
     }
@@ -1308,7 +1340,7 @@ function drawViewer(){
   const seq={};
   const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k),no=String(seq[x.k]=(seq[x.k]||0)+1).padStart(2,"0");
     const head=l?(fold(x)?`<button type="button" class="vw-sec tg" data-g="${x.k}" aria-expanded="${!closed}"><i aria-hidden="true"></i>${esc(l)}<span>${cnt(x.k)}${vc(x.k)?` · ${T("videoN",{n:vc(x.k)})}`:""}</span></button>`:`<div class="vw-sec">${esc(l)}<span>${cnt(x.k)}</span></div>`):"";
-    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}><span class="im">${x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}</span><span class="cp"><b>${no}</b>${x.main?"<span>Main</span>":""}</span></button>`}).join("");
+    return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}><span class="im">${x.mg?`<img data-mg="${esc(x.mg)}" alt="${i+1}">`:x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}</span><span class="cp"><b>${no}</b>${x.main?"<span>Main</span>":""}</span></button>`}).join("");
   const who=[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean);
   const meas=sizeRows(it);
   const facts=who.length||meas.length?`<div class="vw-facts">${who.length?`<div class="g">${who.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}${who.length&&meas.length?`<i aria-hidden="true"></i>`:""}${meas.length?`<div class="g m">${meas.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}</div>`:"";
@@ -1328,6 +1360,7 @@ function drawViewer(){
   if(p)p.onclick=()=>go(-1);if(nx)nx.onclick=()=>go(1);
   const gridEl=document.getElementById("vwGrid");
   gridEl.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{vIdx=+b.dataset.k;showCurrent()};const im=b.querySelector("img");if(im)im.onerror=()=>dropBroken(+b.dataset.k)});
+  fillMega(gridEl,(s,u)=>{for(const x of vList)if(x.mg===s){x.u=u;x.t=u}});
   const size=document.getElementById("vwSize");
   // 열 수 = 패널 폭 ÷ 원하는 사진 폭, 사진 높이 = 실제 열 폭 × 1.25 (4:5)
   const layout=()=>{const cs=getComputedStyle(gridEl),w=gridEl.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),gap=6;
@@ -1357,7 +1390,8 @@ function dropBroken(k){
 function showCurrent(noScroll){
   const cur=vList[vIdx],img=document.getElementById("vwImg");if(!cur||!img)return;
   img.onerror=()=>dropBroken(vIdx);
-  if(cur.u)img.src=cur.u;img.alt=`${vIt?.name||""} ${vIdx+1}`;
+  if(cur.u)img.src=cur.u;else if(cur.mg){img.removeAttribute("src");megaUrl(cur.mg).then(u=>{cur.u=cur.t=u;if(vList[vIdx]===cur)img.src=u}).catch(()=>{})}
+  img.alt=`${vIt?.name||""} ${vIdx+1}`;
   // 영상: 구글 드라이브 재생 화면을 큰 사진 자리에 띄움
   const vb=document.getElementById("vwVideo");
   if(vb){if(cur.vid||cur.vsrc){stopHls();vb.innerHTML=cur.vid?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(cur.vid)}/preview" allow="autoplay; fullscreen" allowfullscreen title="video"></iframe>`:(cur.hls?`<video controls playsinline preload="metadata"${cur.u?` poster="${esc(cur.u)}"`:""}></video>`:`<video src="${esc(cur.vsrc)}" controls playsinline preload="metadata"></video>`);vb.hidden=false;img.hidden=true;
@@ -1371,7 +1405,7 @@ function showCurrent(noScroll){
     if(g&&g.scrollHeight>g.clientHeight+1){const gr=g.getBoundingClientRect(),ar=act.getBoundingClientRect();if(ar.top<gr.top)g.scrollTop+=ar.top-gr.top-8;else if(ar.bottom>gr.bottom)g.scrollTop+=ar.bottom-gr.bottom+8}
     else if(!noScroll)act.scrollIntoView({block:"nearest",inline:"nearest"})}
   // 앞뒤 사진 미리 받아 두기 (넘길 때 빈 화면 방지)
-  for(const k of [1,-1]){const n=vList[(vIdx+k+vList.length)%vList.length];if(n&&n.u&&!n.vid&&!n.vsrc){const pre=new Image();pre.referrerPolicy="no-referrer";pre.src=n.u}}
+  for(const k of [1,-1]){const n=vList[(vIdx+k+vList.length)%vList.length];if(n&&n.mg&&!n.u){megaUrl(n.mg).then(u=>{n.u=n.t=u}).catch(()=>{})}else if(n&&n.u&&!n.vid&&!n.vsrc){const pre=new Image();pre.referrerPolicy="no-referrer";pre.src=n.u}}
   resetZoom&&resetZoom();
 }
 /* HLS(.m3u8) 영상: 사파리·아이폰은 바로 재생, 그 밖에는 hls.js를 처음 한 번만 불러와 재생 */
@@ -1423,7 +1457,7 @@ function setupZoom(){
     for(const el of [img(),peekP,peekN])el.style.transition=t;
     img().style.transform=`translate3d(${dx}px,0,0)`;peekP.style.transform=`translate3d(${dx-W-GAP}px,0,0)`;peekN.style.transform=`translate3d(${dx+W+GAP}px,0,0)`};
   const swipeStart=()=>{if(vList.length<2)return false;clearTimeout(swT);const p=at(vIdx-1),n=at(vIdx+1);
-    peekP.src=p.u||p.t||"";peekN.src=n.u||n.t||"";main.classList.add("swiping");return true};
+    for(const [el,x] of [[peekP,p],[peekN,n]]){const u=x.u||x.t;if(u)el.src=u;else{el.removeAttribute("src");if(x.mg)megaUrl(x.mg).then(v=>{x.u=x.t=v;el.src=v}).catch(()=>{})}}main.classList.add("swiping");return true};
   const swipeEnd=(dx,vx)=>{const W=rect().width;
     const d=(dx<-W*0.25||(vx<-0.35&&dx<0))?1:(dx>W*0.25||(vx>0.35&&dx>0))?-1:0;
     const target=d?-d*(W+GAP):0,rem=Math.abs(target-dx),v=Math.abs(vx);
@@ -1527,7 +1561,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.7";
+const APP_VER="2026-11-04.8";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
@@ -1557,7 +1591,7 @@ async function bgRefresh(){
     do{
       bgAgain=false;
       // 사진이 없는 후보부터, 서버가 링크를 다시 읽어 저장 (누가 열든 저장됨)
-      const pool=items.filter(it=>!it.withdrawn_at&&itemLinks(it).some(x=>!isMega(x))&&!fresh.has(it.id)).sort((a,b)=>(a.photos.length?1:0)-(b.photos.length?1:0));
+      const pool=items.filter(it=>!it.withdrawn_at&&itemLinks(it).length&&!fresh.has(it.id)).sort((a,b)=>(a.photos.length?1:0)-(b.photos.length?1:0));
       const worker=async()=>{for(let it;(it=pool.shift());){
         fresh.add(it.id);
         try{
