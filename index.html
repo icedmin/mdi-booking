@@ -38,7 +38,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .inner{max-width:none;margin:0 auto}   /* 화면 폭 전체 사용, 양옆 여백은 .gut 20px */
 
 /* 헤더 */
-.hd{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.hd{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);border-bottom:1px solid var(--line)}
 .hd .inner{display:flex;justify-content:space-between;align-items:center;gap:16px;height:60px}
 .mark{margin:0;font-weight:800;font-size:21px;letter-spacing:-.01em;color:var(--ink);text-transform:uppercase;white-space:nowrap;line-height:1}
 .mark span{font-weight:400;font-size:12px;letter-spacing:.14em;color:var(--muted);margin-left:8px;vertical-align:3px}
@@ -49,7 +49,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .notice b{color:var(--pink);font-weight:700}
 
 /* 단계 탭 */
-.tabs{display:flex;gap:30px;padding-block:18px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.tabs{display:flex;gap:30px;padding-block:18px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:30;background:var(--bg)}   /* 위 머리줄(61px) 바로 아래에 붙음 */
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{font-size:14px;font-weight:700;color:var(--muted);letter-spacing:.01em;white-space:nowrap;padding-bottom:10px;margin-bottom:-1px;border-bottom:2px solid transparent}
 .tabs button:hover{color:var(--ink)}
@@ -655,7 +655,7 @@ const gear=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-wi
 document.getElementById("setDlg").addEventListener("click",e=>{if(e.target.id==="setDlg")e.target.close()});
 addEventListener("resize",()=>{const d=document.getElementById("setDlg");if(d.open)d.close()});
 const chev=`<svg class="cv" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 3.8 5 6.6 8 3.8"/></svg>`;
-function setBtnHtml(){const nm=me?(profile?.display_name||me.email):T("settings");return `<button id="openSet" class="acct" aria-haspopup="dialog">${gear}<span class="nm">${esc(nm)}</span>${chev}</button>`}
+function setBtnHtml(){const nm=me?(profile?.display_name||me.email):T("settings");return `<button id="openSet" class="acct" aria-haspopup="dialog"><span class="nm">${esc(nm)}</span>${chev}</button>`}
 function bindSetBtn(){const b=document.getElementById("openSet");if(b)b.onclick=openSettings}
 
 /* ---------- 인증 ---------- */
@@ -1527,7 +1527,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.5";
+const APP_VER="2026-11-04.6";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
