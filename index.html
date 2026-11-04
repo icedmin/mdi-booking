@@ -264,11 +264,11 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-sz input{width:80px;flex:none;margin:0;accent-color:var(--ink)}
 .vw-sz button{width:24px;height:24px;font-size:16px;font-weight:700;line-height:1;color:var(--ink);display:grid;place-items:center}
 .vw-grid button[data-k].main,.vw-grid button[data-k].main[aria-current="true"]{border-color:var(--pink)}
-/* MAIN 표시: 반투명 흰 알약 + 로즈 점, 사진 위에서도 읽히도록 흐림 배경 */
-.vw-tag{position:absolute;top:7px;right:7px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#a8476f;font-size:9.5px;font-weight:700;letter-spacing:.12em;padding:4px 8px 4px 7px;border-radius:999px;line-height:1;box-shadow:0 1px 6px rgba(0,0,0,.12);pointer-events:none;z-index:1}
-.vw-tag::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--pink);flex:none}
-.vw-main .vw-tag{top:14px;right:max(14px,env(safe-area-inset-right,0px));font-size:10.5px;padding:6px 11px 6px 10px;gap:6px;z-index:2}
-.vw-main .vw-tag::before{width:6px;height:6px}
+/* MAIN 표시: 오른쪽 위 모서리 분홍 삼각형 + 흰 별 (글자는 화면 읽기용으로만 남김) */
+.vw-tag{position:absolute;top:0;right:0;width:40px;height:40px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 100%);font-size:0;color:transparent;overflow:hidden;pointer-events:none;z-index:1}
+.vw-tag::after{content:"★";position:absolute;top:5px;right:6px;font-size:12px;line-height:1;color:#fff}
+.vw-main .vw-tag{width:54px;height:54px;z-index:2}
+.vw-main .vw-tag::after{top:7px;right:8px;font-size:16px}
 .vw-grid{overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 18px;display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));gap:6px;align-content:start}
 .vw-grid button[data-k]{position:relative;display:block;width:100%;height:var(--th,160px);border:2px solid transparent;padding:0;background:var(--tile);overflow:hidden;min-width:0}
 .vw-grid button[data-k] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -1156,7 +1156,7 @@ function placeTag(){
   const W=m.clientWidth,H=m.clientHeight,nw=img.naturalWidth,nh=img.naturalHeight;
   if(!nw||!nh){tg.style.top="";tg.style.right="";return}
   const sc=Math.min(W/nw,H/nh),dw=nw*sc,dh=nh*sc;
-  tg.style.top=Math.round((H-dh)/2+12)+"px";tg.style.right=Math.round((W-dw)/2+12)+"px";
+  tg.style.top=Math.round((H-dh)/2)+"px";tg.style.right=Math.round((W-dw)/2)+"px";
 }
 window.addEventListener("resize",()=>placeTag());
 function go(d){if(!vList.length)return;vIdx=(vIdx+d+vList.length)%vList.length;showCurrent()}
