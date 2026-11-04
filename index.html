@@ -424,6 +424,12 @@ button.vw-sec.tg:hover{color:var(--acc)}
 .wdlist li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
 .wdlist li b{color:var(--ink);text-transform:uppercase}
 .wdlist li span{color:var(--muted)}
+/* 사진 오른쪽 아래 남은 시간: 각진 흰 칸 + 포인트 레드 숫자, 12시간 이내면 굵게 + 점 */
+.pic .tm{position:absolute;right:8px;bottom:8px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--red);font-size:12px;font-weight:500;line-height:1;padding:6px 8px;font-variant-numeric:tabular-nums;letter-spacing:.02em;white-space:nowrap;pointer-events:none}
+.pic .tm.soon{font-weight:700}
+.pic .tm.soon::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pic .tm{background:rgba(16,16,16,.86)}}
+:root[data-theme="dark"] .pic .tm{background:rgba(16,16,16,.86)}
 .pic .more{position:absolute;right:8px;bottom:8px;background:var(--bg);color:var(--ink);font-size:11.5px;font-weight:700;padding:3px 8px}
 </style>
 
@@ -795,11 +801,11 @@ function card(it){
   const P=n=>n+T("pts");
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="wdx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}">×</button>`):""}${canView&&total>1?`<span class="more">${T("vwPortfolio")}${total>1?" "+total+T("photosN"):""}</span>`:canView&&it.link?`<span class="more">${T("vwPortfolio")}</span>`:""}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="wdx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}">×</button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span></span>`:""}</div>
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
-        <p class="status ${scls}" data-timer="${it.id}">${isClosed?`${T("closedAt")} ${fmt(dl)}`:`${T("left")} <span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span>`}</p></div>
+        ${isClosed?`<p class="status ${scls}">${T("closedAt")} ${fmt(dl)}</p>`:""}</div>
       ${sizeRows(it).length?`<div class="mr" title="${T("sizeTitle")}">${sizeRows(it).map(r=>`<p>${esc(r)}</p>`).join("")}</div>`:""}
     </div>
     <dl class="info">
@@ -919,7 +925,7 @@ setInterval(()=>{
     const rem=+el.dataset.dl-Date.now();
     if(rem<=0){re=true;return}
     el.textContent=left(rem);
-    el.closest(".status").classList.toggle("soon",rem<12*H);
+    const box=el.closest(".tm,.status");if(box)box.classList.toggle("soon",rem<12*H);
   });
   if(re&&tab!=="admin")render();
 },1000);
