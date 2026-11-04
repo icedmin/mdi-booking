@@ -8,20 +8,20 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 /* Layout: 모델 에이전시 사이트형. 흰 고정 헤더(굵은 대문자 워드마크) · 가운데 단계 탭 · 큰 세로 사진 + 가운데 대문자 이름 + 'Label - value' 정보줄 */
 :root{
   --bg:#ffffff; --fg:#1b1b1b; --ink:#000000; --muted:#767676; --line:#e5e5e5; --tile:#f3f3f3;
-  --pink:#d9609a; --ok:#1f7a4d; --bad:#c0392b; --acc:#a8476f; --accbg:#f7e6ee; --accbg2:#f1d5e2;
-  --font:"Nanum Gothic","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --pink:#ff2b2b; --red:#ff2b2b; --ok:#000000; --bad:#000000; --acc:#ff2b2b; --accbg:transparent; --accbg2:#f2f2f2; --muted:#8a8a8a; --line:#ececec;
+  --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; --acc:#f4a6c8; --accbg:rgba(240,140,187,.14); --accbg2:rgba(240,140,187,.22); color-scheme:dark}}
+  --pink:#ff5a52; --red:#ff5a52; --ok:#ffffff; --bad:#ffffff; --acc:#ff5a52; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101010; --fg:#ececec; --ink:#ffffff; --muted:#9a9a9a; --line:#2a2a2a; --tile:#1b1b1b;
-  --pink:#f08cbb; --ok:#5fc48f; --bad:#ff7a6b; --acc:#f4a6c8; --accbg:rgba(240,140,187,.14); --accbg2:rgba(240,140,187,.22); color-scheme:dark}
+  --pink:#ff5a52; --red:#ff5a52; --ok:#ffffff; --bad:#ffffff; --acc:#ff5a52; --accbg:transparent; --accbg2:#1f1f1f; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased;word-break:keep-all}
 p,h2,h3{text-wrap:pretty}
@@ -173,6 +173,42 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .reg .actions{margin-top:auto;display:grid;grid-template-columns:1fr 2fr;gap:8px}
 .reg .actions .btn{width:100%;text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== 모던 정리 (2026-11-04): 흑백 + 포인트 레드. 굵기 낮춤, 칸 없는 투표, 가는 선 ===== */
+body{letter-spacing:-.005em}
+.tabs button{font-weight:500}.tabs button[aria-selected="true"]{font-weight:600}
+.tabs .n{color:var(--muted)}
+.ph-head h2{font-weight:700}.ph-head .en{color:var(--muted);font-weight:500}
+.ph-head .r .btn{background:transparent;color:var(--ink);border:1px solid var(--ink);font-weight:500}
+.ph-head .r .btn:hover{background:var(--accbg2)}
+.facts button{font-weight:400}.facts button b{font-weight:600}
+.facts button[aria-pressed="true"]{border-color:var(--red)}
+.name{font-weight:600;font-size:15px;letter-spacing:.01em}
+.meta .mr{color:#6b6b6b;font-weight:400}
+.status{color:var(--red);font-weight:500;letter-spacing:0}
+.status.soon{color:var(--red);font-weight:700}
+.status.soon::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px}
+.status.done{color:var(--muted)}
+.info{border-top:0;margin-top:18px;padding-top:0;font-size:12.5px;gap:5px 14px}
+.info dd{font-weight:400}.info a{font-weight:500;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.score{margin-top:18px;padding-top:16px}
+.score .avg{font-weight:300;font-size:32px;letter-spacing:-.02em}
+.score .avg small{font-size:12px}
+.score .st{font-weight:500;font-size:12px;color:var(--muted)}.score .st.ok{color:var(--ink)}
+.bar{height:1px;margin-top:14px;background:#d8d8d8}
+.bar i,.bar i.ok{top:-.5px;bottom:auto;height:2px;background:var(--ink)}
+.bar .cut{width:2px;height:11px;top:-5px;background:var(--red)}
+.bar-lab{font-size:10.5px;margin-top:6px}.bar-lab .c{color:var(--red);font-weight:600}
+.vote{display:flex;justify-content:space-between;gap:0;margin-top:18px}
+.vote button{border:0;width:30px;height:30px;padding:0;border-radius:50%;font-weight:500;color:var(--muted);display:grid;place-items:center;transition:background .15s,color .15s}
+.vote button:hover{color:var(--ink);background:var(--accbg2);border:0}
+.vote button[aria-pressed="true"]{background:var(--red);color:#fff;border:0}
+.mine{font-size:12px}.mine b{color:var(--red)}
+.who summary{font-weight:600}
+.by{font-size:11.5px}
+.result{border:0;padding:0;font-weight:600}
+.result.pass,.result.fail{color:var(--ink)}
+button.vw-sec.tg:hover{color:var(--ink)}
 </style>
 
 </head>
