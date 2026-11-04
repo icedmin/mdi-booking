@@ -1069,7 +1069,7 @@ function bindPick(){
 const lampMem=new Map();
 function lamp(id,st){
   const m=lampMem.get(id),now=Date.now();let a="",from="",t0=now;
-  if(m&&m.st!==st){from=m.st;a=st==="off"?"a-out":from==="off"?"a-on":""}   // 초록↔빨강은 애니메이션 없이 바로 바뀜
+  if(m&&m.st!==st){from=m.st;a=""}   // 스위치처럼 켜짐·꺼짐·색 전환 모두 바로 바뀜
   else if(m&&m.a&&now-m.t0<900){a=m.a;from=m.from;t0=m.t0}
   lampMem.set(id,{st,a,from,t0});
   const lab=st==="go"?T("passUp"):st==="no"?T("passDown"):T("noVotes");
