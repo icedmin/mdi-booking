@@ -688,7 +688,7 @@ function sizeRows(it){
 function card(it){
   const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
-  const urls=it.photos.slice(0,2).map(p=>photoUrls[p]).filter(Boolean);
+  const urls=it.photos.slice(0,1).map(p=>photoUrls[p]).filter(Boolean);   // 카드는 메인 사진 1장만
   const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
@@ -1032,7 +1032,7 @@ function buildList(it,g,sn,fo){
   const remote=fo&&fo.length
     ?fo.flatMap((grp,gi)=>(grp.i||[]).map(x=>({...parseItem(x),k:"f"+gi,f:grp.n||""})))
     :g.map(u=>({...parseItem(u),k:"p"})).concat(sn.map(u=>({...parseItem(u),k:"s"})));
-  const own=it.photos.map((path,i)=>({u:photoUrls[path],path,k:"p",own:true,i})).filter(x=>x.u);
+  const own=it.photos.map((path,i)=>({u:photoUrls[path],t:photoUrls[path],path,k:"p",own:true,i})).filter(x=>x.u);
   const uploads=own.filter(x=>!/\/link-/.test(x.path));
   const first=own.find(x=>x.i===0);
   let mainHit=null;
@@ -1093,7 +1093,8 @@ async function setMain(){
       path=r.paths[0];
     }
     const old=it.photos[0];
-    const photos=[path,...it.photos.filter(p=>p!==path&&!(p===old&&/\/link-/.test(p)))];
+    // 링크에서 복사해 둔 사진(link-)은 원본이 포트폴리오에 있으므로 새 메인 1장만 남김. 직접 올린 사진은 유지
+    const photos=[path,...it.photos.filter(p=>p!==path&&!/\/link-/.test(p))];
     const main_url=x.own?null:(x.s||x.u);
     const {error}=await sb.from("candidates").update({photos,main_url}).eq("id",it.id);
     if(error)throw error;
