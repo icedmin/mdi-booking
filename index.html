@@ -236,6 +236,22 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-strip button[aria-current="true"]{border-color:var(--ink)}
 .vw-strip .lab{flex:none;align-self:center;font-size:11px;font-weight:700;color:var(--muted);padding:0 6px;writing-mode:horizontal-tb;white-space:nowrap}
 .pic{cursor:pointer}
+.facts button{font:inherit;color:var(--muted);padding:3px 0;border-bottom:2px solid transparent}
+.facts button:hover{color:var(--ink)}
+.facts button[aria-pressed="true"]{color:var(--ink);border-color:var(--pink)}
+.fnote{font-size:12.5px;color:var(--muted);margin:-10px 0 18px}
+.fnote button{color:var(--ink);font-weight:700;border-bottom:1px solid var(--ink);margin-left:6px}
+.wd{margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.wd button{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding:2px 0}
+.wd button:hover{color:var(--bad);border-color:var(--bad)}
+.wd .q{font-size:12.5px;color:var(--bad);font-weight:700;width:100%;text-align:center}
+.wd .yes{color:var(--bad);font-weight:700;border-color:var(--bad)}
+.wdlist summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);list-style:none;padding:10px 0}
+.wdlist summary::-webkit-details-marker{display:none}
+.wdlist ul{list-style:none;margin:0;padding:0}
+.wdlist li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
+.wdlist li b{color:var(--ink);text-transform:uppercase}
+.wdlist li span{color:var(--muted)}
 .pic .more{position:absolute;right:8px;bottom:8px;background:var(--bg);color:var(--ink);font-size:11.5px;font-weight:700;padding:3px 8px}
 </style>
 
@@ -307,7 +323,9 @@ ko:{
  pdNoImport:"사진을 가져오지 못했습니다 (사이트가 차단했을 수 있습니다)",pdSaved:"사진을 저장했습니다",pdPartial:"{a}장 저장, {b}장 실패",
  setTitle:"설정",lang:"언어",close:"닫기",
  vwSaved:"보드 사진",vwPortfolio:"포트폴리오",vwOpen:"원본 페이지 ↗",vwLoading:"포트폴리오를 불러오는 중…",vwNone:"표시할 사진이 없습니다.",vwFail:"포트폴리오를 불러오지 못했습니다: ",
- vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오"
+ vwFromLink:"링크에서 찾은 사진",photoClickHint:"사진을 누르면 포트폴리오",vwSnaps:"스냅",
+ withdraw:"투표에서 내리기",wdAsk:"이 후보를 투표에서 내릴까요?",wdYes:"내리기",wdDone:"투표에서 내렸습니다",wdList:"내린 후보",restore:"다시 올리기",restored:"다시 올렸습니다",wdBy:"내린 사람",wdFail:"처리하지 못했습니다: ",
+ fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
 en:{
  st_cand:"Candidates",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
@@ -352,7 +370,9 @@ en:{
  pdNoImport:"Couldn't import photos (the site may block it)",pdSaved:"Photos saved",pdPartial:"{a} saved, {b} failed",
  setTitle:"Settings",lang:"Language",close:"Close",
  vwSaved:"Board photos",vwPortfolio:"Portfolio",vwOpen:"Original page ↗",vwLoading:"Loading portfolio…",vwNone:"No photos to show.",vwFail:"Couldn't load the portfolio: ",
- vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio"
+ vwFromLink:"Found on link",photoClickHint:"Tap photo for portfolio",vwSnaps:"Snaps",
+ withdraw:"Remove from voting",wdAsk:"Remove this candidate from voting?",wdYes:"Remove",wdDone:"Removed from voting",wdList:"Removed candidates",restore:"Restore",restored:"Restored",wdBy:"Removed by",wdFail:"Couldn't update: ",
+ fAll:"Show all",fShowing:"Showing:",fNone:"No candidates match"
 }};
 let LANG="ko";try{LANG=localStorage.getItem("mdi-lang")||"ko"}catch(e){}
 if(!I18N[LANG])LANG="ko";
@@ -372,7 +392,7 @@ if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>$
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null, authMode="login";
-const openWho=new Set();
+const openWho=new Set();let filter="all";const wdAsk=new Set();
 
 /* ---------- 정적 영역(언어 바뀔 때 다시 그림) ---------- */
 function staticText(){
@@ -475,7 +495,7 @@ function stats(it){const v=vOf(it.id).map(x=>x.score);const n=v.length;const avg
 const deadline=it=>new Date(it.deadline).getTime();
 const closed=it=>Date.now()>=deadline(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
-function stageOf(it){if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
+function stageOf(it){if(it.withdrawn_at)return "withdrawn";if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
 function left(ms){if(ms<=0)return T("closedAt");const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+T("day"):"")+p(h)+":"+p(m)+":"+p(x)}
 
 async function signPaths(paths){
@@ -510,7 +530,7 @@ function header(){
   const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{tab=tab==="admin"?"cand":"admin";render()};
 }
 function tabsHtml(){
-  const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>c[stageOf(it)]++);
+  const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
   return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
@@ -519,7 +539,7 @@ function card(it){
   const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,2).map(p=>photoUrls[p]).filter(Boolean);
-  const total=it.photos.length+(it.gallery?.length||0);
+  const total=it.photos.length+(it.gallery?.length||0)+(it.snaps?.length||0);
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
   const scls=isClosed?"done":(rem<12*H?"soon":"");
@@ -552,6 +572,7 @@ function card(it){
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
     <p class="by">${T("regBy")} ${esc(name(it.created_by))} · ${fmt(it.created_at)}</p>
+    ${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wd"><span class="q">${T("wdAsk")}</span><button class="yes" data-wdyes="${it.id}">${T("wdYes")}</button><button data-wdno="${it.id}">${T("cancel")}</button></div>`:`<div class="wd"><button data-wd="${it.id}">${T("withdraw")}</button></div>`):""}
   </article>`;
 }
 
@@ -580,11 +601,17 @@ function render(){
     const fail=list.filter(it=>closed(it));
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
     const notMine=open.filter(it=>!vOf(it.id).some(v=>v.user_id===me.id)).length;
+    const isSoon=it=>deadline(it)-Date.now()<24*H, isTodo=it=>!vOf(it.id).some(v=>v.user_id===me.id);
+    const shown=filter==="soon"?open.filter(isSoon):filter==="todo"?open.filter(isTodo):open;
+    const fb=(k,label,n)=>`<button type="button" data-filter="${k}" aria-pressed="${filter===k}">${label}<b>${n}</b></button>`;
+    const wds=items.filter(it=>it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin"));
     html+=head("cand",T("candDesc"),
-        `<div class="facts"><span>${T("voting")}<b>${open.length}</b></span><span>${T("soon24")}<b>${soon}</b></span><span>${T("myTodo")}<b>${notMine}</b></span></div>`,
+        `<div class="facts">${fb("all",T("voting"),open.length)}${fb("soon",T("soon24"),soon)}${fb("todo",T("myTodo"),notMine)}</div>`,
         `<button class="btn" id="openReg">${T("addCand")}</button>`)+
-      (open.length?`<div class="grid">${open.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`)+
-      (fail.length?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"");
+      (filter!=="all"?`<p class="fnote">${T("fShowing")} ${filter==="soon"?T("soon24"):T("myTodo")} · ${shown.length}<button type="button" data-filter="all">${T("fAll")}</button></p>`:"")+
+      (shown.length?`<div class="grid">${shown.map(card).join("")}</div>`:(open.length?`<div class="empty"><b>${T("fNone")}</b></div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`))+
+      (fail.length&&filter==="all"?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"")+
+      (wds.length&&filter==="all"?`<details class="wdlist sec" style="display:block"><summary>${T("wdList")} ${wds.length} +</summary><ul>${wds.map(it=>`<li><span><b>${esc(it.name)}</b> · ${esc(it.agency||"")}</span><span>${T("wdBy")} ${esc(name(it.withdrawn_by))} · ${fmt(it.withdrawn_at)}</span><button class="btn line" style="padding:6px 12px;font-size:12px" data-restore="${it.id}">${T("restore")}</button></li>`).join("")}</ul></details>`:"");
   }else if(tab==="contact"){
     html+=head("contact",T("contactDesc"))+
       (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
@@ -595,6 +622,22 @@ function render(){
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
   const o=document.getElementById("openReg");if(o)o.onclick=openReg;
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
+  root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;render()});
+  root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{wdAsk.add(b.dataset.wd);render()});
+  root.querySelectorAll("[data-wdno]").forEach(b=>b.onclick=()=>{wdAsk.delete(b.dataset.wdno);render()});
+  root.querySelectorAll("[data-wdyes]").forEach(b=>b.onclick=async()=>{
+    b.disabled=true;const id=b.dataset.wdyes;
+    const {error}=await sb.from("candidates").update({withdrawn_at:new Date().toISOString()}).eq("id",id);
+    wdAsk.delete(id);
+    if(error)toast(T("wdFail")+error.message);else toast(T("wdDone"));
+    await loadAll();render();
+  });
+  root.querySelectorAll("[data-restore]").forEach(b=>b.onclick=async()=>{
+    b.disabled=true;
+    const {error}=await sb.from("candidates").update({withdrawn_at:null}).eq("id",b.dataset.restore);
+    if(error)toast(T("wdFail")+error.message);else toast(T("restored"));
+    await loadAll();render();
+  });
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
   root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{
@@ -637,10 +680,10 @@ function drawPick(box,images,sel,onChange){
 
 /* ---------- 등록 ---------- */
 const dlg=document.getElementById("dlg");
-let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],scannedLink="",scanning=null;
+let pending=[],gtype="",linkSel=[],linkPage="",linkGallery=[],linkSnaps=[],scannedLink="",scanning=null;
 function setG(v){gtype=v;document.querySelectorAll("#gseg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===v));document.getElementById("gamtWrap").hidden=v!=="yes"}
 function openReg(){
-  staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];scannedLink="";scanning=null;gtype="";
+  staticText();pending=[];linkSel=[];linkPage="";linkGallery=[];linkSnaps=[];scannedLink="";scanning=null;gtype="";
   dlg.showModal();
 }
 function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1400,sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext("2d").drawImage(img,0,0,c.width,c.height);c.toBlob(b=>res(b?{blob:b,preview:URL.createObjectURL(b)}:null),"image/jpeg",.85)};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
@@ -649,9 +692,9 @@ async function runScan(quiet){
   if(quiet&&(!/^https?:\/\/\S+\.\S+/i.test(link)||link===scannedLink))return;
   scannedLink=link;
   if(!/^https?:\/\//i.test(link)){msg.textContent=T("needLink");msg.className="pickmsg err";msg.hidden=false;return}
-  msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];
+  msg.textContent=T("scanning");msg.className="pickmsg";msg.hidden=false;box.innerHTML="";linkSel=[];linkGallery=[];linkSnaps=[];
   try{
-    const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];
+    const r=await scanLink(link);linkPage=r.url||link;linkGallery=r.gallery||[];linkSnaps=r.snaps||[];
     const nm=document.getElementById("f-name");if(!nm.value.trim()&&!nm.dataset.dirty&&document.activeElement!==nm&&r.title)nm.value=r.title;
     if(!r.images.length){msg.textContent=T("noImgFound");msg.className="pickmsg err";return}
     if(r.suggested)linkSel=[r.suggested];
@@ -708,7 +751,7 @@ function bindReg(){
         if(error)throw new Error(T("upFail")+error.message);
         paths.push(path);
       }
-      const {error}=await sb.from("candidates").insert({name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,gallery:link?linkGallery.slice(0,60):[],gtype,
+      const {error}=await sb.from("candidates").insert({name:document.getElementById("f-name").value.trim()||nm,agency:document.getElementById("f-agency").value.trim(),link,photos:paths,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
       dlg.close();tab="cand";toast(T("regDone"));
@@ -725,7 +768,7 @@ async function openPickFor(it){
   const msg=document.getElementById("pdMsg"),box=document.getElementById("pdPick"),ok=document.getElementById("pdOk");
   msg.textContent=T("scanning");msg.className="pickmsg";box.innerHTML="";ok.disabled=true;pickDlg.showModal();
   try{
-    const r=await scanLink(it.link);pickTarget._page=r.url||it.link;pdGallery=r.gallery||[];
+    const r=await scanLink(it.link);pickTarget._page=r.url||it.link;pdGallery=r.gallery||[];pickTarget._snaps=r.snaps||[];
     if(!r.images.length){msg.textContent=T("pdNone");msg.className="pickmsg err";return}
     if(r.suggested)pdSel=[r.suggested];
     msg.textContent=T("pdPick",{n:r.images.length});
@@ -739,7 +782,7 @@ function bindPick(){
     try{
       const r=await importImages(pdSel,pickTarget._page);
       if(!r.paths.length)throw new Error(T("pdNoImport"));
-      const patch={photos:r.paths};if(!pickTarget.gallery?.length&&pdGallery.length)patch.gallery=pdGallery.slice(0,60);
+      const patch={photos:r.paths};if(!pickTarget.gallery?.length&&pdGallery.length)patch.gallery=pdGallery.slice(0,200);if(!pickTarget.snaps?.length&&pickTarget._snaps?.length)patch.snaps=pickTarget._snaps.slice(0,200);
       const {error}=await sb.from("candidates").update(patch).eq("id",pickTarget.id);
       if(error)throw error;
       pickDlg.close();toast(r.failed.length?T("pdPartial",{a:r.paths.length,b:r.failed.length}):T("pdSaved"));
@@ -756,18 +799,18 @@ async function openViewer(it){
   if(!it)return;vIt=it;vIdx=0;
   await signPaths(it.photos);
   const saved=it.photos.map(p=>photoUrls[p]).filter(Boolean).map(u=>({u,own:true}));
-  vList=saved.concat((it.gallery||[]).map(u=>({u,own:false})));
+  vList=saved.concat((it.gallery||[]).map(u=>({u,own:false,k:"p"})),(it.snaps||[]).map(u=>({u,own:false,k:"s"})));
   drawViewer();viewer.showModal();
-  if(!it.gallery?.length&&it.link){
+  if(!it.gallery?.length&&!it.snaps?.length&&it.link){
     setVwMsg(T("vwLoading"));
     try{
       const r=await scanLink(it.link);
-      const g=(r.gallery||[]).slice(0,60);
+      const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200);
       if(vIt!==it)return;
-      vList=saved.concat(g.map(u=>({u,own:false})));
-      if(g.length&&(it.created_by===me.id||profile.role==="admin")){
-        const {error}=await sb.from("candidates").update({gallery:g}).eq("id",it.id);
-        if(!error)it.gallery=g;
+      vList=saved.concat(g.map(u=>({u,own:false,k:"p"})),sn.map(u=>({u,own:false,k:"s"})));
+      if((g.length||sn.length)&&(it.created_by===me.id||profile.role==="admin")){
+        const {error}=await sb.from("candidates").update({gallery:g,snaps:sn}).eq("id",it.id);
+        if(!error){it.gallery=g;it.snaps=sn}
       }
       drawViewer();
     }catch(e){if(vIt===it){drawViewer();setVwMsg(T("vwFail")+e.message)}}
@@ -776,7 +819,7 @@ async function openViewer(it){
 function setVwMsg(m){const el=document.getElementById("vwMsg");if(el){el.textContent=m;el.hidden=false}}
 function drawViewer(){
   const it=vIt,n=vList.length,cur=vList[vIdx];
-  const strip=vList.map((x,i)=>`${i===0&&x.own?`<span class="lab">${T("vwSaved")}</span>`:""}${!x.own&&(i===0||vList[i-1].own)?`<span class="lab">${T("vwFromLink")}</span>`:""}<button type="button" data-k="${i}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer"></button>`).join("");
+  const strip=vList.map((x,i)=>`${i===0&&x.own?`<span class="lab">${T("vwSaved")}</span>`:""}${!x.own&&(i===0||vList[i-1].own||vList[i-1].k!==x.k)?`<span class="lab">${x.k==="s"?T("vwSnaps"):T("vwPortfolio")}</span>`:""}<button type="button" data-k="${i}" aria-current="${i===vIdx}"><img src="${esc(x.u)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer"></button>`).join("");
   vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-main" id="vwMain">${cur?`<img id="vwImg" src="${esc(cur.u)}" alt="${esc(it.name)} ${vIdx+1}" referrerpolicy="no-referrer">${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count">${vIdx+1} / ${n}</span>`:""}`:""}
