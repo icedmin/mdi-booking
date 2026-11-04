@@ -44,7 +44,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .notice b{color:var(--pink);font-weight:700}
 
 /* 단계 탭 */
-.tabs{display:flex;gap:30px;padding-block:18px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:30px;padding-block:18px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{font-size:14px;font-weight:700;color:var(--muted);letter-spacing:.01em;white-space:nowrap;padding-bottom:10px;margin-bottom:-1px;border-bottom:2px solid transparent}
 .tabs button:hover{color:var(--ink)}
