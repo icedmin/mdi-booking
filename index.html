@@ -234,7 +234,15 @@ form.reg{padding:calc(26px + env(safe-area-inset-top,0px)) max(26px,env(safe-are
 .vw-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px max(20px,env(safe-area-inset-right,0px)) 14px max(20px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
 .vw-top .t{min-width:0}
 .vw-top .t b{display:block;font-size:16px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.02em}
-.vw-top .t span{font-size:12.5px;color:var(--muted)}
+.vw-top .t .nm{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.vw-top .t .nm b{display:inline}
+.vw-top .t .ag{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.vw-facts{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;margin-top:5px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.vw-facts .g{display:flex;flex-wrap:nowrap;white-space:nowrap}
+.vw-facts span+span::before{content:"·";margin:0 7px;color:var(--muted)}
+.vw-facts i{width:1px;height:11px;background:var(--line);margin:0 11px}
+.vw-facts .m{color:var(--ink)}
+@media (max-width:760px){.vw-facts{flex-direction:column;align-items:flex-start;gap:3px}.vw-facts i{display:none}}
 .vw-top .acts{display:flex;align-items:center;gap:14px;font-size:13px;flex:none}
 .vw-top .acts a{color:var(--ink);font-weight:700}
 .vw-top .x{font-size:26px;line-height:1;color:var(--ink)}
@@ -1084,14 +1092,17 @@ const saveVS=()=>{try{localStorage.setItem("mdi-vw",JSON.stringify(VS))}catch(e)
 const narrow=()=>window.matchMedia("(max-width:760px)").matches;
 function drawViewer(){
   const it=vIt,n=vList.length;
-  const fold=x=>/^f/.test(x.k)&&x.f;   // 웹하드 하위 폴더 → 접기·펴기
+  const fold=x=>/^f/.test(x.k)?!!x.f:true;   // 포트폴리오·스냅·웹하드 하위 폴더 모두 접기·펴기 (처음엔 접힘)
   const secLab=(x,i)=>(i===0||vList[i-1].k!==x.k)?(/^f/.test(x.k)?(x.f||""):(x.k==="s"?T("vwSnaps"):T("vwPortfolio"))):"";
   const cnt=k=>vList.filter(x=>x.k===k).length;
   const vc=k=>vList.filter(x=>x.k===k&&x.vid).length;
   const grid=vList.map((x,i)=>{const l=secLab(x,i),closed=fold(x)&&!vOpen.has(x.k);
     const head=l?(fold(x)?`<button type="button" class="vw-sec tg" data-g="${x.k}" aria-expanded="${!closed}"><i aria-hidden="true"></i>${esc(l)}<span>${cnt(x.k)}${vc(x.k)?` · ${T("videoN",{n:vc(x.k)})}`:""}</span></button>`:`<div class="vw-sec">${esc(l)}<span>${cnt(x.k)}</span></div>`):"";
     return `${head}<button type="button" data-k="${i}" data-gk="${x.k}" class="${x.main?"main":""}${x.vid||x.vsrc?" vid":""}" aria-current="${i===vIdx}" ${closed?"hidden":""}>${x.t?`<img src="${esc(x.t)}" alt="${i+1}" loading="lazy" referrerpolicy="no-referrer">`:`<span class="vw-vtile" aria-hidden="true">VIDEO</span>`}${x.vid||x.vsrc?`<span class="vw-play" aria-hidden="true"></span>`:""}${x.main?`<span class="vw-tag">MAIN</span>`:""}</button>`}).join("");
-  vw.innerHTML=`<div class="vw-top"><div class="t"><b>${esc(it.name)}</b><span>${esc(it.agency||"")}${n?` · ${T("vwPortfolio")} ${n}${T("photosN")}`:""}</span></div>
+  const who=[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean);
+  const meas=sizeRows(it);
+  const facts=who.length||meas.length?`<div class="vw-facts">${who.length?`<div class="g">${who.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}${who.length&&meas.length?`<i aria-hidden="true"></i>`:""}${meas.length?`<div class="g m">${meas.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}</div>`:"";
+  vw.innerHTML=`<div class="vw-top"><div class="t"><div class="nm"><b>${esc(it.name)}</b>${it.agency?`<span class="ag">${esc(it.agency)}</span>`:""}</div>${facts}</div>
     <div class="acts">${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">${T("vwOpen")}</a>`:""}<button class="x" id="vwClose" aria-label="${T("close")}">×</button></div></div>
     <div class="vw-body" id="vwBody" style="--pw:${VS.pw}px;--ph:${VS.ph}px">
       <div class="vw-main" id="vwMain">${n?`<img id="vwImg" alt="${esc(it.name)}" referrerpolicy="no-referrer"><span class="vw-tag" id="vwMainTag" hidden>MAIN</span><div class="vw-video" id="vwVideo" hidden></div>${n>1?`<button class="vw-nav prev" id="vwPrev" aria-label="prev">‹</button><button class="vw-nav next" id="vwNext" aria-label="next">›</button><span class="vw-count" id="vwCount"></span>`:""}<div class="vw-zoom"><button type="button" id="zOut" aria-label="${T("zOut")}">−</button><button type="button" id="zFit" aria-label="${T("zFit")}">${T("zFit")}</button><button type="button" id="zIn" aria-label="${T("zIn")}">+</button></div>`:""}
