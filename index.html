@@ -958,6 +958,14 @@ async function scanMerged(links){
   return out;
 }
 const scanItem=it=>scanMerged(itemLinks(it));
+/* 서버 저장 한도(폴더 40개, 약 2MB) 안으로: 넘으면 가장 큰 폴더부터 뒤쪽 사진을 줄임 (화면에는 이번 접속 동안 전부 보임) */
+function fitFolders(fo){
+  if(!fo||!fo.length)return fo;
+  fo=fo.slice(0,40).map(g=>({n:g.n,i:(g.i||[]).slice()}));
+  const LIM=1500000;let size=JSON.stringify(fo).length;
+  while(size>LIM){const big=fo.reduce((a,b)=>b.i.length>a.i.length?b:a);if(big.i.length<=10)break;big.i.length=Math.floor(big.i.length*0.85);size=JSON.stringify(fo).length}
+  return fo;
+}
 const importImages=(images,page)=>callFn({action:"import",images,page});
 function drawPick(box,images,sel,onChange){
   box.innerHTML=images.map((u,i)=>`<button type="button" data-i="${i}" aria-pressed="${sel.includes(u)}" title="${i+1}"><img src="${esc(u)}" alt="${i+1}" referrerpolicy="no-referrer" loading="lazy"></button>`).join("");
@@ -1114,7 +1122,7 @@ function bindReg(){
         paths.push(path);
       }
       const V=id=>{const el=document.getElementById(id);return el.dataset.na==="1"?"N/A":el.value.trim().toUpperCase()};
-      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:nm,agency:V("f-agency"),link,links:link?extra:[],photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],folders:link&&linkFolders?.length?linkFolders:null,gtype,
+      const {error}=await sb.from("candidates").insert({height:V("f-height"),bust:V("f-bust"),waist:V("f-waist"),hips:V("f-hips"),shoe:V("f-shoe"),nationality:V("f-nat"),age:V("f-age"),name:nm,agency:V("f-agency"),link,links:link?extra:[],photos:paths,main_url:mainUrl,gallery:link?linkGallery.slice(0,200):[],snaps:link?linkSnaps.slice(0,200):[],folders:link&&linkFolders?.length?fitFolders(linkFolders):null,gtype,
         gamt:gtype==="yes"?document.getElementById("f-gamt").value.trim():"",memo:document.getElementById("f-memo").value.trim(),created_by:me.id});
       if(error)throw new Error(T("regFail")+error.message);
       rememberAgency(document.getElementById("f-agency").value);remember("mdi-nats",V("f-nat"));
@@ -1240,7 +1248,7 @@ async function openViewer(it){
       if(vIt!==it)return;
       if(g.length||sn.length||fo){
         scanCache.set(it.id,{gallery:g,snaps:sn,folders:fo||it.folders});Object.assign(it,{gallery:g,snaps:sn},fo?{folders:fo}:{});
-        if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;
+        if(canEdit(it)){const patch={gallery:g,snaps:sn};if(fo)patch.folders=fitFolders(fo);
           for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!it[k])patch[k]=String(r.info[k]).slice(0,20);const {error}=await sb.from("candidates").update(patch).eq("id",it.id);if(!error){Object.assign(it,patch)}}
         const cur=vList[vIdx];
         vList=buildList(it,g,sn,fo||it.folders);
@@ -1533,7 +1541,7 @@ async function autoFill(){
       if(im.paths.length){patch.photos=im.paths;patch.main_url=r.suggested}
       if(!it.gallery?.length&&r.gallery?.length)patch.gallery=r.gallery.slice(0,200);
       if(!it.snaps?.length&&r.snaps?.length)patch.snaps=r.snaps.slice(0,200);
-      if(!it.folders&&r.folders?.length)patch.folders=r.folders;
+      if(!it.folders&&r.folders?.length)patch.folders=fitFolders(r.folders);
       for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!it[k])patch[k]=String(r.info[k]).slice(0,20);
       if(Object.keys(patch).length)await sb.from("candidates").update(patch).eq("id",it.id);
       fresh.add(it.id);if(itemLinks(it).some(x=>isDbx(x)||isYx(x)))dbxFresh.add(it.id);
@@ -1557,9 +1565,9 @@ async function bgRefresh(){
         const g=(r.gallery||[]).slice(0,200),sn=(r.snaps||[]).slice(0,200),fo=r.folders?.length?r.folders:null;
         if(!g.length&&!sn.length&&!fo)continue;
         const cur=items.find(x=>x.id===it.id)||it;
-        const patch={gallery:g,snaps:sn};if(fo)patch.folders=fo;
+        const patch={gallery:g,snaps:sn};if(fo)patch.folders=fitFolders(fo);
         for(const k of Object.keys(INFO_MAP))if(r.info?.[k]&&!cur[k])patch[k]=String(r.info[k]).slice(0,20);
-        const same=JSON.stringify([cur.gallery,cur.snaps,cur.folders])===JSON.stringify([g,sn,fo||cur.folders]);
+        const same=JSON.stringify([cur.gallery,cur.snaps,cur.folders])===JSON.stringify([g,sn,patch.folders||cur.folders]);
         Object.assign(cur,patch);scanCache.set(cur.id,{gallery:g,snaps:sn,folders:fo||cur.folders});
         if(!same&&canEdit(cur))await sb.from("candidates").update(patch).eq("id",cur.id);
         if(!same&&tab!=="admin"&&!viewer.open)render();
