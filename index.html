@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>MDI 부킹 보드</title>
 
@@ -28,6 +28,8 @@ p,h2,h3{text-wrap:pretty}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 dialog:focus{outline:none}
+/* 폰: 화면 전체 확대·축소(두 손가락, 두 번 탭) 막음. 사진 창 안의 사진 확대는 따로 처리 */
+html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .gut{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 .inner{max-width:1240px;margin:0 auto}
@@ -275,13 +277,29 @@ button.vw-sec.tg:hover{color:var(--ink)}
 /* 설정창 · 포트폴리오 보기 */
 .iconbtn{display:inline-flex;align-items:center;gap:6px}
 .iconbtn svg{width:15px;height:15px}
-#setDlg form{padding:26px;display:flex;flex-direction:column;gap:18px;min-width:min(360px,calc(100vw - 32px))}
-#setDlg{margin:auto;height:auto;width:auto;border:1px solid var(--line)}
-#setDlg h3{margin:0;font-size:18px;font-weight:800;color:var(--ink)}
-#setDlg .lbl{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px}
-#setDlg .seg{grid-template-columns:repeat(2,1fr)}
-#setDlg .seg.seg3{grid-template-columns:repeat(3,1fr)}
-#setDlg .note{font-size:11.5px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+/* 설정: 헤더 버튼 아래 작은 팝업 */
+dialog#setDlg{position:fixed;inset:auto;margin:0;width:300px;max-width:calc(100vw - 24px);height:auto;max-height:calc(100dvh - 90px);overflow:auto;
+  border:1px solid var(--line);background:var(--bg);box-shadow:0 14px 40px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.06)}
+dialog#setDlg::backdrop{background:transparent}
+#setDlg form{padding:6px 0;display:block;min-width:0}
+#setDlg .pv-id{padding:12px 16px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+#setDlg .pv-id b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#setDlg .pv-id span{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#setDlg .pv-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px 0}
+#setDlg .pv-row>span{font-size:12.5px;color:var(--fg);white-space:nowrap}
+#setDlg .sg{display:flex;border:1px solid var(--line)}
+#setDlg .sg button{height:28px;padding:0 10px;font-size:12px;font-weight:500;color:var(--muted);border:0;border-left:1px solid var(--line);background:none;min-width:44px}
+#setDlg .sg button:first-child{border-left:0}
+#setDlg .sg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+#setDlg .pv-note{font-size:11px;color:var(--muted);margin:8px 16px 10px;line-height:1.45}
+#setDlg .pv-menu{border-top:1px solid var(--line);padding:4px 0 0}
+#setDlg .pv-menu button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:13px;color:var(--ink);border:0;background:none}
+#setDlg .pv-menu button:hover{background:var(--tile)}
+.hd .right button.acct{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 2px;border:0;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.hd .right button.acct:hover{color:var(--ink)}
+.acct svg{width:15px;height:15px;flex:none}.acct .cv{width:10px;height:10px;color:var(--muted)}
+.acct .nm{max-width:140px;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.acct .nm{max-width:96px}}
 #viewer{margin:0;width:100vw;max-width:100vw;height:100%;max-height:100%;border:0;padding:0;background:var(--bg);color:var(--fg)}
 #viewer::backdrop{background:rgba(0,0,0,.6)}
 .vw{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -589,28 +607,37 @@ function staticText(){
 
 /* ---------- 설정 ---------- */
 function openSettings(){
-  const f=document.getElementById("setForm");
-  f.innerHTML=`<h3>${T("setTitle")}</h3>
-    <div><div class="lbl">${T("lang")}</div><div class="seg" id="langSeg">
-      <button type="button" data-l="ko" aria-pressed="${LANG==="ko"}">한국어</button><button type="button" data-l="en" aria-pressed="${LANG==="en"}">English</button></div></div>
-    <div><div class="lbl">${T("unitThree")}</div><div class="seg">
-      <button type="button" data-u="three:in" aria-pressed="${U.three==="in"}">inch</button><button type="button" data-u="three:cm" aria-pressed="${U.three==="cm"}">cm</button></div></div>
-    <div><div class="lbl">${T("unitShoe")}</div><div class="seg seg3">
-      <button type="button" data-u="shoe:mm" aria-pressed="${U.shoe==="mm"}">mm</button><button type="button" data-u="shoe:us" aria-pressed="${U.shoe==="us"}">US</button><button type="button" data-u="shoe:eu" aria-pressed="${U.shoe==="eu"}">EU</button></div>
-      <p class="note">${T("shoeNote")}</p></div>
-    <button class="btn line" type="button" id="setClose">${T("close")}</button>`;
+  const f=document.getElementById("setForm"),d=document.getElementById("setDlg");
+  const seg=(attr,opts,cur)=>`<div class="sg">${opts.map(([v,l])=>`<button type="button" ${attr}="${v}" aria-pressed="${cur===v.split(":").pop()}">${l}</button>`).join("")}</div>`;
+  f.innerHTML=`${me?`<div class="pv-id"><b>${esc(profile?.display_name||me.email)}</b><span>${esc(me.email||"")}</span></div>`:""}
+    <div class="pv-row"><span>${T("lang")}</span>${seg("data-l",[["ko","한국어"],["en","English"]],LANG)}</div>
+    <div class="pv-row"><span>${T("unitThree")}</span>${seg("data-u",[["three:in","inch"],["three:cm","cm"]],U.three)}</div>
+    <div class="pv-row"><span>${T("unitShoe")}</span>${seg("data-u",[["shoe:mm","mm"],["shoe:us","US"],["shoe:eu","EU"]],U.shoe)}</div>
+    <p class="pv-note">${T("shoeNote")}</p>
+    ${me?`<div class="pv-menu">${profile?.approved&&profile.role==="admin"?`<button type="button" id="toAdmin">${tab==="admin"?T("toBoard"):T("members")}</button>`:""}<button type="button" id="logout">${T("logout")}</button></div>`:""}`;
   f.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
     LANG=b.dataset.l;try{localStorage.setItem("mdi-lang",LANG)}catch(e){}
-    document.documentElement.lang=LANG;staticText();openSettings();
+    document.documentElement.lang=LANG;staticText();
     if(me&&profile?.approved)render();else if(me)pendingView();else authView(authMode);
+    openSettings();
   });
   f.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.u.split(":");U[k]=v;try{localStorage.setItem("mdi-units",JSON.stringify(U))}catch(e){}
-    openSettings();if(me&&profile?.approved&&tab!=="admin")render()});
-  document.getElementById("setClose").onclick=()=>document.getElementById("setDlg").close();
-  const d=document.getElementById("setDlg");if(!d.open)d.showModal();
+    if(me&&profile?.approved&&tab!=="admin")render();openSettings()});
+  const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();sb.auth.signOut()};
+  const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{d.close();tab=tab==="admin"?"cand":"admin";render()};
+  // 헤더의 버튼 바로 아래에 작은 창으로 띄움
+  const btn=document.getElementById("openSet");
+  if(btn){const r=btn.getBoundingClientRect();d.style.top=Math.round(r.bottom+8)+"px";d.style.right=Math.max(12,Math.round(innerWidth-r.right))+"px"}
+  if(!d.open)d.showModal();
 }
 const gear=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"/></svg>`;
-function setBtnHtml(){return `<button id="openSet" class="iconbtn">${gear}${T("settings")}</button>`}
+/* iOS 사파리는 user-scalable=no를 무시하므로 확대 제스처를 직접 막음 */
+["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+/* 팝업 바깥을 누르거나 화면 크기가 바뀌면 닫힘 */
+document.getElementById("setDlg").addEventListener("click",e=>{if(e.target.id==="setDlg")e.target.close()});
+addEventListener("resize",()=>{const d=document.getElementById("setDlg");if(d.open)d.close()});
+const chev=`<svg class="cv" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 3.8 5 6.6 8 3.8"/></svg>`;
+function setBtnHtml(){const nm=me?(profile?.display_name||me.email):T("settings");return `<button id="openSet" class="acct" aria-haspopup="dialog">${gear}<span class="nm">${esc(nm)}</span>${chev}</button>`}
 function bindSetBtn(){const b=document.getElementById("openSet");if(b)b.onclick=openSettings}
 
 /* ---------- 인증 ---------- */
@@ -651,8 +678,7 @@ function authView(mode="login",msg=""){
   };
 }
 function pendingView(){
-  hdRight.innerHTML=`${setBtnHtml()}<span class="who">${esc(profile?.display_name||me.email)}</span><button id="logout">${T("logout")}</button>`;
-  bindSetBtn();document.getElementById("logout").onclick=()=>sb.auth.signOut();
+  hdRight.innerHTML=setBtnHtml();bindSetBtn();
   root.innerHTML=`<div class="auth"><h2>${T("pending")}</h2><p class="sub">${T("pendingSub")}</p>
     <button class="btn line" id="reload">${T("reload")}</button></div>`;
   document.getElementById("reload").onclick=()=>location.reload();
@@ -676,16 +702,26 @@ async function signPaths(paths){
   (data||[]).forEach(d=>{if(d.signedUrl)photoUrls[d.path]=d.signedUrl});
 }
 async function loadAll(){
+  const t0=Date.now();
   const [c,v,p]=await Promise.all([
     sb.from("candidates").select("*").order("created_at",{ascending:false}),
     sb.from("votes").select("candidate_id,user_id,score"),
     sb.from("profiles").select("id,display_name,role,approved,created_at").order("created_at")
   ]);
   if(c.error||v.error||p.error)throw (c.error||v.error||p.error);
-  items=c.data;votes=v.data;members=p.data;
+  items=c.data;votes=v.data;members=p.data;applyPending(t0);
   await signPaths(items.flatMap(i=>i.photos.slice(0,2)));
 }
 let reloadT=null;
+/* 내 투표 중 서버 저장이 아직 안 끝난 것: 그 사이 다시 읽은 목록이 옛 값이어도 화면은 내가 누른 값을 유지 (깜빡임 방지) */
+const myPending=new Map(),voteQ=new Map();
+function applyPending(t0){
+  for(const [cid,p] of myPending){
+    if(p.done&&p.done<t0){myPending.delete(cid);continue}   // 저장이 끝난 뒤 시작한 읽기면 서버 값이 맞음
+    votes=votes.filter(v=>!(v.candidate_id===cid&&v.user_id===me.id));
+    if(p.score!=null)votes.push({candidate_id:cid,user_id:me.id,score:p.score});
+  }
+}
 function scheduleReload(){clearTimeout(reloadT);reloadT=setTimeout(async()=>{try{await loadAll();render()}catch(e){console.error(e)}},300)}
 function subscribe(){
   if(channel)return;
@@ -695,10 +731,8 @@ function subscribe(){
 
 /* ---------- 화면 ---------- */
 function header(){
-  hdRight.innerHTML=`${profile.role==="admin"?`<button id="toAdmin">${tab==="admin"?T("toBoard"):T("members")}</button>`:""}${setBtnHtml()}<span class="who">${esc(profile.display_name||me.email)}</span><button id="logout">${T("logout")}</button>`;
+  hdRight.innerHTML=setBtnHtml();
   bindSetBtn();
-  document.getElementById("logout").onclick=()=>sb.auth.signOut();
-  const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{tab=tab==="admin"?"cand":"admin";render()};
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
@@ -852,16 +886,22 @@ function render(){
     const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
     const score=+b.dataset.v;
     const prev=votes.find(v=>v.candidate_id===it.id&&v.user_id===me.id);
-    if(prev&&prev.score===score){   // 같은 점수를 다시 누르면 투표 취소
-      votes=votes.filter(v=>v!==prev);render();
-      const {error}=await sb.from("votes").delete().eq("candidate_id",it.id).eq("user_id",me.id);
-      if(error){toast(T("voteFail")+error.message);await loadAll();render()}
-      return;
-    }
-    if(prev)prev.score=score;else votes.push({candidate_id:it.id,user_id:me.id,score});
+    const next=prev&&prev.score===score?null:score;   // 같은 점수를 다시 누르면 투표 취소
+    votes=votes.filter(v=>!(v.candidate_id===it.id&&v.user_id===me.id));
+    if(next!=null)votes.push({candidate_id:it.id,user_id:me.id,score:next});
+    const pend={score:next,done:0};myPending.set(it.id,pend);
     render();
-    const {error}=await sb.from("votes").upsert({candidate_id:it.id,user_id:me.id,score,updated_at:new Date().toISOString()},{onConflict:"candidate_id,user_id"});
-    if(error){toast(T("voteFail")+error.message);await loadAll();render()}
+    // 같은 후보의 저장 요청은 누른 순서대로 하나씩 보냄 (빠르게 눌러도 마지막 값이 서버에 남도록)
+    const job=(voteQ.get(it.id)||Promise.resolve()).then(async()=>{
+      const r=next==null
+        ?await sb.from("votes").delete().eq("candidate_id",it.id).eq("user_id",me.id)
+        :await sb.from("votes").upsert({candidate_id:it.id,user_id:me.id,score:next,updated_at:new Date().toISOString()},{onConflict:"candidate_id,user_id"});
+      return r.error;
+    });
+    voteQ.set(it.id,job.catch(()=>{}));
+    const error=await job.catch(e=>e);
+    if(myPending.get(it.id)===pend)pend.done=Date.now();
+    if(error){myPending.delete(it.id);toast(T("voteFail")+(error.message||error));await loadAll();render()}
   });
 }
 
