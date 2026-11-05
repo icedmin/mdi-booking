@@ -1198,9 +1198,10 @@ const pfHtml=c=>`<div class="pf ${c}" role="group" aria-label="${T("pfLabel")}">
 let pf="all";try{pf=localStorage.getItem("mdi-pf")||"all"}catch(e){}
 /* 폰: 통과 필터는 한 칸 — 누르면 전체/통과/미통과 고르는 메뉴 */
 const PFCHK='<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.2 5 8.6 9.6 3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const pfMenuHtml=()=>`<div class="pfd pf-l"><button type="button" class="pfb${pf!=="all"?" set":""}" aria-haspopup="true" aria-expanded="false" aria-label="${T("pfLabel")}">${T("pf_"+pf)}<svg class="cv" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2.2 3.8 5 6.6 7.8 3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="pfm" role="menu">${["all","pass","fail"].map(k=>`<button type="button" role="menuitemradio" data-pf="${k}" aria-checked="${pf===k}">${T("pf_"+k)}${pf===k?PFCHK:""}</button>`).join("")}</div></div>`;
-document.addEventListener("click",e=>{document.querySelectorAll(".pfd.open").forEach(d=>{if(!d.contains(e.target)){d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")}})});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".pfd.open").forEach(d=>{d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")})});
+let pfOpen=false;   // 다시 그려도 열린 상태 유지 — 바깥을 누르거나 고를 때만 닫힘
+const pfMenuHtml=()=>`<div class="pfd pf-l${pfOpen?" open":""}"><button type="button" class="pfb${pf!=="all"?" set":""}" aria-haspopup="true" aria-expanded="${pfOpen}" aria-label="${T("pfLabel")}">${T("pf_"+pf)}<svg class="cv" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2.2 3.8 5 6.6 7.8 3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="pfm" role="menu">${["all","pass","fail"].map(k=>`<button type="button" role="menuitemradio" data-pf="${k}" aria-checked="${pf===k}">${T("pf_"+k)}${pf===k?PFCHK:""}</button>`).join("")}</div></div>`;
+document.addEventListener("pointerdown",e=>{if(!pfOpen||(e.target.closest&&e.target.closest(".pfd")))return;pfOpen=false;document.querySelectorAll(".pfd.open").forEach(d=>{{d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")}})});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pfOpen){pfOpen=false;document.querySelectorAll(".pfd.open").forEach(d=>{d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")})}});
 const msecOpen={mReady:true,mVoting:true,mMoved:true,mProg:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
 /* 내 보드에서 카드 맨 아래 붙는 등록자 버튼 (컨택 시작 / 진행 시작 / 재심사) */
 function ownerAct(it){
@@ -1333,8 +1334,8 @@ function render(){
   });
   root.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{gf=b.dataset.gf;try{localStorage.setItem("mdi-gf",gf)}catch(e){}render()});
   root.querySelectorAll("[data-cf]").forEach(b=>b.onclick=()=>{cf=b.dataset.cf;try{localStorage.setItem("mdi-cf",cf)}catch(e){}render()});
-  root.querySelectorAll(".pfb").forEach(b=>b.onclick=()=>{const d=b.parentElement,o=!d.classList.contains("open");d.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
-  root.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;try{localStorage.setItem("mdi-pf",pf)}catch(e){}render()});
+  root.querySelectorAll(".pfb").forEach(b=>b.onclick=()=>{const d=b.parentElement,o=!d.classList.contains("open");pfOpen=o;d.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
+  root.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;pfOpen=false;try{localStorage.setItem("mdi-pf",pf)}catch(e){}render()});
   root.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{mf=b.dataset.mf;render()});
   root.querySelectorAll("[data-mwho]").forEach(d=>d.ontoggle=()=>{d.open?mwhoOpen.add(d.dataset.mwho):mwhoOpen.delete(d.dataset.mwho)});
   root.querySelectorAll("[data-msec]").forEach(d=>d.ontoggle=()=>{msecOpen[d.dataset.msec]=d.open;try{localStorage.setItem("mdi-msec",JSON.stringify(msecOpen))}catch(e){}});
@@ -2183,7 +2184,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.65";
+const APP_VER="2026-11-05.66";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
