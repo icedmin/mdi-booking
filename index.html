@@ -432,6 +432,20 @@ img.plw{opacity:0!important}
 .gls.mslide .k svg{width:13px;height:13px}
 .gls.mslide .sh{padding-left:26px}
 @media (max-width:640px){.ph-head+.msec{margin-top:2px}}
+@media (max-width:640px){
+  .mc{gap:2px}.mph{margin-bottom:6px}
+  .mwho>summary{padding:1px 0}
+  .gls.mslide{height:30px;border-radius:8px;font-size:12px;margin-top:6px}
+  .gls.mslide .k{top:2px;left:2px;width:26px;height:26px;border-radius:6px}
+  .gls.mslide .k svg{width:12px;height:12px}
+  .gls.mslide .sh{padding-left:24px}
+}
+/* PC: 카드 글자 줄 간격과 컨택 버튼 더 촘촘하게 */
+.mc{gap:3px}.mph{margin-bottom:7px}
+.mwho>summary{padding:1px 0}
+.gls.mclick{height:28px;border-radius:8px;font-size:12px;margin-top:6px}
+.gls.mclick .k{top:2px;right:2px;width:22px;height:22px;border-radius:6px}
+.gls.mclick .k svg{width:11px;height:11px}
 </style>
 
 </head>
@@ -1204,7 +1218,7 @@ function render(){
   });   // PC: 클릭
   root.querySelectorAll("[data-slide]").forEach(tr=>{   // 폰: 끝까지 밀어야 넘어감
     const k=tr.querySelector(".k"),fill=tr.querySelector(".fill");let x0=null,x=0,done=false;
-    const max=()=>tr.clientWidth-k.offsetWidth-6;
+    const max=()=>tr.clientWidth-k.offsetWidth-2*k.offsetLeft;
     const set=(v,anim)=>{x=Math.max(0,Math.min(max(),v));k.style.transition=fill.style.transition=anim?"transform .25s ease,width .25s ease":"none";k.style.transform=`translateX(${x}px)`;fill.style.width=(x+k.offsetWidth/2+3)+"px";tr.style.setProperty("--p",x/max())};
     tr.addEventListener("pointerdown",e=>{if(done)return;x0=e.clientX-x;tr.setPointerCapture(e.pointerId);tr.classList.add("drag")});
     tr.addEventListener("pointermove",e=>{if(x0==null||done)return;set(e.clientX-x0,false)});
@@ -1995,7 +2009,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.39";
+const APP_VER="2026-11-05.41";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
