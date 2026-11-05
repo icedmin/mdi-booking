@@ -373,22 +373,24 @@ img.plw{opacity:0!important}
 .mwho[open]>summary .pm::before{transform:translateY(1px) rotate(-135deg)}
 .mwho dl{margin:6px 0 0;display:grid;grid-template-columns:1fr auto;gap:4px 10px}
 .mwho dt,.mwho dd{margin:0}.mwho dd{text-align:right;font-variant-numeric:tabular-nums}.mwho .no{color:var(--muted)}
-/* 컨택: 폰은 밀어서, PC는 클릭 (같은 생김새) */
-.mslide,.mclick{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:34px;margin-top:4px;border-radius:999px;border:0;overflow:hidden;
-  background:rgba(22,194,90,.1);color:#0e9a47;font:inherit;font-size:12.5px;font-weight:500;user-select:none;-webkit-user-select:none}
+/* 컨택: 폰은 밀어서, PC는 클릭 (같은 생김새, 무채색) */
+.mslide,.mclick{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:36px;margin-top:6px;border-radius:999px;border:0;overflow:hidden;
+  background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);font:inherit;font-size:12.5px;font-weight:500;letter-spacing:-.01em;user-select:none;-webkit-user-select:none}
 .mslide{touch-action:pan-y;cursor:grab}
-.mslide .k,.mclick .k{position:absolute;left:3px;top:3px;width:28px;height:28px;border-radius:50%;background:var(--go);color:#fff;display:grid;place-items:center;z-index:2;box-shadow:0 2px 6px rgba(22,194,90,.3)}
-.mslide .fill{position:absolute;left:0;top:0;bottom:0;width:34px;border-radius:999px;background:rgba(22,194,90,.18);z-index:1}
-.mslide .sh{position:relative;z-index:1;padding-left:18px;opacity:calc(1 - var(--p,0)*1.4);
-  background:linear-gradient(90deg,#0e9a47 0,#0e9a47 35%,#7fe9aa 50%,#0e9a47 65%,#0e9a47 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.6s linear infinite}
-@keyframes shine{from{background-position:100% 0}to{background-position:-150% 0}}
-.mslide.drag{cursor:grabbing}.mslide.ok .k{animation:none}
-.mclick{cursor:pointer;gap:6px;padding-left:20px;transition:background .15s}
-.mclick:hover{background:rgba(22,194,90,.16)}.mclick:active{transform:scale(.98)}
+.mslide .k,.mclick .k{position:absolute;left:3px;top:3px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;z-index:2;transition:background .2s}
+.mslide .fill{position:absolute;left:0;top:0;bottom:0;width:36px;border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,transparent);z-index:1}
+.mslide .sh{position:relative;z-index:1;padding-left:20px;opacity:calc(1 - var(--p,0)*1.5);color:var(--muted);
+  -webkit-mask:linear-gradient(90deg,#000 0,#000 40%,rgba(0,0,0,.35) 50%,#000 60%,#000 100%) 0 0/250% 100%;mask:linear-gradient(90deg,#000 0,#000 40%,rgba(0,0,0,.35) 50%,#000 60%,#000 100%) 0 0/250% 100%;animation:shine 2.8s linear infinite}
+@keyframes shine{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:-150% 0;mask-position:-150% 0}}
+.mslide.drag{cursor:grabbing}.mslide.ok .k{background:var(--go)}
+.mclick{cursor:pointer;gap:6px;padding-left:24px;transition:background .15s}
+.mclick:hover{background:color-mix(in srgb,var(--ink) 10%,transparent)}.mclick:active{transform:scale(.98)}
 .mclick .k{transition:transform .2s}.mclick:hover .k{transform:translateX(3px)}
-html[data-theme="dark"] .mslide,html[data-theme="dark"] .mclick{color:#3ddc84}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mslide,:root:not([data-theme="light"]) .mclick{color:#3ddc84}}
 @media (prefers-reduced-motion:reduce){.mslide .sh{animation:none}}
+.mrr{width:100%;height:32px;margin-top:6px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
+.mrr:hover{border-color:var(--ink)}
+.mrr.arm{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mrr{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 10px}
 </style>
 
 </head>
@@ -639,7 +641,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택",slideTo:"밀어서 컨택",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택",slideTo:"밀어서 컨택",rereview:"재심사 요청",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -686,7 +688,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Contact",slideTo:"Slide to contact",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Contact",slideTo:"Slide to contact",rereview:"Request re-review",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
@@ -1039,6 +1041,7 @@ function mineHtml(){
     const ARW='<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6h7.5M6.5 2.8 9.7 6l-3.2 3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const stTxt=isC?"":(!s.n?`<span class="ms-none">${T("noVotes")}</span>`:ok?(miss.length?`<span class="ms-sub">${T("missN").replace("{n}",miss.length)}</span>`:""):`<span class="ms-no">${T("mvBelow")}</span>`);
     const act="";
+    const rr=isC&&!ok&&!it.contacted_at?`<button type="button" class="mrr" data-rr="${it.id}">${T("rereview")}</button>`:"";
     const go=rdy?(matchMedia("(pointer:coarse)").matches
       ?`<div class="mslide" data-slide="${it.id}" role="button" aria-label="${T("toContact")}"><span class="fill"></span><span class="sh">${T("slideTo")}</span><span class="k">${ARW}</span></div>`
       :`<button type="button" class="mclick" data-mv="${it.id}"><span class="k">${ARW}</span>${T("toContact")}</button>`):"";
@@ -1050,7 +1053,7 @@ function mineHtml(){
       <div class="mtime">${time}</div>
       <div class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}</span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span></div>
       ${stTxt?`<div class="mst"><span class="mst-t">${stTxt}</span></div>`:""}
-      ${go}${who}
+      ${go}${rr}${who}
     </li>`;
   };
   const sec=(k,list)=>list.length?`<details class="msec" data-msec="${k}" ${msecOpen[k]?"open":""}><summary><h3>${T(k)}<span class="c">${list.length}</span></h3><span class="pm" aria-hidden="true"></span></summary><ul class="mgrid">${list.map(row).join("")}</ul></details>`:"";
@@ -1123,7 +1126,14 @@ function render(){
     if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}else toast(T("movedT"));
     await loadAll();render();
   };
-  root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{b.disabled=true;doMove(b.dataset.mv)});   // PC: 클릭
+  root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{b.disabled=true;doMove(b.dataset.mv)});
+  root.querySelectorAll("[data-rr]").forEach(b=>b.onclick=async()=>{   // 두 번 눌러야 실행 (점수가 지워지므로)
+    if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent=T("rrAgain");clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove("arm");b.textContent=T("rereview")},4000);return}
+    clearTimeout(b._t);b.disabled=true;
+    const {error}=await sb.rpc("request_rereview",{cid:b.dataset.rr});
+    if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("rrFail")+(k?T("err_"+k):error.message))}else toast(T("rrDone"));
+    await loadAll();render();
+  });   // PC: 클릭
   root.querySelectorAll("[data-slide]").forEach(tr=>{   // 폰: 끝까지 밀어야 넘어감
     const k=tr.querySelector(".k"),fill=tr.querySelector(".fill");let x0=null,x=0,done=false;
     const max=()=>tr.clientWidth-k.offsetWidth-6;
@@ -1891,7 +1901,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.30";
+const APP_VER="2026-11-05.31";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
