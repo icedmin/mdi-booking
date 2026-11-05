@@ -478,12 +478,10 @@ img.plw{opacity:0!important}
 .hd .right .scope button[data-scope="mine"][aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .scope .rdy{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 6px rgba(22,194,90,.55)}
 .tabs button[disabled]{opacity:.35;cursor:not-allowed}
-.tabs.mine button[aria-selected="true"]{border-color:var(--red)}
 .ph-head h2 .mytag{display:inline-block;vertical-align:3px;margin-left:8px;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:0}
 @media (max-width:640px){.hd .right{gap:8px}.hd .right .scope button{padding:0 10px;font-size:12px}}
 @media (max-width:400px){.hd .mark span{display:none}}
 /* 전체/내 보드 전환 시 부드럽게 */
-#root.swap{animation:scopeIn .22s ease-out}
 @keyframes scopeIn{from{opacity:.35}to{opacity:1}}
 .card>.gls,.card>.mrr{margin-top:12px}
 </style>
@@ -1025,13 +1023,13 @@ function header(){
   const rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
   hdRight.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`+setBtnHtml();
   bindSetBtn();
-  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render();root.classList.remove("swap");void root.offsetWidth;root.classList.add("swap")});
+  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
-  return `<nav class="tabs${scope==="mine"?" mine":""}" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav>`;
+  return `<nav class="tabs" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav>`;
 }
-function head(stage,desc,extra="",right=""){if(scope==="mine"&&T("myDesc_"+stage))desc=T("myDesc_"+stage);return `<section class="ph-head"><div class="l"><h2>${SN(stage)}${scope==="mine"?`<span class="mytag">${T("scopeMine")}</span>`:""}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
+function head(stage,desc,extra="",right=""){if(scope==="mine"&&T("myDesc_"+stage))desc=T("myDesc_"+stage);return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
 const NA=v=>v==="N/A";
 const disp=v=>NA(v)?T("naShort"):v;
@@ -1188,7 +1186,7 @@ function mineHtml(stage){
   const body=stage==="cand"?sec("mReady",ready)+sec("mVoting",voting)+sec("mFail",fail)
     :stage==="contact"?sec("mMoved",moved):stage==="prog"?sec("mProg",progd):"";
   const desc=T("myDesc_"+stage)||"";
-  const title=`<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="mytag">${T("scopeMine")}</span><span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}</div>${stage==="cand"?`<div class="r"><button class="btn" id="openReg">${T("addCand")}</button></div>`:""}</section>`;
+  const title=head(stage,desc,"",stage==="cand"?`<button class="btn" id="openReg">${T("addCand")}</button>`:"");
   return title+(body||(stage==="missed"?`<div class="empty"><b>${T("soonTitle")}</b>${SN(stage)} · ${T("soonSub")}</div>`:`<div class="empty"><b>${T("emptyMineStage")}</b>${stage==="cand"?T("emptyMineSub"):""}</div>`));
 }
 function render(){
@@ -1198,7 +1196,9 @@ function render(){
   if(scope==="mine"&&NOMINE.includes(tab))tab="cand";
   const list=items.filter(it=>stageOf(it)===tab&&inScope(it));
   let html=tabsHtml();
-  if(tab==="cand"){
+  if(scope==="mine"){
+    html+=mineHtml(tab);
+  }else if(tab==="cand"){
     const open=list.filter(it=>!closed(it)).sort((a,b)=>deadline(a)-deadline(b));
     const fail=list.filter(it=>closed(it));
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
@@ -2084,7 +2084,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.49";
+const APP_VER="2026-11-05.50";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
