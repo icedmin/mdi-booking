@@ -489,9 +489,12 @@ img.plw{opacity:0!important}
 @media (max-width:640px){.pf.pf-l{height:37.4px;box-sizing:border-box;align-items:stretch}.pf.pf-l button{padding-top:0;padding-bottom:0;display:inline-flex;align-items:center}}
 /* 내 보드 토글 구역: 첫 구역 제목 줄이 전체 보드의 칸 버튼 줄과 같은 자리·높이에 오게 */
 .msecs>.msec{margin-top:26px}
-.msecs>.msec:first-child{margin-top:-16.8px}
-.msecs>.msec:first-child>summary{min-height:33.9px;margin-bottom:24.4px}
-@media (max-width:640px){.msecs>.msec:first-child{margin-top:-16px}.msecs>.msec:first-child>summary{min-height:37.4px;margin-bottom:23.6px}}
+.fph{height:var(--fh);margin-top:7.2px}
+@media (max-width:640px){.fph{margin-top:8px}}
+:root{--fh:33.875px}
+@media (max-width:640px){:root{--fh:37.4375px}}
+.msecs>.msec:first-child{margin-top:calc(-24px - var(--fh))}
+.msecs>.msec:first-child>summary{min-height:var(--fh);margin-bottom:24px;box-sizing:border-box}
 /* 범위 전환을 로고 옆으로 */
 .hd .inner{justify-content:flex-start}
 .hd .hscope{margin-left:22px;display:flex;align-items:center}
@@ -518,8 +521,8 @@ img.plw{opacity:0!important}
 /* 폰: 공유/내 보드 스위치를 탭 위 한 줄로, 폭을 꽉 채움 */
 @media (max-width:640px){
   .tabbar{flex-wrap:wrap;row-gap:12px;column-gap:0;padding-top:12px}
-  .tabbar .scope{flex:1 0 100%;margin-bottom:0;height:36px;display:flex}
-  .tabbar .scope button{flex:1;justify-content:center;height:30px;font-size:13px;padding:0}
+  .tabbar .scope{flex:1 0 100%;margin-bottom:0;height:30px;display:flex}
+  .tabbar .scope button{flex:1;justify-content:center;height:24px;font-size:12px;padding:0}
   .tabbar .tabs{flex:1 0 100%}
 }
 </style>
@@ -777,7 +780,7 @@ ko:{
  voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",mfAll:"전체",scopeLabel:"보기 범위",scopeAll:"공유 보드",scopeMine:"내 보드",noMineBoard:"체류 중은 개인 보드가 없습니다",myDesc_cand:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",myDesc_contact:"내가 컨택 중인 모델입니다. 진행을 시작하면 진행 중으로 넘어갑니다.",myDesc_prog:"내가 진행 중인 모델입니다.",myDesc_missed:"",emptyMineStage:"해당하는 내 모델이 없습니다",mProg:"진행 중",toProg:"진행 시작",slideProg:"밀어서 진행 시작",progNamed:"{n} 진행 중으로 이동",progAt:"진행 이동",progDesc:"컨택을 마치고 진행 중인 모델입니다.",gfAll:"전체 진행",gfMine:"내 진행",gfNone:"내가 등록한 진행 중 모델이 없습니다",emptyProg:"진행 중인 모델이 없습니다",emptyProgSub:"내 모델 탭의 컨택 중 모델에서 진행을 시작하면 여기에 모입니다.",err_not_contacting:"컨택 중인 모델이 아닙니다",err_already_progressed:"이미 진행 중입니다",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
- candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
+ candDesc:"",
  voting:"전체 투표",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 투표 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
  closedFail:"점수 미달",
@@ -824,7 +827,7 @@ en:{
  voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mfAll:"All",scopeLabel:"Scope",scopeAll:"Shared",scopeMine:"Mine",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
- candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
+ candDesc:"",
  voting:"All votes",soon24:"Closing in 24h",myTodo:"Not voted",addCand:"+ Add to vote",
  emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
  closedFail:"Closed · not passed",
@@ -866,7 +869,7 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hid
 let tab="cand";try{tab=localStorage.getItem("mdi-tab2")||"cand"}catch(e){}
 /* 보기 범위: 전체 보드(all) / 내 보드(mine). 체류 중은 개인판 없음 */
 let scope="all";try{scope=localStorage.getItem("mdi-scope")==="mine"?"mine":"all"}catch(e){}
-const NOMINE=["town"];
+const NOMINE=[];   // 내 보드에서 막아둘 탭 (현재 없음)
 const inScope=it=>scope!=="mine"||it.created_by===me.id;
 if(tab==="mine"){tab="cand";scope="mine"}
 if(!STAGES.includes(tab)&&tab!=="admin")tab="cand";
@@ -1232,6 +1235,7 @@ function mineHtml(stage){
   const grid=l=>l.length?`<ul class="mgrid">${l.map(row).join("")}</ul>`:"";
   let body="",extra="";
   if(stage==="cand"){
+    extra=`<div class="fph" aria-hidden="true"></div>`;   // 공유 보드의 칸 버튼 줄과 같은 자리 확보 → 첫 구역 제목이 그 자리로 올라감
     body=`<div class="msecs">${sec("mReady",ready)+sec("mVoting",voting)+sec("mFail",fail)}</div>`;
   }else if(stage==="contact")body=grid(moved);
   else if(stage==="prog")body=grid(progd);
@@ -2156,7 +2160,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.60";
+const APP_VER="2026-11-05.62";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
