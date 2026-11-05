@@ -449,6 +449,14 @@ img.plw{opacity:0!important}
 /* 컨택 버튼 글자: 얇게·조금 크게, 위아래 정중앙 */
 .gls.mclick,.gls.mslide{font-size:13px;font-weight:500;line-height:1}
 .gls.mclick .t,.gls.mslide .sh{display:block;line-height:1;transform:translateY(var(--ty,0px))}
+/* 상단 우측 '내 모델' (개인 메뉴) */
+.hd .right button.mybtn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font-size:12.5px;font-weight:500;white-space:nowrap;cursor:pointer;transition:border-color .15s,background .15s}
+.hd .right button.mybtn:hover{border-color:var(--ink)}
+.hd .right button.mybtn .n{color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+.hd .right button.mybtn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.hd .right button.mybtn[aria-pressed="true"] .n{color:color-mix(in srgb,var(--bg) 65%,transparent)}
+.hd .right button.mybtn .rdy{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 6px rgba(22,194,90,.55)}
+@media (max-width:640px){.hd .right{gap:10px}.hd .right button.mybtn{height:28px;padding:0 10px;font-size:12px}}
 </style>
 
 </head>
@@ -980,13 +988,14 @@ function subscribe(){
 
 /* ---------- 화면 ---------- */
 function header(){
-  hdRight.innerHTML=setBtnHtml();
+  const myN=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at).length,rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
+  hdRight.innerHTML=`<button type="button" id="openMine" class="mybtn" aria-pressed="${tab==="mine"}">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}" aria-label="${T("mReady")} ${rdy}"></span>`:""}</button>`+setBtnHtml();
   bindSetBtn();
+  const m=document.getElementById("openMine");if(m)m.onclick=()=>{tab="mine";render();window.scrollTo({top:0})};
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
-  const myN=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at).length,rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
-  return `<nav class="tabs" role="tablist"><button role="tab" class="mytab" aria-selected="${tab==="mine"}" data-tab="mine">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}" aria-label="${T("mReady")} ${rdy}"></span>`:""}</button><span class="tsep" aria-hidden="true"></span>${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
+  return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
@@ -1158,19 +1167,12 @@ function render(){
   }else if(tab==="mine"){
     html+=mineHtml();
   }else if(tab==="contact"){
-    const mineC=list.filter(it=>it.created_by===me.id);
-    if(cf!=="all"&&cf!=="mine")cf="all";
-    const shownC=cf==="mine"?mineC:list;
-    const cb=(k,label,n)=>`<button type="button" data-cf="${k}" aria-pressed="${cf===k}">${label}<b>${n}</b></button>`;
-    html+=head("contact",T("contactDesc"),`<div class="facts">${cb("all",T("cfAll"),list.length)}${cb("mine",T("cfMine"),mineC.length)}</div>`)+
-      (shownC.length?`<div class="grid">${shownC.map(card).join("")}</div>`:(list.length?`<div class="empty"><b>${T("cfNone")}</b></div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`));
+    html+=head("contact",T("contactDesc"))+
+      (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
   }else if(tab==="prog"){
-    const mineG=list.filter(it=>it.created_by===me.id);
-    if(gf!=="all"&&gf!=="mine")gf="all";
-    const shownG=(gf==="mine"?mineG:list).sort((a,b)=>new Date(b.progressed_at)-new Date(a.progressed_at));
-    const gb=(k,label,n)=>`<button type="button" data-gf="${k}" aria-pressed="${gf===k}">${label}<b>${n}</b></button>`;
-    html+=head("prog",T("progDesc"),`<div class="facts">${gb("all",T("gfAll"),list.length)}${gb("mine",T("gfMine"),mineG.length)}</div>`)+
-      (shownG.length?`<div class="grid">${shownG.map(card).join("")}</div>`:(list.length?`<div class="empty"><b>${T("gfNone")}</b></div>`:`<div class="empty"><b>${T("emptyProg")}</b>${T("emptyProgSub")}</div>`));
+    const shownG=list.slice().sort((a,b)=>new Date(b.progressed_at)-new Date(a.progressed_at));
+    html+=head("prog",T("progDesc"))+
+      (shownG.length?`<div class="grid">${shownG.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyProg")}</b>${T("emptyProgSub")}</div>`);
   }else{
     html+=head(tab,"")+`<div class="empty"><b>${T("soonTitle")}</b>${SN(tab)} · ${T("soonSub")}</div>`;
   }
@@ -2012,7 +2014,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.42";
+const APP_VER="2026-11-05.43";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
