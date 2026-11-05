@@ -627,6 +627,9 @@ dialog#setDlg::backdrop{background:transparent}
 .pbn-go{flex:none;height:30px;padding:0 13px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
 .pbn-x{flex:none;width:30px;height:30px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;border-radius:8px}
 #setDlg .pv-push{display:flex;gap:6px;align-items:center}
+.auth label.chk{flex-direction:row;gap:10px;align-items:flex-start;margin:2px 0 4px;cursor:pointer;font-size:13px;font-weight:400;line-height:1.4}
+.auth label.chk input{flex:none;width:18px;height:18px;padding:0;margin:1px 0 0;border-radius:4px;accent-color:var(--ink)}
+.auth .chk span{display:flex;flex-direction:column;gap:2px}.auth .chk b{font-weight:600;color:var(--ink)}.auth .chk small{font-size:12px;color:var(--muted)}
 #setDlg .pv-push b{font-size:12px;font-weight:600;color:var(--go)}
 #setDlg .pv-push button{height:28px;padding:0 10px;font-size:12px;font-weight:500;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;cursor:pointer}
 #setDlg .pv-push button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -977,13 +980,13 @@ function staticText(){
 const VAPID_PUB="BDUU0EGxEkqyxFU1JnChxcbuXV6W8srPfarYaV-MEcRiLr_hlZl1QvZV7qeUw9ZwVnVEP-KOhUH3maGIA7pKiw8";
 const PT={ko:{row:"마감 알림",on:"켜짐",turnOn:"켜기",turnOff:"끄기",test:"시험",how:"방법 보기",denied:"차단됨",unsup:"이 브라우저는 지원 안 함",
   noteIos:"아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",noteDenied:"폰 설정 › 알림에서 MDI Booking을 허용해 주세요.",noteOn:"마감 10분·5분 전, 아직 투표하지 않았으면 이 기기로 알림이 옵니다.",
-  bnOn:"투표 마감 10분·5분 전 알림을 받으세요",bnIos:"홈 화면에 추가하면 마감 알림을 받을 수 있어요",
+  bnOn:"가입 때 동의한 마감 알림을 이 기기에서 허용해 주세요",bnIos:"홈 화면에 추가하면 동의한 마감 알림을 받을 수 있어요",allow:"허용",suTitle:"투표 마감 알림 받기",suDesc:"마감 10분·5분 전, 아직 투표하지 않았으면 폰으로 알림이 옵니다. 설정에서 언제든 끌 수 있습니다.",
   onT:"알림을 켰습니다",offT:"알림을 껐습니다",deniedT:"알림이 허용되지 않았습니다",fail:"알림을 켜지 못했습니다: ",testT:"시험 알림을 보냈습니다",testFail:"시험 알림을 보내지 못했습니다: ",
   gTitle:"홈 화면에 추가하기",gSub:"아이폰은 홈 화면 앱에서만 알림을 받을 수 있습니다. 한 번만 하면 됩니다.",
   g1:"Safari 아래쪽 __SHARE__ 공유 버튼을 누릅니다",g2:"목록에서 <b>홈 화면에 추가</b> → <b>추가</b>",g3:"홈 화면에 생긴 <b>MDI</b> 아이콘으로 엽니다",g4:"화면 위 알림 칸의 <b>켜기</b> → <b>허용</b>",ok:"확인",close:"닫기"},
  en:{row:"Deadline alerts",on:"On",turnOn:"Turn on",turnOff:"Turn off",test:"Test",how:"How",denied:"Blocked",unsup:"Not supported here",
   noteIos:"On iPhone, alerts work only in the app added to the Home Screen.",noteDenied:"Allow MDI Booking in your phone's notification settings.",noteOn:"You'll get an alert 10 and 5 minutes before a deadline if you haven't voted.",
-  bnOn:"Get alerts 10 and 5 minutes before a vote closes",bnIos:"Add to Home Screen to get deadline alerts",
+  bnOn:"Allow the deadline alerts you agreed to on this device",bnIos:"Add to Home Screen to get the deadline alerts you agreed to",allow:"Allow",suTitle:"Get vote deadline alerts",suDesc:"10 and 5 minutes before a vote closes, if you haven't voted. You can turn this off anytime in settings.",
   onT:"Alerts on",offT:"Alerts off",deniedT:"Notifications were not allowed",fail:"Couldn't turn on alerts: ",testT:"Test alert sent",testFail:"Couldn't send test alert: ",
   gTitle:"Add to Home Screen",gSub:"On iPhone, alerts only work in the Home Screen app. You only do this once.",
   g1:"Tap the __SHARE__ Share button in Safari",g2:"Choose <b>Add to Home Screen</b> → <b>Add</b>",g3:"Open the <b>MDI</b> icon on your Home Screen",g4:"Tap <b>Turn on</b> in the alert bar → <b>Allow</b>",ok:"OK",close:"Close"}};
@@ -1006,7 +1009,8 @@ const subJson=s=>{const j=s.toJSON();return {p_endpoint:j.endpoint,p_p256dh:j.ke
 const b64u=s=>{const p="=".repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(b,c=>c.charCodeAt(0))};
 async function pushSync(){   // 로그인 후: 이 기기가 이미 켜져 있으면 서버에 다시 저장(다른 계정으로 바뀐 경우 포함)
   pushOn=false;
-  try{if(pushCapable()&&Notification.permission==="granted"){const r=await swReady;const s=r&&await r.pushManager.getSubscription();
+  try{if(pushCapable()&&Notification.permission==="granted"){const r=await swReady;let s=r&&await r.pushManager.getSubscription();
+    if(!s&&profile?.push_opt_in&&r){try{s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)})}catch(_){}}
     if(s){const {error}=await sb.rpc("save_push_sub",subJson(s));pushOn=!error}}}catch(e){}
   pushChecked=true;
 }
@@ -1020,14 +1024,14 @@ async function pushEnable(){
     let s=await r.pushManager.getSubscription();
     if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)});
     const {error}=await sb.rpc("save_push_sub",subJson(s));if(error)throw error;
-    pushOn=true;toast(P("onT"));
+    pushOn=true;if(profile)profile.push_opt_in=true;sb.rpc("set_push_opt_in",{p:true});toast(P("onT"));
   }catch(e){toast(P("fail")+(e?.message||e))}
   pushRefreshUI();
 }
 async function pushDisable(){
   try{const r=await swReady;const s=r&&await r.pushManager.getSubscription();
     if(s){await sb.rpc("remove_push_sub",{p_endpoint:s.endpoint});await s.unsubscribe()}
-    pushOn=false;toast(P("offT"))}catch(e){toast(P("fail")+(e?.message||e))}
+    pushOn=false;if(profile)profile.push_opt_in=false;sb.rpc("set_push_opt_in",{p:false});toast(P("offT"))}catch(e){toast(P("fail")+(e?.message||e))}
   pushRefreshUI();
 }
 async function pushTest(){
@@ -1044,9 +1048,10 @@ function openPushGuide(){
 document.getElementById("pushDlg").addEventListener("click",e=>{if(e.target.id==="pushDlg")e.target.close()});
 function pushBanner(){
   if(!pushChecked)return "";
+  if(!profile?.push_opt_in)return "";
   const m=pushMode();if(m!=="off"&&m!=="ios-browser")return "";
   try{if(localStorage.getItem("mdi-push-x")===m)return ""}catch(e){}
-  return `<div class="pbn" role="note"><i class="bell">${BELL_SVG}</i><span>${m==="ios-browser"?P("bnIos"):P("bnOn")}</span><button type="button" class="pbn-go" ${m==="ios-browser"?"data-pguide":"data-pon"}>${m==="ios-browser"?P("how"):P("turnOn")}</button><button type="button" class="pbn-x" data-px="${m}" aria-label="${P("close")}">${X_SVG}</button></div>`;
+  return `<div class="pbn" role="note"><i class="bell">${BELL_SVG}</i><span>${m==="ios-browser"?P("bnIos"):P("bnOn")}</span><button type="button" class="pbn-go" ${m==="ios-browser"?"data-pguide":"data-pon"}>${m==="ios-browser"?P("how"):P("allow")}</button><button type="button" class="pbn-x" data-px="${m}" aria-label="${P("close")}">${X_SVG}</button></div>`;
 }
 function pushRowHtml(){
   const m=pushMode();
@@ -1117,6 +1122,7 @@ function authView(mode="login",msg=""){
     ${mode==="signup"?`<label for="a-name">${T("nameOrTitle")}<input id="a-name" autocomplete="name" required></label>`:""}
     <label for="a-email">${T("email")}<input id="a-email" type="email" autocomplete="email" required></label>
     <label for="a-pw">${T("password")}<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
+    ${mode==="signup"?`<label class="chk" for="a-push"><input type="checkbox" id="a-push" checked><span><b>${P("suTitle")}</b><small>${P("suDesc")}</small></span></label>`:""}
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
     <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
     <p class="switch">${mode==="login"?`${T("firstTime")} <button type="button" id="aSwitch">${T("doSignup")}</button>`:`${T("haveAcct")} <button type="button" id="aSwitch">${T("doLogin")}</button>`}</p>
@@ -1137,7 +1143,10 @@ function authView(mode="login",msg=""){
       const name=document.getElementById("a-name").value.trim();
       if(!name){btn.disabled=false;return say(T("needName"))}
       if(pw.length<6){btn.disabled=false;return say(T("pwShort"))}
-      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name},emailRedirectTo:location.origin+location.pathname}});
+      // 알림 동의: 가입 버튼을 누른 그 순간에 폰 허용 창을 띄움 (홈 화면 앱이 아닌 아이폰 Safari는 나중에 홈 화면 앱에서)
+      const wantPush=!!document.getElementById("a-push")?.checked;
+      if(wantPush&&pushMode()==="off"&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
+      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name,push_opt_in:wantPush},emailRedirectTo:location.origin+location.pathname}});
       btn.disabled=false;
       if(error)return say(T("signupFail")+error.message);
       if(!data.session)authView("login",T("signupDone"));
@@ -2308,7 +2317,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.69";
+const APP_VER="2026-11-05.70";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
