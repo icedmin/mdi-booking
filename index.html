@@ -470,6 +470,18 @@ img.plw{opacity:0!important}
   .pf button{font-size:13px;line-height:1;padding:0 14px;display:inline-flex;align-items:center}
   .ph-head .r #openReg{box-sizing:border-box;height:34px;display:inline-flex;align-items:center;padding:0 16px;font-size:13px;font-weight:500;line-height:1;letter-spacing:0;border-radius:999px}
 }
+/* 상단 범위 전환: 전체 보드 / 내 보드 */
+.scope{display:inline-flex;padding:3px;border-radius:999px;background:var(--line);gap:2px;height:32px;box-sizing:border-box}
+.hd .right .scope button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:0 13px;font-size:12.5px;font-weight:500;line-height:1;color:var(--muted);background:none;white-space:nowrap;cursor:pointer}
+.hd .right .scope button:hover{color:var(--ink);border:0}
+.hd .right .scope button[aria-pressed="true"]{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.hd .right .scope button[data-scope="mine"][aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.scope .rdy{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 6px rgba(22,194,90,.55)}
+.tabs button[disabled]{opacity:.35;cursor:not-allowed}
+.tabs.mine button[aria-selected="true"]{border-color:var(--red)}
+.ph-head h2 .mytag{display:inline-block;vertical-align:3px;margin-left:8px;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:0}
+@media (max-width:640px){.hd .right{gap:8px}.hd .right .scope button{padding:0 10px;font-size:12px}}
+@media (max-width:400px){.hd .mark span{display:none}}
 </style>
 
 </head>
@@ -721,7 +733,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",mProg:"진행 중",toProg:"진행 시작",slideProg:"밀어서 진행 시작",progNamed:"{n} 진행 중으로 이동",progAt:"진행 이동",progDesc:"컨택을 마치고 진행 중인 모델입니다.",gfAll:"전체 진행",gfMine:"내 진행",gfNone:"내가 등록한 진행 중 모델이 없습니다",emptyProg:"진행 중인 모델이 없습니다",emptyProgSub:"내 모델 탭의 컨택 중 모델에서 진행을 시작하면 여기에 모입니다.",err_not_contacting:"컨택 중인 모델이 아닙니다",err_already_progressed:"이미 진행 중입니다",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",scopeLabel:"보기 범위",scopeAll:"전체 보드",scopeMine:"내 보드",noMineBoard:"체류 중은 개인 보드가 없습니다",myDesc_cand:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",myDesc_contact:"내가 컨택 중인 모델입니다. 진행을 시작하면 진행 중으로 넘어갑니다.",myDesc_prog:"내가 진행 중인 모델입니다.",myDesc_missed:"",emptyMineStage:"해당하는 내 모델이 없습니다",mProg:"진행 중",toProg:"진행 시작",slideProg:"밀어서 진행 시작",progNamed:"{n} 진행 중으로 이동",progAt:"진행 이동",progDesc:"컨택을 마치고 진행 중인 모델입니다.",gfAll:"전체 진행",gfMine:"내 진행",gfNone:"내가 등록한 진행 중 모델이 없습니다",emptyProg:"진행 중인 모델이 없습니다",emptyProgSub:"내 모델 탭의 컨택 중 모델에서 진행을 시작하면 여기에 모입니다.",err_not_contacting:"컨택 중인 모델이 아닙니다",err_already_progressed:"이미 진행 중입니다",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -768,7 +780,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",scopeLabel:"Scope",scopeAll:"All",scopeMine:"Mine",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
@@ -811,7 +823,12 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const fmt=t=>new Date(t).toLocaleString(LANG==="en"?"en-US":"ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
 let tab="cand";try{tab=localStorage.getItem("mdi-tab2")||"cand"}catch(e){}
-if(!STAGES.includes(tab)&&tab!=="admin"&&tab!=="mine")tab="cand";
+/* 보기 범위: 전체 보드(all) / 내 보드(mine). 체류 중은 개인판 없음 */
+let scope="all";try{scope=localStorage.getItem("mdi-scope")==="mine"?"mine":"all"}catch(e){}
+const NOMINE=["town"];
+const inScope=it=>scope!=="mine"||it.created_by===me.id;
+if(tab==="mine"){tab="cand";scope="mine"}
+if(!STAGES.includes(tab)&&tab!=="admin")tab="cand";
 document.documentElement.lang=LANG;
 
 if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>${T("loadFailSub")}</div>`;return}
@@ -1001,14 +1018,14 @@ function subscribe(){
 
 /* ---------- 화면 ---------- */
 function header(){
-  const myN=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at).length,rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
-  hdRight.innerHTML=`<button type="button" id="openMine" class="mybtn" aria-pressed="${tab==="mine"}">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}" aria-label="${T("mReady")} ${rdy}"></span>`:""}</button>`+setBtnHtml();
+  const rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
+  hdRight.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`+setBtnHtml();
   bindSetBtn();
-  const m=document.getElementById("openMine");if(m)m.onclick=()=>{tab="mine";render();window.scrollTo({top:0})};
+  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
 }
 function tabsHtml(){
-  const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
-  return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
+  const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
+  return `<nav class="tabs${scope==="mine"?" mine":""}" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
@@ -1103,6 +1120,7 @@ function adminView(){
 }
 
 let mvAsk=null;
+
 let cf="all",gf="all";try{gf=localStorage.getItem("mdi-gf")||"all"}catch(e){}
 try{cf=localStorage.getItem("mdi-cf")||"all"}catch(e){}
 /* 투표 숫자 줄: 1~내 점수까지 옅게 이어진 배경. 점수가 바뀐 그 순간에만 늘어나고 줄어드는 움직임 */
@@ -1111,7 +1129,7 @@ function vfAnim(id,n){n=n||0;const old=vfMem.get(id);vfMem.set(id+"p",old??n);vf
 const pfHtml=c=>`<div class="pf ${c}" role="group" aria-label="${T("pfLabel")}">${["all","pass","fail"].map(k=>`<button type="button" data-pf="${k}" aria-pressed="${pf===k}">${T("pf_"+k)}</button>`).join("")}</div>`;
 let pf="all";try{pf=localStorage.getItem("mdi-pf")||"all"}catch(e){}
 const msecOpen={mReady:true,mVoting:true,mMoved:true,mProg:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
-function mineHtml(){
+function mineHtml(stage){
   const my=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at);
   const ready=my.filter(readyToMove).sort((a,b)=>deadline(a)-deadline(b));
   const voting=my.filter(it=>!closed(it)&&!readyToMove(it)).sort((a,b)=>deadline(a)-deadline(b));
@@ -1149,8 +1167,11 @@ function mineHtml(){
     </li>`;
   };
   const sec=(k,list)=>list.length?`<details class="msec" data-msec="${k}" ${msecOpen[k]?"open":""}><summary><h3>${T(k)}<span class="c">${list.length}</span></h3><span class="pm" aria-hidden="true"></span></summary><ul class="mgrid">${list.map(row).join("")}</ul></details>`:"";
-  return head("mine",T("mineDesc"))+(my.length?sec("mReady",ready)+sec("mVoting",voting)+sec("mMoved",moved)+sec("mProg",progd)+sec("mFail",fail)
-    :`<div class="empty"><b>${T("emptyMine")}</b>${T("emptyMineSub")}</div>`);
+  const body=stage==="cand"?sec("mReady",ready)+sec("mVoting",voting)+sec("mFail",fail)
+    :stage==="contact"?sec("mMoved",moved):stage==="prog"?sec("mProg",progd):"";
+  const desc=T("myDesc_"+stage)||"";
+  const title=`<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="mytag">${T("scopeMine")}</span><span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}</div>${stage==="cand"?`<div class="r"><button class="btn" id="openReg">${T("addCand")}</button></div>`:""}</section>`;
+  return title+(body||(stage==="missed"?`<div class="empty"><b>${T("soonTitle")}</b>${SN(stage)} · ${T("soonSub")}</div>`:`<div class="empty"><b>${T("emptyMineStage")}</b>${stage==="cand"?T("emptyMineSub"):""}</div>`));
 }
 function render(){
   header();
@@ -1158,7 +1179,10 @@ function render(){
   if(tab==="admin")return adminView();
   const list=items.filter(it=>stageOf(it)===tab);
   let html=tabsHtml();
-  if(tab==="cand"){
+  if(scope==="mine"&&tab==="town")tab="cand";
+  if(scope==="mine"){
+    html+=mineHtml(tab);
+  }else if(tab==="cand"){
     const open=list.filter(it=>!closed(it)).sort((a,b)=>deadline(a)-deadline(b));
     const fail=list.filter(it=>closed(it));
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
@@ -1177,8 +1201,7 @@ function render(){
       (shown.length?`<div class="grid">${shown.map(card).join("")}</div>`:(open.length?`<div class="empty"><b>${T("fNone")}</b></div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`))+
       (fail.length&&filter==="all"&&pf!=="pass"?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"")+
       (wds.length&&filter==="all"?`<details class="wdlist sec" style="display:block"><summary>${T("wdList")} ${wds.length}<span class="pm" aria-hidden="true"></span></summary><ul>${wds.map(it=>`<li><span><b>${esc(it.name)}</b> · ${esc(it.agency||"")}</span><span>${T("wdBy")} ${esc(name(it.withdrawn_by))} · ${fmt(it.withdrawn_at)}</span><button class="btn line" style="padding:6px 12px;font-size:12px" data-restore="${it.id}">${T("restore")}</button></li>`).join("")}</ul></details>`:"");
-  }else if(tab==="mine"){
-    html+=mineHtml();
+  }else if(false){
   }else if(tab==="contact"){
     html+=head("contact",T("contactDesc"))+
       (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
@@ -2045,7 +2068,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.46";
+const APP_VER="2026-11-05.48";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
