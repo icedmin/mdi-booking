@@ -326,10 +326,18 @@ img.plw{opacity:0!important}
 /* 타이머 진행선: 두께 2.5px, 끝에 빛이 살짝 깜빡 (도화선) */
 .card .pic .tm .tbar{height:2.5px}
 .card .pic .tm .tbar i{position:relative}
-.card .pic .tm .tbar i::after{content:"";position:absolute;right:-4px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.95) 0,rgba(255,190,165,.85) 28%,rgba(232,55,11,.35) 55%,rgba(232,55,11,0) 72%);animation:fuse 1.6s ease-in-out infinite}
-@keyframes fuse{0%,100%{opacity:.35;transform:scale(.75)}50%{opacity:1;transform:scale(1.15)}}
-@media (prefers-reduced-motion:reduce){.card .pic .tm .tbar i::after{animation:none;opacity:.7}}
+/* 진행선 끝의 빛: 꺼지지 않고 촛불처럼 일렁임 (두 겹이 서로 다른 박자로 흔들려 불규칙하게 보임) */
+.card .pic .tm .tbar i::after,.card .pic .tm .tbar i::before{content:"";position:absolute;top:50%;pointer-events:none;border-radius:50%}
+.card .pic .tm .tbar i::after{right:-6px;width:14px;height:6px;margin-top:-3px;
+  background:radial-gradient(ellipse at 60% 50%,rgba(255,236,224,.95) 0,rgba(255,150,110,.75) 30%,rgba(232,55,11,.25) 62%,rgba(232,55,11,0) 78%);
+  filter:blur(.4px);transform-origin:70% 50%;animation:flick1 1.9s linear infinite}
+.card .pic .tm .tbar i::before{right:-9px;width:22px;height:10px;margin-top:-5px;
+  background:radial-gradient(ellipse at 60% 50%,rgba(255,120,80,.35) 0,rgba(232,55,11,.15) 45%,rgba(232,55,11,0) 75%);
+  filter:blur(1.5px);transform-origin:70% 50%;animation:flick2 1.3s linear infinite}
+@keyframes flick1{0%{transform:scale(1,1);opacity:.9}13%{transform:scale(1.18,.88);opacity:.97}27%{transform:scale(.9,1.08);opacity:.82}41%{transform:scale(1.1,.94);opacity:1}
+  58%{transform:scale(.95,1.04);opacity:.86}74%{transform:scale(1.14,.9);opacity:.96}88%{transform:scale(.97,1.02);opacity:.88}100%{transform:scale(1,1);opacity:.9}}
+@keyframes flick2{0%{transform:scale(1);opacity:.7}22%{transform:scale(1.12,.92);opacity:.9}47%{transform:scale(.9,1.06);opacity:.6}71%{transform:scale(1.08,.96);opacity:.85}100%{transform:scale(1);opacity:.7}}
+@media (prefers-reduced-motion:reduce){.card .pic .tm .tbar i::after,.card .pic .tm .tbar i::before{animation:none}}
 .tabs{overflow-y:hidden;overscroll-behavior-x:contain;touch-action:pan-x}
 .ph-head .r{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .frow{display:flex;align-items:center;gap:10px}.frow .facts{min-width:0}
@@ -1828,7 +1836,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.18";
+const APP_VER="2026-11-05.19";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
