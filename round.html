@@ -961,12 +961,13 @@ function render(){
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
     const notMine=open.filter(it=>!vOf(it.id).some(v=>v.user_id===me.id)).length;
     const isSoon=it=>deadline(it)-Date.now()<24*H, isTodo=it=>!vOf(it.id).some(v=>v.user_id===me.id);
-    const shown=filter==="soon"?open.filter(isSoon):filter==="todo"?open.filter(it=>isTodo(it)||todoKeep.has(it.id)):open;
+    if(filter==="soon")filter="all";
+    const shown=filter==="todo"?open.filter(it=>isTodo(it)||todoKeep.has(it.id)):open;
     if(filter==="todo")shown.forEach(it=>todoKeep.add(it.id));
     const fb=(k,label,n)=>`<button type="button" data-filter="${k}" aria-pressed="${filter===k}">${label}<b>${n}</b></button>`;
     const wds=items.filter(it=>it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin"));
     html+=head("cand",T("candDesc"),
-        `<div class="facts">${fb("all",T("voting"),open.length)}${fb("soon",T("soon24"),soon)}${fb("todo",T("myTodo"),notMine)}</div>`,
+        `<div class="facts">${fb("all",T("voting"),open.length)}${fb("todo",T("myTodo"),notMine)}</div>`,
         `<button class="btn" id="openReg">${T("addCand")}</button>`)+
       (filter!=="all"?`<p class="fnote">${T("fShowing")} ${filter==="soon"?T("soon24"):T("myTodo")} · ${shown.length}<button type="button" data-filter="all">${T("fAll")}</button></p>`:"")+
       (shown.length?`<div class="grid">${shown.map(card).join("")}</div>`:(open.length?`<div class="empty"><b>${T("fNone")}</b></div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`))+
