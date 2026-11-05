@@ -817,7 +817,7 @@ ko:{
  nameOrTitle:"이름 또는 직함",email:"이메일",password:"비밀번호",doLogin:"로그인",doSignup:"가입하기",
  firstTime:"처음이신가요?",haveAcct:"이미 계정이 있나요?",
  needEmailPw:"이메일과 비밀번호를 입력하세요.",notConfirmed:"이메일 인증이 아직 안 됐습니다. 메일함의 인증 링크를 먼저 눌러 주세요.",badLogin:"이메일 또는 비밀번호가 맞지 않습니다.",
- needName:"이름 또는 직함을 입력하세요.",pwShort:"비밀번호는 6자 이상이어야 합니다.",signupFail:"가입하지 못했습니다: ",signupDone:"가입 완료. 메일함의 인증 링크를 누른 뒤 로그인해 주세요.",
+ needName:"이름 또는 직함을 입력하세요.",pwShort:"비밀번호는 6자 이상이어야 합니다.",password2:"비밀번호 확인",pwMismatch:"비밀번호가 서로 다릅니다. 다시 확인해 주세요.",signupFail:"가입하지 못했습니다: ",signupDone:"가입 완료. 메일함의 인증 링크를 누른 뒤 로그인해 주세요.",
  pending:"승인 대기 중",pendingSub:"관리자가 가입을 승인하면 사용할 수 있습니다. 승인 후 새로고침해 주세요.",reload:"새로고침",
  logout:"로그아웃",settings:"설정",members:"사용자 관리",toBoard:"보드로",unknown:"알 수 없음",
  loading:"불러오는 중…",infoFail:"정보를 불러오지 못했습니다",dataFail:"데이터를 불러오지 못했습니다",
@@ -864,7 +864,7 @@ en:{
  nameOrTitle:"Name or title",email:"Email",password:"Password",doLogin:"Log in",doSignup:"Sign up",
  firstTime:"New here?",haveAcct:"Already have an account?",
  needEmailPw:"Enter your email and password.",notConfirmed:"Your email isn't verified yet. Click the link in the verification email first.",badLogin:"Wrong email or password.",
- needName:"Enter your name or title.",pwShort:"Password must be at least 6 characters.",signupFail:"Couldn't sign up: ",signupDone:"Signed up. Click the link in the verification email, then log in.",
+ needName:"Enter your name or title.",pwShort:"Password must be at least 6 characters.",password2:"Confirm password",pwMismatch:"Passwords don't match. Please check again.",signupFail:"Couldn't sign up: ",signupDone:"Signed up. Click the link in the verification email, then log in.",
  pending:"Waiting for approval",pendingSub:"You can use the board once an admin approves you. Refresh after approval.",reload:"Refresh",
  logout:"Log out",settings:"Settings",members:"Members",toBoard:"Board",unknown:"Unknown",
  loading:"Loading…",infoFail:"Couldn't load your profile",dataFail:"Couldn't load data",
@@ -1122,6 +1122,7 @@ function authView(mode="login",msg=""){
     ${mode==="signup"?`<label for="a-name">${T("nameOrTitle")}<input id="a-name" autocomplete="name" required></label>`:""}
     <label for="a-email">${T("email")}<input id="a-email" type="email" autocomplete="email" required></label>
     <label for="a-pw">${T("password")}<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
+    ${mode==="signup"?`<label for="a-pw2">${T("password2")}<input id="a-pw2" type="password" autocomplete="new-password" required minlength="6"></label>`:""}
     ${mode==="signup"?`<label class="chk" for="a-push"><input type="checkbox" id="a-push" required><span><b>${P("suTitle")}</b><small>${P("suDesc")}</small></span></label>`:""}
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
     <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
@@ -1143,6 +1144,7 @@ function authView(mode="login",msg=""){
       const name=document.getElementById("a-name").value.trim();
       if(!name){btn.disabled=false;return say(T("needName"))}
       if(pw.length<6){btn.disabled=false;return say(T("pwShort"))}
+      if(pw!==document.getElementById("a-pw2").value){btn.disabled=false;return say(T("pwMismatch"))}
       // 알림 동의: 가입 버튼을 누른 그 순간에 폰 허용 창을 띄움 (홈 화면 앱이 아닌 아이폰 Safari는 나중에 홈 화면 앱에서)
       const wantPush=!!document.getElementById("a-push")?.checked;
       if(!wantPush){btn.disabled=false;return say(P("suNeed"))}   // 가입 조건: 마감 알림 동의
@@ -2318,7 +2320,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.71";
+const APP_VER="2026-11-05.72";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
