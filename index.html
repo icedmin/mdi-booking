@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MDI Booking">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>/* 화면 모드: auto(기기 설정 따라감) · light · dark — 그리기 전에 적용해 깜빡임 방지 */
 try{var t=localStorage.getItem("mdi-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <title>MDI 부킹 보드</title>
@@ -614,6 +620,28 @@ dialog#setDlg::backdrop{background:transparent}
 #setDlg .pv-menu{border-top:1px solid var(--line);padding:4px 0 0}
 #setDlg .pv-menu button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:13px;color:var(--ink);border:0;background:none}
 #setDlg .pv-menu button:hover{background:var(--tile)}
+/* 마감 알림 */
+.pbn{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:9px 8px 9px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink);background:var(--bg)}
+.pbn .bell{flex:none;color:var(--red);display:grid}
+.pbn span{flex:1;min-width:0;line-height:1.35}
+.pbn-go{flex:none;height:30px;padding:0 13px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.pbn-x{flex:none;width:30px;height:30px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;border-radius:8px}
+#setDlg .pv-push{display:flex;gap:6px;align-items:center}
+#setDlg .pv-push b{font-size:12px;font-weight:600;color:var(--go)}
+#setDlg .pv-push button{height:28px;padding:0 10px;font-size:12px;font-weight:500;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;cursor:pointer}
+#setDlg .pv-push button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#setDlg .pv-push .off{font-size:12px;color:var(--muted)}
+dialog#pushDlg{margin:auto;inset:0;height:fit-content;max-height:calc(100dvh - 48px);overflow:auto;width:340px;max-width:calc(100vw - 32px);border:0;border-left:0;border-radius:16px;padding:0;background:var(--bg);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+dialog#pushDlg::backdrop{background:rgba(0,0,0,.35)}
+#pushForm{padding:20px 20px 16px;display:block}
+#pushForm h3{margin:0 0 4px;font-size:16px;font-weight:700}
+#pushForm .sub{margin:0 0 14px;font-size:12.5px;color:var(--muted);line-height:1.45}
+#pushForm ol{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+#pushForm li{counter-increment:s;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45}
+#pushForm li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
+#pushForm li svg{vertical-align:-3px;margin:0 2px}
+#pushForm .act{display:flex;justify-content:flex-end;margin-top:18px}
+#pushForm .act button{height:34px;padding:0 16px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .hd .right button.acct{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 2px;border:0;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
 .hd .right button.acct:hover{color:var(--ink)}
 .acct svg{width:15px;height:15px;flex:none}.acct .gr{width:16px;height:16px;color:var(--muted)}.acct:hover .gr{color:var(--ink)}.acct .cv{width:10px;height:10px;color:var(--muted)}
@@ -765,6 +793,7 @@ button.vw-sec.tg:hover{color:var(--acc)}
 <dialog id="dlg"><form class="reg" id="regForm" novalidate></form></dialog>
 <dialog id="pickDlg"><form method="dialog" id="pickForm"></form></dialog>
 <dialog id="setDlg"><form method="dialog" id="setForm"></form></dialog>
+<dialog id="pushDlg"><form method="dialog" id="pushForm"></form></dialog>
 <dialog id="viewer"><div class="vw" id="vw"></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
@@ -944,6 +973,98 @@ function staticText(){
   bindReg();bindPick();
 }
 
+/* ---------- 폰 알림: 투표 마감 10분·5분 전, 아직 투표하지 않은 사람에게 ---------- */
+const VAPID_PUB="BDUU0EGxEkqyxFU1JnChxcbuXV6W8srPfarYaV-MEcRiLr_hlZl1QvZV7qeUw9ZwVnVEP-KOhUH3maGIA7pKiw8";
+const PT={ko:{row:"마감 알림",on:"켜짐",turnOn:"켜기",turnOff:"끄기",test:"시험",how:"방법 보기",denied:"차단됨",unsup:"이 브라우저는 지원 안 함",
+  noteIos:"아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",noteDenied:"폰 설정 › 알림에서 MDI Booking을 허용해 주세요.",noteOn:"마감 10분·5분 전, 아직 투표하지 않았으면 이 기기로 알림이 옵니다.",
+  bnOn:"투표 마감 10분·5분 전 알림을 받으세요",bnIos:"홈 화면에 추가하면 마감 알림을 받을 수 있어요",
+  onT:"알림을 켰습니다",offT:"알림을 껐습니다",deniedT:"알림이 허용되지 않았습니다",fail:"알림을 켜지 못했습니다: ",testT:"시험 알림을 보냈습니다",testFail:"시험 알림을 보내지 못했습니다: ",
+  gTitle:"홈 화면에 추가하기",gSub:"아이폰은 홈 화면 앱에서만 알림을 받을 수 있습니다. 한 번만 하면 됩니다.",
+  g1:"Safari 아래쪽 __SHARE__ 공유 버튼을 누릅니다",g2:"목록에서 <b>홈 화면에 추가</b> → <b>추가</b>",g3:"홈 화면에 생긴 <b>MDI</b> 아이콘으로 엽니다",g4:"화면 위 알림 칸의 <b>켜기</b> → <b>허용</b>",ok:"확인",close:"닫기"},
+ en:{row:"Deadline alerts",on:"On",turnOn:"Turn on",turnOff:"Turn off",test:"Test",how:"How",denied:"Blocked",unsup:"Not supported here",
+  noteIos:"On iPhone, alerts work only in the app added to the Home Screen.",noteDenied:"Allow MDI Booking in your phone's notification settings.",noteOn:"You'll get an alert 10 and 5 minutes before a deadline if you haven't voted.",
+  bnOn:"Get alerts 10 and 5 minutes before a vote closes",bnIos:"Add to Home Screen to get deadline alerts",
+  onT:"Alerts on",offT:"Alerts off",deniedT:"Notifications were not allowed",fail:"Couldn't turn on alerts: ",testT:"Test alert sent",testFail:"Couldn't send test alert: ",
+  gTitle:"Add to Home Screen",gSub:"On iPhone, alerts only work in the Home Screen app. You only do this once.",
+  g1:"Tap the __SHARE__ Share button in Safari",g2:"Choose <b>Add to Home Screen</b> → <b>Add</b>",g3:"Open the <b>MDI</b> icon on your Home Screen",g4:"Tap <b>Turn on</b> in the alert bar → <b>Allow</b>",ok:"OK",close:"Close"}};
+const P=k=>(PT[LANG]||PT.ko)[k];
+const SHARE_SVG='<svg width="16" height="18" viewBox="0 0 16 18" fill="none" aria-hidden="true"><path d="M8 11V1.5M4.8 4.5 8 1.3l3.2 3.2" stroke="#0a84ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 7H3.2A1.2 1.2 0 0 0 2 8.2v7.6A1.2 1.2 0 0 0 3.2 17h9.6a1.2 1.2 0 0 0 1.2-1.2V8.2A1.2 1.2 0 0 0 12.8 7h-2.3" stroke="#0a84ff" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const BELL_SVG='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8a4 4 0 0 0-4 4v2.6L2.8 10.6v.9h10.4v-.9L12 8.4V5.8a4 4 0 0 0-4-4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 13.3a1.7 1.7 0 0 0 3.2 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+const X_SVG='<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const isStandalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+const pushCapable=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+const swReady=("serviceWorker" in navigator)?navigator.serviceWorker.register("sw.js").catch(()=>null):Promise.resolve(null);
+let pushOn=false,pushChecked=false;
+function pushMode(){
+  if(isIOS&&!isStandalone())return "ios-browser";
+  if(!pushCapable())return "unsupported";
+  if(Notification.permission==="denied")return "denied";
+  return pushOn?"on":"off";
+}
+const subJson=s=>{const j=s.toJSON();return {p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth,p_ua:navigator.userAgent}};
+const b64u=s=>{const p="=".repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(b,c=>c.charCodeAt(0))};
+async function pushSync(){   // 로그인 후: 이 기기가 이미 켜져 있으면 서버에 다시 저장(다른 계정으로 바뀐 경우 포함)
+  pushOn=false;
+  try{if(pushCapable()&&Notification.permission==="granted"){const r=await swReady;const s=r&&await r.pushManager.getSubscription();
+    if(s){const {error}=await sb.rpc("save_push_sub",subJson(s));pushOn=!error}}}catch(e){}
+  pushChecked=true;
+}
+function pushRefreshUI(){const d=document.getElementById("setDlg");if(d&&d.open)openSettings();if(me&&profile?.approved&&tab!=="admin")render()}
+async function pushEnable(){
+  try{
+    const perm=await Notification.requestPermission();   // 누른 즉시 물어봐야 아이폰에서 창이 뜸
+    if(perm!=="granted"){toast(P("deniedT"));return pushRefreshUI()}
+    const r=await swReady;if(!r)throw new Error("service worker");
+    await navigator.serviceWorker.ready;
+    let s=await r.pushManager.getSubscription();
+    if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)});
+    const {error}=await sb.rpc("save_push_sub",subJson(s));if(error)throw error;
+    pushOn=true;toast(P("onT"));
+  }catch(e){toast(P("fail")+(e?.message||e))}
+  pushRefreshUI();
+}
+async function pushDisable(){
+  try{const r=await swReady;const s=r&&await r.pushManager.getSubscription();
+    if(s){await sb.rpc("remove_push_sub",{p_endpoint:s.endpoint});await s.unsubscribe()}
+    pushOn=false;toast(P("offT"))}catch(e){toast(P("fail")+(e?.message||e))}
+  pushRefreshUI();
+}
+async function pushTest(){
+  try{const {data,error}=await sb.functions.invoke("deadline-push",{body:{}});if(error)throw error;
+    const ok=(data?.results||[]).some(r=>r.status===201||r.status===200);
+    if(!ok)throw new Error(JSON.stringify(data?.results||data));toast(P("testT"))}
+  catch(e){toast(P("testFail")+(e?.message||e))}
+}
+function openPushGuide(){
+  const f=document.getElementById("pushForm"),d=document.getElementById("pushDlg");
+  f.innerHTML=`<h3>${P("gTitle")}</h3><p class="sub">${P("gSub")}</p><ol><li><span>${P("g1").replace("__SHARE__",SHARE_SVG)}</span></li><li><span>${P("g2")}</span></li><li><span>${P("g3")}</span></li><li><span>${P("g4")}</span></li></ol><div class="act"><button type="submit">${P("ok")}</button></div>`;
+  if(!d.open)d.showModal();
+}
+document.getElementById("pushDlg").addEventListener("click",e=>{if(e.target.id==="pushDlg")e.target.close()});
+function pushBanner(){
+  if(!pushChecked)return "";
+  const m=pushMode();if(m!=="off"&&m!=="ios-browser")return "";
+  try{if(localStorage.getItem("mdi-push-x")===m)return ""}catch(e){}
+  return `<div class="pbn" role="note"><i class="bell">${BELL_SVG}</i><span>${m==="ios-browser"?P("bnIos"):P("bnOn")}</span><button type="button" class="pbn-go" ${m==="ios-browser"?"data-pguide":"data-pon"}>${m==="ios-browser"?P("how"):P("turnOn")}</button><button type="button" class="pbn-x" data-px="${m}" aria-label="${P("close")}">${X_SVG}</button></div>`;
+}
+function pushRowHtml(){
+  const m=pushMode();
+  const ctrl=m==="on"?`<b>${P("on")}</b><button type="button" data-ptest>${P("test")}</button><button type="button" data-poff>${P("turnOff")}</button>`
+    :m==="off"?`<button type="button" class="pri" data-pon>${P("turnOn")}</button>`
+    :m==="ios-browser"?`<button type="button" class="pri" data-pguide>${P("how")}</button>`
+    :m==="denied"?`<span class="off">${P("denied")}</span>`:`<span class="off">${P("unsup")}</span>`;
+  const note=m==="on"?P("noteOn"):m==="ios-browser"?P("noteIos"):m==="denied"?P("noteDenied"):"";
+  return `<div class="pv-row"><span>${P("row")}</span><div class="pv-push">${ctrl}</div></div>${note?`<p class="pv-note">${note}</p>`:""}`;
+}
+function bindPush(el){
+  el.querySelectorAll("[data-pon]").forEach(b=>b.onclick=pushEnable);
+  el.querySelectorAll("[data-poff]").forEach(b=>b.onclick=pushDisable);
+  el.querySelectorAll("[data-ptest]").forEach(b=>b.onclick=pushTest);
+  el.querySelectorAll("[data-pguide]").forEach(b=>b.onclick=()=>{const d=document.getElementById("setDlg");if(d.open)d.close();openPushGuide()});
+  el.querySelectorAll("[data-px]").forEach(b=>b.onclick=()=>{try{localStorage.setItem("mdi-push-x",b.dataset.px)}catch(e){}render()});
+}
+
 /* ---------- 설정 ---------- */
 let THEME=(()=>{try{const t=localStorage.getItem("mdi-theme");return t==="light"||t==="dark"?t:"auto"}catch(e){return "auto"}})();
 function setTheme(t){THEME=t;try{localStorage.setItem("mdi-theme",t)}catch(e){}
@@ -957,6 +1078,7 @@ function openSettings(){
     <div class="pv-row"><span>${T("unitThree")}</span>${seg("data-u",[["three:in","inch"],["three:cm","cm"]],U.three)}</div>
     <div class="pv-row"><span>${T("unitShoe")}</span>${seg("data-u",[["shoe:mm","mm"],["shoe:us","US"],["shoe:eu","EU"]],U.shoe)}</div>
     <p class="pv-note">${T("shoeNote")}</p>
+    ${me&&profile?.approved?pushRowHtml():""}
     ${me?`<div class="pv-menu">${profile?.approved&&profile.role==="admin"?`<button type="button" id="toAdmin">${tab==="admin"?T("toBoard"):T("members")}</button>`:""}<button type="button" id="logout">${T("logout")}</button></div>`:""}`;
   f.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
     LANG=b.dataset.l;try{localStorage.setItem("mdi-lang",LANG)}catch(e){}
@@ -967,6 +1089,7 @@ function openSettings(){
   f.querySelectorAll("[data-th]").forEach(b=>b.onclick=()=>{setTheme(b.dataset.th);openSettings()});
   f.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.u.split(":");U[k]=v;try{localStorage.setItem("mdi-units",JSON.stringify(U))}catch(e){}
     if(me&&profile?.approved&&tab!=="admin")render();openSettings()});
+  bindPush(f);
   const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();sb.auth.signOut()};
   const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{d.close();tab=tab==="admin"?"cand":"admin";render()};
   // 헤더의 버튼 바로 아래에 작은 창으로 띄움
@@ -1275,7 +1398,7 @@ function render(){
   if(tab==="admin")return adminView();
   if(scope==="mine"&&NOMINE.includes(tab))tab="cand";
   const list=items.filter(it=>stageOf(it)===tab&&inScope(it));
-  let html=tabsHtml();
+  let html=pushBanner()+tabsHtml();
   if(scope==="mine"){
     html+=mineHtml(tab);
   }else if(tab==="cand"){
@@ -1335,6 +1458,7 @@ function render(){
   root.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{gf=b.dataset.gf;try{localStorage.setItem("mdi-gf",gf)}catch(e){}render()});
   root.querySelectorAll("[data-cf]").forEach(b=>b.onclick=()=>{cf=b.dataset.cf;try{localStorage.setItem("mdi-cf",cf)}catch(e){}render()});
   root.querySelectorAll(".pfb").forEach(b=>b.onclick=()=>{const d=b.parentElement,o=!d.classList.contains("open");pfOpen=o;d.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
+  bindPush(root);
   root.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;pfOpen=false;try{localStorage.setItem("mdi-pf",pf)}catch(e){}render()});
   root.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{mf=b.dataset.mf;render()});
   root.querySelectorAll("[data-mwho]").forEach(d=>d.ontoggle=()=>{d.open?mwhoOpen.add(d.dataset.mwho):mwhoOpen.delete(d.dataset.mwho)});
@@ -2184,7 +2308,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.67";
+const APP_VER="2026-11-05.68";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
@@ -2201,6 +2325,7 @@ async function boot(session){
   root.innerHTML=`<div class="loading">${T("loading")}</div>`;
   try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
   subscribe();render();autoFill();
+  pushSync().then(()=>{if(tab!=="admin")render()});
 }
 /* 링크만 있고 사진이 없는 내 후보(관리자는 전체)는 메인 사진·포트폴리오를 자동으로 채움 — 세션당 1회 */
 const autoTried=new Set();
