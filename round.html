@@ -235,13 +235,14 @@ button.vw-sec.tg:hover{color:var(--ink)}
 
 /* ===== 둥근 무드 (떠 있는 것·사진·버튼은 둥글게, 구조는 그대로) ===== */
 .pic{border-radius:14px}
-.pic .cmore{position:absolute;top:8px;right:8px;z-index:3;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(20,20,20,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.pic .cmore::before{content:"";position:absolute;inset:-8px}
-.pic .cmore:hover{background:rgba(20,20,20,.75)}
+.pic .cx{position:absolute;top:8px;right:8px;z-index:3;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(20,20,20,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pic .cx::before{content:"";position:absolute;inset:-8px}
+.pic .cx:hover{background:rgba(20,20,20,.75)}
 .pic .cmenu{position:absolute;top:44px;right:8px;z-index:5;min-width:180px;background:var(--bg);color:var(--ink);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.06);display:flex;flex-direction:column;cursor:default;animation:wdIn .12s ease-out}
 .pic .cmenu button{text-align:left;padding:10px 12px;border-radius:8px;font-size:13.5px;color:var(--ink);background:none;border:0}
 .pic .cmenu button:hover{background:var(--tile)}
 .pic:has(.cmenu) .tm{display:none}
+.who summary .regby .edit{font:inherit;font-size:12.5px;color:var(--ink);text-decoration:underline;text-underline-offset:2px;background:none;border:0;padding:0}
 .who summary .regby{margin-left:auto;margin-right:10px;font-weight:400;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
 .facts{gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .facts::-webkit-scrollbar{display:none}
@@ -444,7 +445,7 @@ button.vw-sec.tg:hover{color:var(--acc)}
 .wdov .btn{border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;min-width:84px;border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff}
 .wdov .btn:first-child{background:#fff;border-color:#fff;color:#111}
 .wdov .btn:hover{border-color:#fff}
-.pic:has(.wdov) .tm,.pic:has(.wdov) .wdx{display:none}
+.pic:has(.wdov) .tm,.pic:has(.wdov) .wdx,.pic:has(.wdov) .cx{display:none}
 .wd{margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .wd button{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding:2px 0}
 .wd button:hover{color:var(--bad);border-color:var(--bad)}
@@ -838,7 +839,7 @@ function card(it){
   const P=n=>n+T("pts");
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cmore" data-more="${it.id}" aria-label="${T("menu")}" aria-haspopup="menu">${DOTS}</button>${moreOpen===it.id?`<div class="cmenu" role="menu"><button type="button" role="menuitem" data-edit="${it.id}">${T("editBtn")}</button><button type="button" role="menuitem" data-wd="${it.id}">${T("withdraw")}</button></div>`:""}`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span></span>`:""}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span></span>`:""}</div>
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
@@ -859,7 +860,7 @@ function card(it){
     ${isClosed?`<div class="result ${ok?"pass":"fail"}"><span>${ok?T("resPass"):T("resFail")}</span><span>${s.n?s.avg.toFixed(1)+T("pts"):T("noVotes")}</span></div>`
       :`<div class="vote" role="group" aria-label="${esc(it.name)}">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}">${n}</button>`).join("")}</div>`}
     <details class="who" data-whobox="${it.id}" ${openWho.has(it.id)?"open":""}>
-      <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="regby">${esc(name(it.created_by))} ${T("regBy")}</span><span class="pm" aria-hidden="true"></span></summary>
+      <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="regby">${esc(name(it.created_by))} ${T("regBy")}${canEdit(it)&&!it.withdrawn_at?` · <button type="button" class="edit" data-edit="${it.id}">${T("editBtn")}</button>`:""}</span><span class="pm" aria-hidden="true"></span></summary>
       <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
@@ -913,7 +914,7 @@ function render(){
   root.innerHTML=html;
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
   const o=document.getElementById("openReg");if(o)o.onclick=()=>openReg();
-  root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.stopPropagation();moreOpen=null;render();openReg(items.find(x=>x.id===b.dataset.edit))});
+  root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();moreOpen=null;render();openReg(items.find(x=>x.id===b.dataset.edit))});
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
   root.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{const k=b.dataset.filter;filter=(filter===k&&k!=="all")?"all":k;todoKeep.clear();render()});
   root.querySelectorAll("[data-wd]").forEach(b=>b.onclick=e=>{e.stopPropagation();moreOpen=null;wdAsk.add(b.dataset.wd);render()});
@@ -933,7 +934,7 @@ function render(){
     await loadAll();render();
   });
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
-  root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=e=>{if(e.target.closest(".wdx,.wdov,.cmore,.cmenu"))return;go()};el.onkeydown=e=>{if(e.target!==el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+  root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=e=>{if(e.target.closest(".wdx,.wdov,.cx"))return;go()};el.onkeydown=e=>{if(e.target!==el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{
     const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
     const score=+b.dataset.v;
