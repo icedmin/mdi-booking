@@ -483,7 +483,7 @@ ko:{
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
- voting:"투표 중",soon24:"24시간 내 마감",myTodo:"내가 아직 안 한 투표",addCand:"+ 등록",
+ voting:"투표 중",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
  closedFail:"마감 · 미통과",
  contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
@@ -530,7 +530,7 @@ en:{
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
- voting:"Voting",soon24:"Closing in 24h",myTodo:"Waiting for my vote",addCand:"+ Add",
+ voting:"Voting",soon24:"Closing in 24h",myTodo:"Not voted",addCand:"+ Add",
  emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
  closedFail:"Closed · not passed",
  contactDesc:"Models that passed the vote · moving to the next stage will be added once the rules are set",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
@@ -1581,7 +1581,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.7";
+const APP_VER="2026-11-05.8";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
