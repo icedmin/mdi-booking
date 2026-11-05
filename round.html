@@ -272,22 +272,24 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .who summary .pm{margin-left:4px}
 .tabs .tsep{flex:none;width:1px;align-self:center;height:14px;background:var(--line);margin:0 -10px 10px}
 .tabs .mytab .rdy{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--go);color:#fff;font-size:11px;font-weight:600;vertical-align:1px}
-.msec{margin-top:26px}.msec h3{font-size:15px;font-weight:600;margin:0 0 10px}.msec h3 .c{color:var(--muted);font-weight:400;margin-left:6px;font-size:13px}
-.mlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.mrow{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
-.mrow.rdy{border-color:color-mix(in srgb,var(--go) 55%,var(--line))}
-.mth{width:64px;height:80px;border-radius:10px;overflow:hidden;background:var(--line);display:grid;place-items:center;color:var(--muted);font-size:20px}
-.mth[role=button]{cursor:pointer}.mth img{width:100%;height:100%;object-fit:cover;display:block}
-.mbody{min-width:0;display:grid;gap:5px}
-.mtop{display:flex;align-items:baseline;gap:8px;min-width:0}.mname{margin:0;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mag{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mstate{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
-.tbar.mb{display:block;width:90px;height:2px;border-radius:2px;background:var(--line);overflow:hidden}.tbar.mb i{display:block;height:100%;background:var(--red)}
-.mscore{display:flex;align-items:center;gap:12px;font-size:13px}.mavg{font-weight:600;font-variant-numeric:tabular-nums}.mavg small{color:var(--muted);font-weight:400;margin-left:1px}.mscore .st{display:inline-flex;align-items:center;gap:6px}.mvn{color:var(--muted)}
-.mmiss{margin:0;font-size:12.5px;color:var(--ink)}.mmiss>span{color:var(--muted);margin-right:4px}.mmiss .all{color:var(--go);font-weight:600;margin:0}
-.mact{display:flex;justify-content:flex-end}
-.mvbtn{background:var(--go)!important;border-color:var(--go)!important;color:#fff!important;white-space:nowrap}
-.mvask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.mvask span{font-size:12.5px;color:var(--muted);white-space:nowrap}.mvask .btn{white-space:nowrap}
-@media (max-width:640px){.mrow{grid-template-columns:56px 1fr;gap:12px}.mth{width:56px;height:70px}.mact{grid-column:1/-1}.mact .mvbtn{width:100%}.mvask{width:100%;justify-content:space-between}.mvask span{flex:1 0 100%}.mvask .btn{flex:1}}
+.msec{margin-top:28px}.msec h3{font-size:14px;font-weight:600;margin:0 0 12px}.msec h3 .c{color:var(--muted);font-weight:400;margin-left:6px;font-size:13px}
+.mgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:26px 16px}
+.mc{min-width:0;display:flex;flex-direction:column;gap:6px}
+.mph{position:relative;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:var(--tile,var(--line));display:grid;place-items:center;color:var(--muted);font-size:22px;margin-bottom:4px}
+.mph[role=button]{cursor:pointer}.mph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mc.rdy .mph{box-shadow:0 0 0 2px var(--go)}
+.mtag{position:absolute;left:8px;top:8px;padding:4px 9px;border-radius:999px;background:var(--go);color:#fff;font-size:11px;font-weight:600;line-height:1.2}
+.mname{margin:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mname span{font-size:12px;font-weight:400;color:var(--muted);margin-left:6px}
+.mtime{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tbar.mb{display:block;flex:1;min-width:30px;height:2px;border-radius:2px;background:var(--line);overflow:hidden}.tbar.mb i{display:block;height:100%;background:var(--red)}
+.mscore.score{margin:0;padding:0;border:0;display:flex;align-items:center;gap:10px;font-size:12.5px}
+.mavg{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}.mscore .st{font-size:12.5px}.mvn{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.mmiss{margin:0;font-size:12px;color:var(--ink);line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.mmiss>span{color:var(--muted);margin-right:5px}
+.mmiss.ok{color:var(--go);font-weight:600}.mmiss.ok span{color:var(--muted);font-weight:400;margin:0}
+.mact{margin-top:4px}.btn.sm{padding:8px 12px;font-size:12.5px;width:100%}
+.mvbtn{background:var(--ink)!important;border-color:var(--ink)!important;color:var(--bg)!important}
+.mvask{display:flex;gap:6px}.mvask .btn{flex:1}
+@media (max-width:640px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}}
 .mscore.score{margin:0;padding:0;border:0}
 .mscore.score .st{font-size:13px}
 </style>
@@ -537,7 +539,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",st_mine:"내 후보",mineDesc:"내가 등록한 후보의 투표 현황입니다. 전원이 투표하고 기준선(6.0)을 넘으면 마감 전에 컨택 중으로 넘길 수 있습니다.",mReady:"컨택 가능",mVoting:"투표 중",mMoved:"컨택 중",mFail:"마감 · 미통과",toContact:"컨택 중으로 넘기기",mvAsk:"넘기면 투표가 마감됩니다",mvYes:"넘기기",movedT:"컨택 중으로 넘겼습니다",mvFail:"넘기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준선 미달",movedAt:"컨택 이동",emptyMine:"등록한 후보가 없습니다",emptyMineSub:"후보 탭에서 후보를 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준선(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",st_mine:"내 후보",mineDesc:"내가 등록한 후보의 투표 현황입니다. 전원 투표 후 기준선(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"컨택 가능",mVoting:"투표 중",mMoved:"컨택 중",mFail:"마감 · 미통과",toContact:"컨택 시작",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준선 미달",movedAt:"컨택 이동",emptyMine:"등록한 후보가 없습니다",emptyMineSub:"후보 탭에서 후보를 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준선(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -584,7 +586,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",st_mine:"My candidates",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Ready to contact",mVoting:"Voting",mMoved:"Contacting",mFail:"Closed · not passed",toContact:"Move to Contacting",mvAsk:"Voting will close",mvYes:"Move",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",st_mine:"My candidates",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Ready to contact",mVoting:"Voting",mMoved:"Contacting",mFail:"Closed · not passed",toContact:"Start contact",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
@@ -928,25 +930,22 @@ function mineHtml(){
   const row=it=>{
     const s=stats(it),ok=passed(it),isC=closed(it),dl=deadline(it),rem=dl-Date.now();
     const ids=new Set(vOf(it.id).map(v=>v.user_id));const miss=voters.filter(m=>!ids.has(m.id));
-    const u=photoUrls[it.photos[0]];
-    const canView=u||it.link;
-    const state=isC?(it.contacted_at?`${T("movedAt")} ${fmt(it.contacted_at)}`:`${T("closedAt")} ${fmt(dl)}`)
-      :`<span class="mtime" data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar mb"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span>`;
-    const rdy=readyToMove(it);
-    const act=rdy?(mvAsk===it.id?`<div class="mvask"><span>${T("mvAsk")}</span><button type="button" class="btn" data-mvyes="${it.id}">${T("mvYes")}</button><button type="button" class="btn line" data-mvno="${it.id}">${T("cancel")}</button></div>`
-      :`<button type="button" class="btn mvbtn" data-mv="${it.id}">${T("toContact")}</button>`):"";
-    return `<li class="mrow${rdy?" rdy":""}">
-      <div class="mth" ${canView?`data-mview="${it.id}" role="button" tabindex="0"`:""}>${u?`<img src="${esc(u)}" alt="">`:`<b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>`}</div>
-      <div class="mbody">
-        <div class="mtop"><p class="mname">${esc(it.name)}</p><span class="mag">${esc(it.agency||"")}</span></div>
-        <div class="mstate">${state}</div>
-        <div class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}<small>/10</small></span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span><span class="mvn">${s.n}/${voters.length}${T("votedN")}</span></div>
-        ${!isC?`<p class="mmiss">${miss.length?`<span>${T("mvWait")}</span> ${miss.map(m=>esc(m.display_name)).join(", ")}`:`<span class="all">${T("mvAllIn")}</span>${ok?"":` · ${T("mvBelow")}`}`}</p>`:""}
-      </div>
-      ${act?`<div class="mact">${act}</div>`:""}
+    const u=photoUrls[it.photos[0]];const canView=u||it.link;const rdy=readyToMove(it);
+    const time=isC?`<span class="mt-c">${it.contacted_at?`${T("movedAt")} ${fmt(it.contacted_at)}`:`${T("closedAt")} ${fmt(dl)}`}</span>`
+      :`<span class="mt-t" data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar mb"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span>`;
+    const who=isC?"":(miss.length?`<p class="mmiss"><span>${T("mvWait")}</span>${miss.map(m=>esc(m.display_name)).join(", ")}</p>`
+      :`<p class="mmiss ok">${T("mvAllIn")}${ok?"":` · <span>${T("mvBelow")}</span>`}</p>`);
+    const act=rdy?(mvAsk===it.id?`<div class="mvask"><button type="button" class="btn sm" data-mvyes="${it.id}">${T("mvYes")}</button><button type="button" class="btn sm line" data-mvno="${it.id}">${T("cancel")}</button></div>`
+      :`<button type="button" class="btn sm mvbtn" data-mv="${it.id}">${T("toContact")}</button>`):"";
+    return `<li class="mc${rdy?" rdy":""}">
+      <div class="mph" ${canView?`data-mview="${it.id}" role="button" tabindex="0"`:""}>${u?`<img src="${esc(u)}" alt="">`:`<b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>`}${rdy?`<span class="mtag">${T("mReady")}</span>`:""}</div>
+      <p class="mname">${esc(it.name)}${it.agency?`<span>${esc(it.agency)}</span>`:""}</p>
+      <div class="mtime">${time}</div>
+      <div class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}</span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span><span class="mvn">${s.n}/${voters.length}${T("ppl")}</span></div>
+      ${who}${act?`<div class="mact">${act}</div>`:""}
     </li>`;
   };
-  const sec=(k,list)=>list.length?`<div class="msec"><h3>${T(k)}<span class="c">${list.length}</span></h3><ul class="mlist">${list.map(row).join("")}</ul></div>`:"";
+  const sec=(k,list)=>list.length?`<div class="msec"><h3>${T(k)}<span class="c">${list.length}</span></h3><ul class="mgrid">${list.map(row).join("")}</ul></div>`:"";
   return head("mine",T("mineDesc"))+(my.length?sec("mReady",ready)+sec("mVoting",voting)+sec("mMoved",moved)+sec("mFail",fail)
     :`<div class="empty"><b>${T("emptyMine")}</b>${T("emptyMineSub")}</div>`);
 }
