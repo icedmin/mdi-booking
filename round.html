@@ -524,7 +524,7 @@ const STAGES=["cand","contact","prog","town","missed"];
 /* ---------- 언어 ---------- */
 const I18N={
 ko:{
- st_cand:"투표",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
+ st_cand:"모델 투표",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
  loadFail:"연결 도구를 불러오지 못했습니다",loadFailSub:"인터넷 연결을 확인하고 새로고침해 주세요.",
  login:"로그인",signup:"가입",loginSub:"MDI 부킹 보드는 승인된 사내 인원만 사용할 수 있습니다.",signupSub:"가입 후 관리자가 승인하면 사용할 수 있습니다.",
  nameOrTitle:"이름 또는 직함",email:"이메일",password:"비밀번호",doLogin:"로그인",doSignup:"가입하기",
@@ -539,7 +539,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"컨택 가능",mVoting:"투표 중",mMoved:"컨택 중",mFail:"마감 · 미통과",toContact:"컨택 시작",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"컨택 가능",mVoting:"투표 중",mMoved:"컨택 중",mFail:"마감 · 미통과",toContact:"컨택 시작",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -571,7 +571,7 @@ ko:{
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
 en:{
- st_cand:"Voting",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
+ st_cand:"Model vote",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
  loadFail:"Couldn't load the connection library",loadFailSub:"Check your internet connection and refresh.",
  login:"Log in",signup:"Sign up",loginSub:"MDI Booking Board is for approved staff only.",signupSub:"You can use the board once an admin approves your account.",
  nameOrTitle:"Name or title",email:"Email",password:"Password",doLogin:"Log in",doSignup:"Sign up",
@@ -622,7 +622,7 @@ let U={three:"in",shoe:"mm"};try{Object.assign(U,JSON.parse(localStorage.getItem
 if(!I18N[LANG])LANG="ko";
 const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
 const SN=s=>T("st_"+s);
-const EN={mine:"MY MODELS",cand:"VOTING",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
+const EN={mine:"MY MODELS",cand:"MODEL VOTE",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
 
 const root=document.getElementById("root"),hdRight=document.getElementById("hdRight");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));

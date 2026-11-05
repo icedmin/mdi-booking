@@ -464,7 +464,7 @@ const STAGES=["cand","contact","prog","town","missed"];
 /* ---------- 언어 ---------- */
 const I18N={
 ko:{
- st_cand:"투표",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
+ st_cand:"모델 투표",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
  loadFail:"연결 도구를 불러오지 못했습니다",loadFailSub:"인터넷 연결을 확인하고 새로고침해 주세요.",
  login:"로그인",signup:"가입",loginSub:"MDI 부킹 보드는 승인된 사내 인원만 사용할 수 있습니다.",signupSub:"가입 후 관리자가 승인하면 사용할 수 있습니다.",
  nameOrTitle:"이름 또는 직함",email:"이메일",password:"비밀번호",doLogin:"로그인",doSignup:"가입하기",
@@ -511,7 +511,7 @@ ko:{
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
 en:{
- st_cand:"Voting",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
+ st_cand:"Model vote",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
  loadFail:"Couldn't load the connection library",loadFailSub:"Check your internet connection and refresh.",
  login:"Log in",signup:"Sign up",loginSub:"MDI Booking Board is for approved staff only.",signupSub:"You can use the board once an admin approves your account.",
  nameOrTitle:"Name or title",email:"Email",password:"Password",doLogin:"Log in",doSignup:"Sign up",
@@ -562,7 +562,7 @@ let U={three:"in",shoe:"mm"};try{Object.assign(U,JSON.parse(localStorage.getItem
 if(!I18N[LANG])LANG="ko";
 const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
 const SN=s=>T("st_"+s);
-const EN={cand:"VOTING",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
+const EN={cand:"MODEL VOTE",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
 
 const root=document.getElementById("root"),hdRight=document.getElementById("hdRight");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1580,7 +1580,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.5";
+const APP_VER="2026-11-05.6";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
