@@ -1022,8 +1022,7 @@ function mineHtml(){
       :`<span class="mt-t" data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar mb"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span>`;
     const ARW='<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6h7.5M6.5 2.8 9.7 6l-3.2 3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const stTxt=isC?"":(!s.n?`<span class="ms-none">${T("noVotes")}</span>`:ok?`<span class="ms-ok">${T("mvPass")}</span>${miss.length?`<span class="ms-sub"> · ${T("missN").replace("{n}",miss.length)}</span>`:""}`:`<span class="ms-no">${T("mvBelow")}</span>`);
-    const act=rdy?(mvAsk===it.id?`<span class="mvask"><button type="button" class="mvgo" data-mvyes="${it.id}">${T("mvYes")}</button><button type="button" class="mvno" data-mvno="${it.id}">${T("cancel")}</button></span>`
-      :`<button type="button" class="mvgo" data-mv="${it.id}">${T("toContact")}${ARW}</button>`):"";
+    const act=rdy?`<button type="button" class="mvgo" data-mv="${it.id}">${T("toContact")}${ARW}</button>`:"";
     const vm=Object.fromEntries(vOf(it.id).map(v=>[v.user_id,v.score]));
     const who=`<details class="mwho" data-mwho="${it.id}" ${mwhoOpen.has(it.id)?"open":""}><summary>${T("votersShort")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span><span class="pm" aria-hidden="true"></span></summary><dl>${voters.map(m=>vm[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${vm[m.id]}${T("pts")}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl></details>`;
     return `<li class="mc${rdy?" rdy":""}${isC&&!ok?" fail":""}">
@@ -1098,10 +1097,10 @@ function render(){
   root.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;try{localStorage.setItem("mdi-pf",pf)}catch(e){}render()});
   root.querySelectorAll("[data-mwho]").forEach(d=>d.ontoggle=()=>{d.open?mwhoOpen.add(d.dataset.mwho):mwhoOpen.delete(d.dataset.mwho)});
   root.querySelectorAll("[data-msec]").forEach(d=>d.ontoggle=()=>{msecOpen[d.dataset.msec]=d.open;try{localStorage.setItem("mdi-msec",JSON.stringify(msecOpen))}catch(e){}});
-  root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{mvAsk=b.dataset.mv;render()});
+
   root.querySelectorAll("[data-mvno]").forEach(b=>b.onclick=()=>{mvAsk=null;render()});
-  root.querySelectorAll("[data-mvyes]").forEach(b=>b.onclick=async()=>{
-    b.disabled=true;const id=b.dataset.mvyes;
+  root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=async()=>{   // 한 번 누르면 바로 컨택 중으로
+    b.disabled=true;const id=b.dataset.mv;
     const {error}=await sb.rpc("move_to_contact",{cid:id});
     mvAsk=null;
     if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}else toast(T("movedT"));
@@ -1864,7 +1863,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.26";
+const APP_VER="2026-11-05.27";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
