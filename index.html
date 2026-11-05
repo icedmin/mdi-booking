@@ -373,24 +373,54 @@ img.plw{opacity:0!important}
 .mwho[open]>summary .pm::before{transform:translateY(1px) rotate(-135deg)}
 .mwho dl{margin:6px 0 0;display:grid;grid-template-columns:1fr auto;gap:4px 10px}
 .mwho dt,.mwho dd{margin:0}.mwho dd{text-align:right;font-variant-numeric:tabular-nums}.mwho .no{color:var(--muted)}
-/* 컨택: 폰은 밀어서, PC는 클릭 (같은 생김새, 무채색) */
-.mslide,.mclick{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:36px;margin-top:6px;border-radius:999px;border:0;overflow:hidden;
-  background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);font:inherit;font-size:12.5px;font-weight:500;letter-spacing:-.01em;user-select:none;-webkit-user-select:none}
+/* 컨택: 글라스모피즘 — PC는 버튼(오른쪽 ↗ 칸), 폰은 밀기(왼쪽 → 칸) */
+.gls{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:44px;margin-top:10px;padding:0;border-radius:12px;overflow:hidden;
+  font:inherit;font-size:13.5px;font-weight:600;letter-spacing:-.01em;color:var(--ink);user-select:none;-webkit-user-select:none;
+  background:linear-gradient(180deg,rgba(214,240,222,.75),rgba(196,232,207,.6));border:1px solid rgba(120,200,150,.45);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(90,170,120,.12),0 4px 14px rgba(40,140,80,.10)}
+.gls .k{position:absolute;top:4px;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;z-index:2;color:#fff;
+  background:linear-gradient(180deg,rgba(150,215,170,.95),rgba(110,190,140,.95));border:1px solid rgba(70,160,105,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 2px 6px rgba(40,140,80,.22)}
+.mclick{cursor:pointer;transition:filter .15s,transform .1s}.mclick .t{margin-right:30px}
+.mclick .k{right:4px;transition:transform .2s}.mclick:hover{filter:brightness(1.03)}.mclick:hover .k{transform:translate(1px,-1px)}.mclick:active{transform:scale(.985)}
 .mslide{touch-action:pan-y;cursor:grab}
-.mslide .k,.mclick .k{position:absolute;left:3px;top:3px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;z-index:2;transition:background .2s}
-.mslide .fill{position:absolute;left:0;top:0;bottom:0;width:36px;border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,transparent);z-index:1}
-.mslide .sh{position:relative;z-index:1;padding-left:20px;opacity:calc(1 - var(--p,0)*1.5);color:var(--muted);
+.mslide .k{left:4px}
+.mslide .fill{position:absolute;left:0;top:0;bottom:0;width:42px;background:linear-gradient(90deg,rgba(150,215,170,.0),rgba(150,215,170,.45));z-index:1}
+.mslide .sh{position:relative;z-index:1;padding-left:30px;opacity:calc(1 - var(--p,0)*1.5);
   -webkit-mask:linear-gradient(90deg,#000 0,#000 40%,rgba(0,0,0,.35) 50%,#000 60%,#000 100%) 0 0/250% 100%;mask:linear-gradient(90deg,#000 0,#000 40%,rgba(0,0,0,.35) 50%,#000 60%,#000 100%) 0 0/250% 100%;animation:shine 2.8s linear infinite}
 @keyframes shine{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:-150% 0;mask-position:-150% 0}}
-.mslide.drag{cursor:grabbing}.mslide.ok .k{background:var(--go)}
-.mclick{cursor:pointer;gap:6px;padding-left:24px;transition:background .15s}
-.mclick:hover{background:color-mix(in srgb,var(--ink) 10%,transparent)}.mclick:active{transform:scale(.98)}
-.mclick .k{transition:transform .2s}.mclick:hover .k{transform:translateX(3px)}
+.mslide.drag{cursor:grabbing}.mslide.ok .k{background:linear-gradient(180deg,#3ccf78,#1fb35d)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gls{background:linear-gradient(180deg,rgba(40,90,60,.55),rgba(30,70,48,.5));border-color:rgba(90,180,125,.35);color:#e9f5ee;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.25)}}
+:root[data-theme="dark"] .gls{background:linear-gradient(180deg,rgba(40,90,60,.55),rgba(30,70,48,.5));border-color:rgba(90,180,125,.35);color:#e9f5ee;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.25)}
 @media (prefers-reduced-motion:reduce){.mslide .sh{animation:none}}
+/* 점수 줄 = 투표자 토글 */
+.mwho>summary{justify-content:space-between;padding:4px 0}
+.mwho>summary .mscore{display:flex;align-items:center;gap:12px}
+.mwho>summary .vlab{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap}
+.mwho>summary .vlab .c{color:var(--muted);font-weight:400}
 .mrr{width:100%;height:32px;margin-top:6px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
 .mrr:hover{border-color:var(--ink)}
 .mrr.arm{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .mrr{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 10px}
+/* 내가 준 점수까지 이어진 옅은 배경 */
+.vote{position:relative;isolation:isolate}
+.vote::before{content:"";position:absolute;left:0;top:0;height:30px;border-radius:15px;z-index:-1;pointer-events:none;
+  width:calc((100% - 30px) * (var(--n) - 1) / 9 + 30px);background:color-mix(in srgb,var(--red) 11%,transparent);opacity:0;transition:opacity .15s}
+.vote.has::before{opacity:1}
+.vote.vfa::before{animation:vfGrow .28s ease-out}
+@keyframes vfGrow{from{width:calc((100% - 30px) * (max(var(--n0),1) - 1) / 9 + 30px)}}
+/* 컨택 되돌리기 팝업: 글라스 */
+.undo{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:14px;
+  padding:8px 8px 8px 16px;border-radius:14px;max-width:calc(100vw - 32px);font-size:13px;font-weight:500;color:#fff;
+  background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.04) 55%,rgba(255,255,255,.08)),rgba(24,24,24,.78);
+  -webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 0 0 .5px rgba(255,255,255,.18),0 10px 30px rgba(0,0,0,.25)}
+.undo span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.undo button{flex:none;height:30px;padding:0 13px;border-radius:9px;border:0;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.undo button:hover{background:rgba(255,255,255,.26)}
+.undo.in{animation:undoIn .2s ease-out}.undo.out{opacity:0;transform:translate(-50%,6px);transition:opacity .2s,transform .2s}
+@keyframes undoIn{from{opacity:0;transform:translate(-50%,8px)}}
 </style>
 
 </head>
@@ -608,6 +638,7 @@ button.vw-sec.tg:hover{color:var(--acc)}
 <main class="gut"><div class="inner" id="root"><div class="loading">…</div></div></main>
 <footer class="gut"><div class="inner"><b>MDI MODEL MANAGEMENT</b><span id="ftStages"></span></div></footer>
 <div class="toast" id="toast" hidden></div>
+<div class="undo" id="undoBar" hidden role="status"><span id="undoMsg"></span><button type="button" id="undoBtn"></button></div>
 
 <dialog id="dlg"><form class="reg" id="regForm" novalidate></form></dialog>
 <dialog id="pickDlg"><form method="dialog" id="pickForm"></form></dialog>
@@ -641,7 +672,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택",slideTo:"밀어서 컨택",rereview:"재심사 요청",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -688,7 +719,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Contact",slideTo:"Slide to contact",rereview:"Request re-review",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
@@ -997,7 +1028,7 @@ function card(it){
       <div class="bar-lab"><span>0</span><span class="c">6.0</span><span>10</span></div>
     </div>
     ${isClosed?`<div class="result ${ok?"pass":"fail"}"><span>${ok?T("resPass"):T("resFail")}</span><span>${s.n?s.avg.toFixed(1)+T("pts"):T("noVotes")}</span></div>`
-      :`<div class="vote" role="group" aria-label="${esc(it.name)}">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}">${n}</button>`).join("")}</div>`}
+      :`<div class="vote${mine?" has":""}${vfAnim(it.id,mine)}" role="group" aria-label="${esc(it.name)}" style="--n:${mine||0};--n0:${vfMem.get(it.id+"p")||0}">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}">${n}</button>`).join("")}</div>`}
     <details class="who" data-whobox="${it.id}" ${openWho.has(it.id)?"open":""}>
       <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="pm" aria-hidden="true"></span><span class="regby">${esc(name(it.created_by))} ${T("regBy")}${canEdit(it)&&!it.withdrawn_at?` · <button type="button" class="edit" data-edit="${it.id}">${T("editBtn")}</button>`:""}</span></summary>
       <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
@@ -1021,7 +1052,11 @@ function adminView(){
   });
 }
 
-let mvAsk=null;const mwhoOpen=new Set();
+let mvAsk=null;
+let cf="all";try{cf=localStorage.getItem("mdi-cf")||"all"}catch(e){}
+/* 투표 숫자 줄: 1~내 점수까지 옅게 이어진 배경. 점수가 바뀐 그 순간에만 늘어나고 줄어드는 움직임 */
+const vfMem=new Map();
+function vfAnim(id,n){n=n||0;const old=vfMem.get(id);vfMem.set(id+"p",old??n);vfMem.set(id,n);return old!=null&&old!==n&&n?" vfa":""}const mwhoOpen=new Set();
 const pfHtml=c=>`<div class="pf ${c}" role="group" aria-label="${T("pfLabel")}">${["all","pass","fail"].map(k=>`<button type="button" data-pf="${k}" aria-pressed="${pf===k}">${T("pf_"+k)}</button>`).join("")}</div>`;
 let pf="all";try{pf=localStorage.getItem("mdi-pf")||"all"}catch(e){}
 const msecOpen={mReady:true,mVoting:true,mMoved:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
@@ -1042,18 +1077,20 @@ function mineHtml(){
     const stTxt=isC?"":(!s.n?`<span class="ms-none">${T("noVotes")}</span>`:ok?(miss.length?`<span class="ms-sub">${T("missN").replace("{n}",miss.length)}</span>`:""):`<span class="ms-no">${T("mvBelow")}</span>`);
     const act="";
     const rr=isC&&!ok&&!it.contacted_at?`<button type="button" class="mrr" data-rr="${it.id}">${T("rereview")}</button>`:"";
+    const UP='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const RT='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h10.5M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const go=rdy?(matchMedia("(pointer:coarse)").matches
-      ?`<div class="mslide" data-slide="${it.id}" role="button" aria-label="${T("toContact")}"><span class="fill"></span><span class="sh">${T("slideTo")}</span><span class="k">${ARW}</span></div>`
-      :`<button type="button" class="mclick" data-mv="${it.id}"><span class="k">${ARW}</span>${T("toContact")}</button>`):"";
+      ?`<div class="gls mslide" data-slide="${it.id}" role="button" aria-label="${T("toContact")}"><span class="fill"></span><span class="sh">${T("slideTo")}</span><span class="k">${RT}</span></div>`
+      :`<button type="button" class="gls mclick" data-mv="${it.id}"><span class="t">${T("toContact")}</span><span class="k">${UP}</span></button>`):"";
     const vm=Object.fromEntries(vOf(it.id).map(v=>[v.user_id,v.score]));
-    const who=`<details class="mwho" data-mwho="${it.id}" ${mwhoOpen.has(it.id)?"open":""}><summary>${T("votersShort")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span><span class="pm" aria-hidden="true"></span></summary><dl>${voters.map(m=>vm[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${vm[m.id]}${T("pts")}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl></details>`;
+    const who=`<details class="mwho" data-mwho="${it.id}" ${mwhoOpen.has(it.id)?"open":""}><summary><span class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}</span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span></span><span class="vlab">${T("votersShort")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span><span class="pm" aria-hidden="true"></span></span></summary><dl>${voters.map(m=>vm[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${vm[m.id]}${T("pts")}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl></details>`;
     return `<li class="mc${rdy?" rdy":""}${isC&&!ok?" fail":""}">
       <div class="mph" ${canView?`data-mview="${it.id}" role="button" tabindex="0"`:""}>${u?`<img src="${esc(u)}" alt="">`:`<b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>`}</div>
       <p class="mname">${esc(it.name)}${it.agency?`<span>${esc(it.agency)}</span>`:""}</p>
       <div class="mtime">${time}</div>
-      <div class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}</span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span></div>
+      ${who}
       ${stTxt?`<div class="mst"><span class="mst-t">${stTxt}</span></div>`:""}
-      ${go}${rr}${who}
+      ${go}${rr}
     </li>`;
   };
   const sec=(k,list)=>list.length?`<details class="msec" data-msec="${k}" ${msecOpen[k]?"open":""}><summary><h3>${T(k)}<span class="c">${list.length}</span></h3><span class="pm" aria-hidden="true"></span></summary><ul class="mgrid">${list.map(row).join("")}</ul></details>`:"";
@@ -1088,8 +1125,12 @@ function render(){
   }else if(tab==="mine"){
     html+=mineHtml();
   }else if(tab==="contact"){
-    html+=head("contact",T("contactDesc"))+
-      (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
+    const mineC=list.filter(it=>it.created_by===me.id);
+    if(cf!=="all"&&cf!=="mine")cf="all";
+    const shownC=cf==="mine"?mineC:list;
+    const cb=(k,label,n)=>`<button type="button" data-cf="${k}" aria-pressed="${cf===k}">${label}<b>${n}</b></button>`;
+    html+=head("contact",T("contactDesc"),`<div class="facts">${cb("all",T("cfAll"),list.length)}${cb("mine",T("cfMine"),mineC.length)}</div>`)+
+      (shownC.length?`<div class="grid">${shownC.map(card).join("")}</div>`:(list.length?`<div class="empty"><b>${T("cfNone")}</b></div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`));
   }else{
     html+=head(tab,"")+`<div class="empty"><b>${T("soonTitle")}</b>${SN(tab)} · ${T("soonSub")}</div>`;
   }
@@ -1116,6 +1157,7 @@ function render(){
     if(error)toast(T("wdFail")+error.message);else toast(T("restored"));
     await loadAll();render();
   });
+  root.querySelectorAll("[data-cf]").forEach(b=>b.onclick=()=>{cf=b.dataset.cf;try{localStorage.setItem("mdi-cf",cf)}catch(e){}render()});
   root.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;try{localStorage.setItem("mdi-pf",pf)}catch(e){}render()});
   root.querySelectorAll("[data-mwho]").forEach(d=>d.ontoggle=()=>{d.open?mwhoOpen.add(d.dataset.mwho):mwhoOpen.delete(d.dataset.mwho)});
   root.querySelectorAll("[data-msec]").forEach(d=>d.ontoggle=()=>{msecOpen[d.dataset.msec]=d.open;try{localStorage.setItem("mdi-msec",JSON.stringify(msecOpen))}catch(e){}});
@@ -1123,7 +1165,8 @@ function render(){
   root.querySelectorAll("[data-mvno]").forEach(b=>b.onclick=()=>{mvAsk=null;render()});
   const doMove=async id=>{
     const {error}=await sb.rpc("move_to_contact",{cid:id});
-    if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}else toast(T("movedT"));
+    if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}
+    else{undoStack.push(id);showUndo(items.find(x=>x.id===id))}
     await loadAll();render();
   };
   root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{b.disabled=true;doMove(b.dataset.mv)});
@@ -1136,7 +1179,7 @@ function render(){
   });   // PC: 클릭
   root.querySelectorAll("[data-slide]").forEach(tr=>{   // 폰: 끝까지 밀어야 넘어감
     const k=tr.querySelector(".k"),fill=tr.querySelector(".fill");let x0=null,x=0,done=false;
-    const max=()=>tr.clientWidth-k.offsetWidth-6;
+    const max=()=>tr.clientWidth-k.offsetWidth-8;
     const set=(v,anim)=>{x=Math.max(0,Math.min(max(),v));k.style.transition=fill.style.transition=anim?"transform .25s ease,width .25s ease":"none";k.style.transform=`translateX(${x}px)`;fill.style.width=(x+k.offsetWidth/2+3)+"px";tr.style.setProperty("--p",x/max())};
     tr.addEventListener("pointerdown",e=>{if(done)return;x0=e.clientX-x;tr.setPointerCapture(e.pointerId);tr.classList.add("drag")});
     tr.addEventListener("pointermove",e=>{if(x0==null||done)return;set(e.clientX-x0,false)});
@@ -1826,6 +1869,32 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&moreOpen){moreOpen=
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
 
+
+/* ---------- 컨택 되돌리기: 3초 동안 팝업, 그 뒤에도 Ctrl+Z(⌘+Z) ---------- */
+const undoStack=[];let undoT=null;
+function showUndo(it){
+  const bar=document.getElementById("undoBar");if(!bar)return;
+  document.getElementById("undoMsg").textContent=T("movedNamed").replace("{n}",it?it.name:"");
+  document.getElementById("undoBtn").textContent=T("undo");
+  bar.hidden=false;bar.classList.remove("out");void bar.offsetWidth;bar.classList.add("in");
+  clearTimeout(undoT);undoT=setTimeout(hideUndo,3000);
+}
+function hideUndo(){const bar=document.getElementById("undoBar");if(!bar||bar.hidden)return;bar.classList.remove("in");bar.classList.add("out");setTimeout(()=>{if(bar.classList.contains("out"))bar.hidden=true},200)}
+async function undoLast(){
+  const id=undoStack.pop();if(!id)return;
+  hideUndo();
+  const {error}=await sb.rpc("undo_contact",{cid:id});
+  if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("undoFail")+(k?T("err_"+k):error.message))}
+  else toast(T("undone").replace("{n}",items.find(x=>x.id===id)?.name||""));
+  await loadAll();render();
+}
+document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#undoBtn"))undoLast()});
+document.addEventListener("keydown",e=>{
+  if(!(e.ctrlKey||e.metaKey)||e.shiftKey||e.altKey||e.key.toLowerCase()!=="z")return;
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;   // 글자 입력 중이면 원래 되돌리기
+  if(!undoStack.length)return;
+  e.preventDefault();undoLast();
+});
 /* ---------- 사진 로딩 표시: 늦게 뜨는 사진 위에 도는 원 + 퍼센트 ---------- */
 async function readProg(resp,cb){
   if(!resp.ok)throw new Error("HTTP "+resp.status);
@@ -1901,7 +1970,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.31";
+const APP_VER="2026-11-05.35";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
