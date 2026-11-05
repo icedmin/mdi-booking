@@ -449,6 +449,11 @@ img.plw{opacity:0!important}
 /* 컨택 버튼 글자: 얇게·조금 크게, 위아래 정중앙 */
 .gls.mclick,.gls.mslide{font-size:13px;font-weight:500;line-height:1}
 .gls.mclick .t,.gls.mslide .sh{display:block;line-height:1;transform:translateY(var(--ty,0px))}
+/* 밀기: 화살표 칸은 글라스판 높이에 꼭 맞게, 진한 초록은 화살표 칸 오른쪽 끝까지만 */
+.gls.mslide .k{top:0;left:0;bottom:0;height:auto;width:auto;aspect-ratio:1;border:0;border-radius:calc(var(--gr,10px) - 1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.gls.mslide{--gr:10px}
+@media (max-width:640px){.gls.mslide{--gr:8px}}
+.gls.mslide .fill{width:var(--kw,34px);border-radius:calc(var(--gr,10px) - 1px)}
 /* 상단 우측 '내 모델' (개인 메뉴) */
 .hd .right button.mybtn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font-size:12.5px;font-weight:500;white-space:nowrap;cursor:pointer;transition:border-color .15s,background .15s}
 .hd .right button.mybtn:hover{border-color:var(--ink)}
@@ -1336,8 +1341,8 @@ function render(){
   });   // PC: 클릭
   root.querySelectorAll("[data-slide]").forEach(tr=>{   // 폰: 끝까지 밀어야 넘어감
     const k=tr.querySelector(".k"),fill=tr.querySelector(".fill");let x0=null,x=0,done=false;
-    const max=()=>tr.clientWidth-k.offsetWidth-2*k.offsetLeft;
-    const set=(v,anim)=>{x=Math.max(0,Math.min(max(),v));k.style.transition=fill.style.transition=anim?"transform .25s ease,width .25s ease":"none";k.style.transform=`translateX(${x}px)`;fill.style.width=(x+k.offsetWidth/2+3)+"px";tr.style.setProperty("--p",x/max())};
+    const max=()=>tr.clientWidth-k.offsetWidth;tr.style.setProperty("--kw",k.offsetWidth+"px");
+    const set=(v,anim)=>{x=Math.max(0,Math.min(max(),v));k.style.transition=fill.style.transition=anim?"transform .25s ease,width .25s ease":"none";k.style.transform=`translateX(${x}px)`;fill.style.width=(x+k.offsetWidth)+"px";tr.style.setProperty("--p",x/max())};
     tr.addEventListener("pointerdown",e=>{if(done)return;x0=e.clientX-x;tr.setPointerCapture(e.pointerId);tr.classList.add("drag")});
     tr.addEventListener("pointermove",e=>{if(x0==null||done)return;set(e.clientX-x0,false)});
     const up=()=>{if(x0==null||done)return;x0=null;tr.classList.remove("drag");
@@ -2162,7 +2167,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.63";
+const APP_VER="2026-11-05.64";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
