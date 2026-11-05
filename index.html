@@ -311,13 +311,13 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .mc.fail .mph{box-shadow:0 0 0 1px rgba(255,92,60,.55),0 0 7px rgba(255,92,60,.24)}
 /* 사진 로딩 표시 */
 .pl{position:absolute;z-index:2;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;display:grid;place-items:center;pointer-events:none;
-  background:rgba(20,20,20,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;animation:plIn .2s ease-out}
+  color:var(--muted);animation:plIn .2s ease-out}
 .pl svg{position:absolute;inset:5px;width:34px;height:34px;transform:rotate(-90deg)}
-.pl circle{fill:none;stroke-width:2.4}.pl .t{stroke:rgba(255,255,255,.22)}
-.pl .a{stroke:#fff;stroke-linecap:round;stroke-dasharray:28 100;transition:stroke-dasharray .2s linear}
+.pl circle{fill:none;stroke-width:2.4}.pl .t{stroke:var(--line)}
+.pl .a{stroke:var(--ink);stroke-linecap:round;stroke-dasharray:28 100;transition:stroke-dasharray .2s linear}
 .pl:not(.det) svg{animation:plSpin .9s linear infinite}
 .pl.det svg{animation:plSpin 2.4s linear infinite}
-.pl b{font-size:10px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;position:relative}
+.pl b{color:var(--ink);font-size:10px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;position:relative}
 .pl.sm{width:32px;height:32px;margin:-16px 0 0 -16px}.pl.sm svg{inset:3px;width:26px;height:26px}.pl.sm b{font-size:8px}
 .pl.out{opacity:0;transition:opacity .2s}
 img.plw{opacity:0!important}
@@ -1839,7 +1839,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.24";
+const APP_VER="2026-11-05.25";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
