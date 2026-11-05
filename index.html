@@ -297,9 +297,18 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .card .pic .tm .tbar{background:rgba(255,255,255,.35)}
 .card .pic .tm.end{animation:tmEnd 2.4s ease-in-out infinite}
 /* 타이머: 사진 하단 유리 띠 (D) */
-.card .pic .tm{left:0;right:0;bottom:0;border-radius:0 0 14px 14px;flex-direction:row;justify-content:center;align-items:center;padding:7.5px 12px 9.5px;font-size:11.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
-.card .pic .tm .tbar{position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:0}
+.card .pic .tm{left:0;right:0;bottom:0;border-radius:0 0 14px 14px;flex-direction:row;justify-content:center;align-items:center;padding:8px 12px 9px;font-size:11.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.card .pic .tm .tbar{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0;overflow:visible}
+.card .pic .tm .tbar i{box-shadow:0 0 6px rgba(232,55,11,.7),0 0 1px rgba(232,55,11,.9)}
 .card .pic .tm .tbar i{border-radius:0}
+.msec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;margin:0 0 12px;user-select:none}
+.msec>summary::-webkit-details-marker{display:none}
+.msec>summary h3{margin:0}
+.msec>summary .pm{width:16px;height:16px;display:grid;place-items:center;color:var(--muted)}
+.msec>summary .pm::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+.msec[open]>summary .pm::before{transform:translateY(1px) rotate(-135deg)}
+.msec:not([open])>summary{margin-bottom:0}
+.mc.fail .mph{box-shadow:0 0 0 1px rgba(232,55,11,.5),0 0 6px rgba(232,55,11,.16)}
 </style>
 
 </head>
@@ -928,6 +937,7 @@ function adminView(){
 }
 
 let mvAsk=null;
+const msecOpen={mReady:true,mVoting:true,mMoved:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
 function mineHtml(){
   const my=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at);
   const ready=my.filter(readyToMove).sort((a,b)=>deadline(a)-deadline(b));
@@ -945,7 +955,7 @@ function mineHtml(){
       :`<p class="mmiss ok">${T("mvAllIn")}${ok?"":` · <span>${T("mvBelow")}</span>`}</p>`);
     const act=rdy?(mvAsk===it.id?`<div class="mvask"><button type="button" class="btn sm" data-mvyes="${it.id}">${T("mvYes")}</button><button type="button" class="btn sm line" data-mvno="${it.id}">${T("cancel")}</button></div>`
       :`<button type="button" class="btn sm mvbtn" data-mv="${it.id}">${T("toContact")}</button>`):"";
-    return `<li class="mc${rdy?" rdy":""}">
+    return `<li class="mc${rdy?" rdy":""}${isC&&!ok?" fail":""}">
       <div class="mph" ${canView?`data-mview="${it.id}" role="button" tabindex="0"`:""}>${u?`<img src="${esc(u)}" alt="">`:`<b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>`}</div>
       <p class="mname">${esc(it.name)}${it.agency?`<span>${esc(it.agency)}</span>`:""}</p>
       <div class="mtime">${time}</div>
@@ -953,7 +963,7 @@ function mineHtml(){
       ${who}${act?`<div class="mact">${act}</div>`:""}
     </li>`;
   };
-  const sec=(k,list)=>list.length?`<div class="msec"><h3>${T(k)}<span class="c">${list.length}</span></h3><ul class="mgrid">${list.map(row).join("")}</ul></div>`:"";
+  const sec=(k,list)=>list.length?`<details class="msec" data-msec="${k}" ${msecOpen[k]?"open":""}><summary><h3>${T(k)}<span class="c">${list.length}</span></h3><span class="pm" aria-hidden="true"></span></summary><ul class="mgrid">${list.map(row).join("")}</ul></details>`:"";
   return head("mine",T("mineDesc"))+(my.length?sec("mReady",ready)+sec("mVoting",voting)+sec("mMoved",moved)+sec("mFail",fail)
     :`<div class="empty"><b>${T("emptyMine")}</b>${T("emptyMineSub")}</div>`);
 }
@@ -1011,6 +1021,7 @@ function render(){
     if(error)toast(T("wdFail")+error.message);else toast(T("restored"));
     await loadAll();render();
   });
+  root.querySelectorAll("[data-msec]").forEach(d=>d.ontoggle=()=>{msecOpen[d.dataset.msec]=d.open;try{localStorage.setItem("mdi-msec",JSON.stringify(msecOpen))}catch(e){}});
   root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{mvAsk=b.dataset.mv;render()});
   root.querySelectorAll("[data-mvno]").forEach(b=>b.onclick=()=>{mvAsk=null;render()});
   root.querySelectorAll("[data-mvyes]").forEach(b=>b.onclick=async()=>{
@@ -1701,7 +1712,7 @@ document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".cmenu,.cm
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&moreOpen){moreOpen=null;render()}});
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.12";
+const APP_VER="2026-11-05.14";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
