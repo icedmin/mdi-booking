@@ -630,6 +630,21 @@ dialog#setDlg::backdrop{background:transparent}
 .auth label.chk{flex-direction:row;gap:10px;align-items:flex-start;margin:2px 0 4px;cursor:pointer;font-size:13px;font-weight:400;line-height:1.4}
 .auth label.chk input{flex:none;width:18px;height:18px;padding:0;margin:1px 0 0;border-radius:4px;accent-color:var(--ink)}
 .auth .chk span{display:flex;flex-direction:column;gap:2px}.auth .chk b{font-weight:600;color:var(--ink)}.auth .chk small{font-size:12px;color:var(--muted)}
+html.gated,html.gated body{overflow:hidden}
+#pushGate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));
+  background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);animation:pgIn .25s ease-out}
+@keyframes pgIn{from{opacity:0}}
+#pushGate .pg-card{width:min(360px,100%);max-height:100%;overflow:auto;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:24px 22px 16px;box-shadow:0 20px 50px rgba(0,0,0,.18);text-align:left}
+#pushGate .pg-bell{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red);margin-bottom:14px}
+#pushGate .pg-bell svg{width:22px;height:22px}
+#pushGate h3{margin:0 0 6px;font-size:18px;font-weight:700}
+#pushGate p{margin:0 0 14px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+#pushGate ol{margin:0 0 16px;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:11px}
+#pushGate li{counter-increment:s;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45}
+#pushGate li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
+#pushGate li svg{vertical-align:-3px;margin:0 2px}
+#pushGate .pg-go{display:block;width:100%;height:46px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+#pushGate .pg-out{display:block;margin:10px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:8px;cursor:pointer}
 #setDlg .pv-push b{font-size:12px;font-weight:600;color:var(--go)}
 #setDlg .pv-push button{height:28px;padding:0 10px;font-size:12px;font-weight:500;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;cursor:pointer}
 #setDlg .pv-push button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -1010,11 +1025,11 @@ const b64u=s=>{const p="=".repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,"+
 async function pushSync(){   // 로그인 후: 이 기기가 이미 켜져 있으면 서버에 다시 저장(다른 계정으로 바뀐 경우 포함)
   pushOn=false;
   try{if(pushCapable()&&Notification.permission==="granted"){const r=await swReady;let s=r&&await r.pushManager.getSubscription();
-    if(!s&&profile?.push_opt_in&&r){try{s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)})}catch(_){}}
+    if(!s&&r){try{s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUB)})}catch(_){}}
     if(s){const {error}=await sb.rpc("save_push_sub",subJson(s));pushOn=!error}}}catch(e){}
   pushChecked=true;
 }
-function pushRefreshUI(){const d=document.getElementById("setDlg");if(d&&d.open)openSettings();if(me&&profile?.approved&&tab!=="admin")render()}
+function pushRefreshUI(){updateGate();const d=document.getElementById("setDlg");if(d&&d.open)openSettings();if(me&&profile?.approved&&tab!=="admin")render()}
 async function pushEnable(){
   try{
     const perm=await Notification.requestPermission();   // 누른 즉시 물어봐야 아이폰에서 창이 뜸
@@ -1046,6 +1061,36 @@ function openPushGuide(){
   if(!d.open)d.showModal();
 }
 document.getElementById("pushDlg").addEventListener("click",e=>{if(e.target.id==="pushDlg")e.target.close()});
+/* 폰에서는 이 기기에서 알림을 허용해야 이용 가능 (PC는 상관없음) */
+const isPhone=isIOS||/Android/i.test(navigator.userAgent);
+const GPT={ko:{tOff:"알림 허용이 필요합니다",dOff:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 마감 10분·5분 전, 아직 투표하지 않았으면 알려드립니다.",bOff:"알림 허용",
+  tIos:"홈 화면에 추가해 주세요",dIos:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",
+  tDen:"알림이 차단되어 있습니다",dDen:isIOS?"아이폰 설정 › 알림 › MDI Booking에서 알림 허용을 켠 뒤 '다시 확인'을 눌러 주세요.":"크롬 주소창 왼쪽 아이콘 › 권한(또는 사이트 설정) › 알림을 '허용'으로 바꾼 뒤 '다시 확인'을 눌러 주세요.",bDen:"다시 확인",
+  tUns:"이 브라우저에서는 알림을 받을 수 없습니다",dUns:isIOS?"iOS 16.4 이상에서 Safari로 열어 주세요. 카카오톡 같은 앱 안의 브라우저에서는 알림이 안 됩니다.":"크롬으로 열어 주세요. 카카오톡 같은 앱 안의 브라우저에서는 알림이 안 됩니다.",
+  logout:"로그아웃"},
+ en:{tOff:"Allow notifications to continue",dOff:"On phones, deadline alerts are required. You'll get an alert 10 and 5 minutes before a vote closes if you haven't voted.",bOff:"Allow notifications",
+  tIos:"Add to Home Screen",dIos:"On phones, deadline alerts are required. On iPhone, alerts only work in the app added to the Home Screen.",
+  tDen:"Notifications are blocked",dDen:isIOS?"Turn on notifications in Settings › Notifications › MDI Booking, then tap 'Check again'.":"Tap the icon left of the address bar › Permissions (Site settings) › Notifications › Allow, then tap 'Check again'.",bDen:"Check again",
+  tUns:"This browser can't receive alerts",dUns:isIOS?"Open in Safari on iOS 16.4 or later. In-app browsers (e.g. KakaoTalk) can't receive alerts.":"Open in Chrome. In-app browsers (e.g. KakaoTalk) can't receive alerts.",logout:"Log out"}};
+const G=k=>(GPT[LANG]||GPT.ko)[k];
+function updateGate(){
+  let g=document.getElementById("pushGate");
+  const m=pushMode();
+  const need=isPhone&&me&&profile?.approved&&pushChecked&&m!=="on";
+  document.documentElement.classList.toggle("gated",!!need);
+  if(!need){if(g)g.remove();return}
+  if(!g){g=document.createElement("div");g.id="pushGate";g.setAttribute("role","dialog");g.setAttribute("aria-modal","true");document.body.appendChild(g)}
+  const key=m==="ios-browser"?"Ios":m==="denied"?"Den":m==="off"?"Off":"Uns";
+  if(g.dataset.k===key+LANG)return;
+  g.dataset.k=key+LANG;
+  const steps=m==="ios-browser"?`<ol><li><span>${P("g1").replace("__SHARE__",SHARE_SVG)}</span></li><li><span>${P("g2")}</span></li><li><span>${P("g3")}</span></li><li><span>${LANG==="en"?"Log in and tap <b>Allow notifications</b> → <b>Allow</b>":"로그인 후 <b>알림 허용</b> → <b>허용</b>"}</span></li></ol>`:"";
+  const btn=m==="off"?`<button type="button" class="pg-go" data-gon>${G("bOff")}</button>`:m==="denied"?`<button type="button" class="pg-go" data-gre>${G("bDen")}</button>`:"";
+  g.innerHTML=`<div class="pg-card"><i class="pg-bell">${BELL_SVG}</i><h3>${G("t"+key)}</h3><p>${G("d"+key)}</p>${steps}${btn}<button type="button" class="pg-out" data-gout>${G("logout")}</button></div>`;
+  g.querySelector("[data-gon]")?.addEventListener("click",pushEnable);
+  g.querySelector("[data-gre]")?.addEventListener("click",async()=>{g.dataset.k="";await pushSync();updateGate()});
+  g.querySelector("[data-gout]")?.addEventListener("click",()=>sb.auth.signOut());
+}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&isPhone&&me&&profile?.approved){pushSync().then(()=>{const g=document.getElementById("pushGate");if(g)g.dataset.k="";updateGate()})}});
 function pushBanner(){
   if(!pushChecked)return "";
   if(!profile?.push_opt_in)return "";
@@ -1123,7 +1168,6 @@ function authView(mode="login",msg=""){
     <label for="a-email">${T("email")}<input id="a-email" type="email" autocomplete="email" required></label>
     <label for="a-pw">${T("password")}<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
     ${mode==="signup"?`<label for="a-pw2">${T("password2")}<input id="a-pw2" type="password" autocomplete="new-password" required minlength="6"></label>`:""}
-    ${mode==="signup"?`<label class="chk" for="a-push"><input type="checkbox" id="a-push" required><span><b>${P("suTitle")}</b><small>${P("suDesc")}</small></span></label>`:""}
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
     <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
     <p class="switch">${mode==="login"?`${T("firstTime")} <button type="button" id="aSwitch">${T("doSignup")}</button>`:`${T("haveAcct")} <button type="button" id="aSwitch">${T("doLogin")}</button>`}</p>
@@ -1145,11 +1189,7 @@ function authView(mode="login",msg=""){
       if(!name){btn.disabled=false;return say(T("needName"))}
       if(pw.length<6){btn.disabled=false;return say(T("pwShort"))}
       if(pw!==document.getElementById("a-pw2").value){btn.disabled=false;return say(T("pwMismatch"))}
-      // 알림 동의: 가입 버튼을 누른 그 순간에 폰 허용 창을 띄움 (홈 화면 앱이 아닌 아이폰 Safari는 나중에 홈 화면 앱에서)
-      const wantPush=!!document.getElementById("a-push")?.checked;
-      if(!wantPush){btn.disabled=false;return say(P("suNeed"))}   // 가입 조건: 마감 알림 동의
-      if(wantPush&&pushMode()==="off"&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
-      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name,push_opt_in:wantPush},emailRedirectTo:location.origin+location.pathname}});
+      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name},emailRedirectTo:location.origin+location.pathname}});
       btn.disabled=false;
       if(error)return say(T("signupFail")+error.message);
       if(!data.session)authView("login",T("signupDone"));
@@ -1410,7 +1450,7 @@ function render(){
   if(tab==="admin")return adminView();
   if(scope==="mine"&&NOMINE.includes(tab))tab="cand";
   const list=items.filter(it=>stageOf(it)===tab&&inScope(it));
-  let html=pushBanner()+tabsHtml();
+  let html=tabsHtml();
   if(scope==="mine"){
     html+=mineHtml(tab);
   }else if(tab==="cand"){
@@ -2320,7 +2360,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.72";
+const APP_VER="2026-11-05.73";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
@@ -2329,7 +2369,7 @@ const APP_VER="2026-11-05.72";
 staticText();
 async function boot(session){
   me=session?.user||null;
-  if(!me){if(channel){sb.removeChannel(channel);channel=null}return authView()}
+  if(!me){if(channel){sb.removeChannel(channel);channel=null}pushChecked=false;updateGate();return authView()}
   const {data,error}=await sb.from("profiles").select("*").eq("id",me.id).maybeSingle();
   if(error){root.innerHTML=`<div class="empty"><b>${T("infoFail")}</b>${esc(error.message)}</div>`;return}
   profile=data;
@@ -2337,7 +2377,7 @@ async function boot(session){
   root.innerHTML=`<div class="loading">${T("loading")}</div>`;
   try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
   subscribe();render();autoFill();
-  pushSync().then(()=>{if(tab!=="admin")render()});
+  pushSync().then(()=>{if(tab!=="admin")render();updateGate()});
 }
 /* 링크만 있고 사진이 없는 내 후보(관리자는 전체)는 메인 사진·포트폴리오를 자동으로 채움 — 세션당 1회 */
 const autoTried=new Set();
