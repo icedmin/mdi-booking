@@ -421,6 +421,11 @@ img.plw{opacity:0!important}
 .undo button:hover{background:rgba(255,255,255,.26)}
 .undo.in{animation:undoIn .2s ease-out}.undo.out{opacity:0;transform:translate(-50%,6px);transition:opacity .2s,transform .2s}
 @keyframes undoIn{from{opacity:0;transform:translate(-50%,8px)}}
+/* PC 버튼은 얇게 */
+.gls.mclick{height:32px;border-radius:9px;font-size:12.5px;margin-top:8px}
+.gls.mclick .k{top:3px;right:3px;width:24px;height:24px;border-radius:6px}
+.gls.mclick .k svg{width:12px;height:12px}
+.gls.mclick .t{margin-right:22px}
 </style>
 
 </head>
@@ -1984,7 +1989,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.36";
+const APP_VER="2026-11-05.37";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
