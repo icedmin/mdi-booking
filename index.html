@@ -458,9 +458,9 @@ img.plw{opacity:0!important}
 .hd .right button.mybtn .rdy{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 6px rgba(22,194,90,.55)}
 @media (max-width:640px){.hd .right{gap:10px}.hd .right button.mybtn{height:28px;padding:0 10px;font-size:12px}}
 /* 끌어서 투표: 가로로 끌 때만 점수, 세로 스크롤은 그대로 */
-.vote{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.vote{touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .vote.dragging{cursor:grabbing}
-.vote.dragging::before{transition:none}
+.vote.dragging::before{transition:width .12s ease-out}
 /* 카드 높이 정렬: 정보 칸이 남는 높이를 차지해 점수·투표 줄이 같은 높이에 오도록 */
 .grid .card>.info{flex:1 0 auto;align-content:start}
 /* PC: 화면 90% 크기로 (한 화면에 카드가 더 들어오게) */
@@ -501,7 +501,20 @@ img.plw{opacity:0!important}
 .hd .hscope .scope button[aria-pressed="true"]{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .hd .hscope .scope button[data-scope="mine"][aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 @media (max-width:640px){.hd .hscope{margin-left:12px}.hd .hscope .scope button{padding:0 10px;font-size:12px}}
-@media (max-width:389px){.hd .mark span{display:none}}
+/* 범위 전환: 탭 줄 맨 왼쪽 (탭과 함께 고정) */
+.tabbar{display:flex;align-items:flex-end;gap:24px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding-top:14px}
+.tabbar .tabs{position:static;border-bottom:0;padding-top:0;flex:1;min-width:0;align-self:stretch;align-items:flex-end}
+.tabbar .scope{flex:none;margin-bottom:6px}
+.tabbar .scope button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:0 13px;font-size:12.5px;font-weight:500;line-height:1;color:var(--muted);background:none;white-space:nowrap;cursor:pointer;height:26px}
+.tabbar .scope button:hover{color:var(--ink)}
+.tabbar .scope button[aria-pressed="true"]{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tabbar .scope button[data-scope="mine"][aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.hd .hscope{display:none}
+@media (max-width:640px){.tabbar{gap:14px}.tabbar .scope button{padding:0 9px;font-size:12px}}
+/* 로고 크게 */
+.mark{font-size:26px}
+.mark span{font-size:13.5px;margin-left:10px;vertical-align:4px}
+@media (max-width:640px){.mark{font-size:23px}.mark span{font-size:12px;margin-left:8px;vertical-align:3px}}
 </style>
 
 </head>
@@ -1040,15 +1053,18 @@ function subscribe(){
 /* ---------- 화면 ---------- */
 function header(){
   const rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
-  const hs=document.getElementById("hdScope");
-  hs.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`;
+  const hs=document.getElementById("hdScope");hs.innerHTML="";
+  scopeHtml=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`;
   hdRight.innerHTML=setBtnHtml();
   bindSetBtn();
-  hs.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
+}
+let scopeHtml="";
+function bindScope(){
+  root.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
-  return `<nav class="tabs" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav>`;
+  return `<div class="tabbar">${scopeHtml}<nav class="tabs" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav></div>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
@@ -1216,7 +1232,10 @@ function mineHtml(stage){
   const title=head(stage,desc,extra,stage==="cand"?`<button class="btn" id="openReg">${T("addCand")}</button>`:"");
   return title+(body||(stage==="missed"?`<div class="empty"><b>${T("soonTitle")}</b>${SN(stage)} · ${T("soonSub")}</div>`:`<div class="empty"><b>${T("emptyMineStage")}</b>${stage==="cand"?T("emptyMineSub"):""}</div>`));
 }
+let voteDragging=false,renderWaiting=false;
+window.__mdiRender=()=>render();   // 점검용: 외부에서 화면 다시 그리기
 function render(){
+  if(voteDragging){renderWaiting=true;return}
   header();
   try{localStorage.setItem("mdi-tab2",tab)}catch(e){}
   if(tab==="admin")return adminView();
@@ -1258,6 +1277,7 @@ function render(){
   root.innerHTML=html;
   for(const id of [...wdAnimated])if(!wdAsk.has(id))wdAnimated.delete(id);wdAsk.forEach(id=>wdAnimated.add(id));
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+  bindScope();
   const o=document.getElementById("openReg");if(o)o.onclick=()=>openReg();
   root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();moreOpen=null;render();openReg(items.find(x=>x.id===b.dataset.edit))});
   root.querySelectorAll("[data-whobox]").forEach(d=>d.ontoggle=()=>{d.open?openWho.add(d.dataset.whobox):openWho.delete(d.dataset.whobox)});
@@ -1339,19 +1359,34 @@ function render(){
     const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
     castVote(it,+b.dataset.v,true);
   });
-  /* 끌어서 점수 주기: 손가락/마우스 위치에서 가장 가까운 숫자에 딱 붙음 (1~10 정수만) */
+  /* 끌어서 점수 주기: 손가락/마우스 위치에서 가장 가까운 숫자에 딱 붙음 (1~10 정수만)
+     - 끄는 동안에는 화면 다시 그리기를 미뤄서(다른 사람 투표·자동 새로고침) 끊기지 않게 함
+     - 폰: 가로로 움직이면 점수 끌기, 세로로 움직이면 원래대로 화면 스크롤 */
   root.querySelectorAll(".vote").forEach(v=>{
     const btns=[...v.querySelectorAll("button")];if(!btns.length)return;
     const it=items.find(x=>x.id===btns[0].dataset.id);if(!it||closed(it))return;
-    let x0=null,drag=false,cur=0;
-    const pick=x=>{let best=1,d=1e9;btns.forEach(b=>{const r=b.getBoundingClientRect(),c=r.left+r.width/2,dd=Math.abs(x-c);if(dd<d){d=dd;best=+b.dataset.v}});return best};
+    let x0=null,y0=0,drag=false,cur=0,rects=null;
+    const pick=x=>{let best=1,d=1e9;rects.forEach(([c,n])=>{const dd=Math.abs(x-c);if(dd<d){d=dd;best=n}});return best};
     const show=n=>{if(n===cur)return;cur=n;v.style.setProperty("--n",n);v.classList.add("has");v.classList.remove("vfa");btns.forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===n?"true":"false"))};
-    v.addEventListener("pointerdown",e=>{if(e.button>0)return;x0=e.clientX;drag=false;cur=0});
-    v.addEventListener("pointermove",e=>{if(x0==null)return;
-      if(!drag){if(Math.abs(e.clientX-x0)<6)return;drag=true;try{v.setPointerCapture(e.pointerId)}catch(_){}v.classList.add("dragging")}
+    const begin=(x,y)=>{x0=x;y0=y;drag=false;cur=0;rects=btns.map(b=>{const r=b.getBoundingClientRect();return [r.left+r.width/2,+b.dataset.v]})};
+    const startDrag=()=>{drag=true;voteDragging=true;v.classList.add("dragging")};
+    const finish=commit=>{x0=null;if(!drag)return;drag=false;v.classList.remove("dragging");voteDragging=false;v._dragged=true;setTimeout(()=>{v._dragged=false},350);
+      if(commit&&cur)castVote(it,cur,false);else render();if(renderWaiting){renderWaiting=false}};
+    // 마우스·펜
+    v.addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||e.button>0)return;begin(e.clientX,e.clientY)});
+    v.addEventListener("pointermove",e=>{if(e.pointerType==="touch"||x0==null)return;
+      if(!drag){if(Math.abs(e.clientX-x0)<5)return;startDrag();try{v.setPointerCapture(e.pointerId)}catch(_){}}
       show(pick(e.clientX))});
-    const end=e=>{if(x0==null)return;x0=null;if(!drag)return;drag=false;v.classList.remove("dragging");v._dragged=true;setTimeout(()=>{v._dragged=false},350);if(cur)castVote(it,cur,false)};
-    v.addEventListener("pointerup",end);v.addEventListener("pointercancel",e=>{x0=null;if(drag){drag=false;v.classList.remove("dragging");render()}});
+    v.addEventListener("pointerup",e=>{if(e.pointerType==="touch")return;finish(true)});
+    v.addEventListener("lostpointercapture",e=>{if(e.pointerType==="touch")return;if(drag)finish(true)});
+    // 손가락
+    v.addEventListener("touchstart",e=>{if(e.touches.length!==1){x0=null;return}const t=e.touches[0];begin(t.clientX,t.clientY)},{passive:true});
+    v.addEventListener("touchmove",e=>{if(x0==null)return;const t=e.touches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+      if(!drag){if(Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)){x0=null;return}   // 세로 → 스크롤에 양보
+        if(Math.abs(dx)<6)return;startDrag()}
+      e.preventDefault();show(pick(t.clientX))},{passive:false});
+    v.addEventListener("touchend",()=>finish(true));
+    v.addEventListener("touchcancel",()=>finish(false));
   });
 }
 
@@ -2114,7 +2149,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.56";
+const APP_VER="2026-11-05.58";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
