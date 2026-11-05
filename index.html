@@ -482,6 +482,10 @@ img.plw{opacity:0!important}
 .ph-head h2 .mytag{display:inline-block;vertical-align:3px;margin-left:8px;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:0}
 @media (max-width:640px){.hd .right{gap:8px}.hd .right .scope button{padding:0 10px;font-size:12px}}
 @media (max-width:400px){.hd .mark span{display:none}}
+/* 전체/내 보드 전환 시 부드럽게 */
+#root.swap{animation:scopeIn .22s ease-out}
+@keyframes scopeIn{from{opacity:.35}to{opacity:1}}
+.card>.gls,.card>.mrr{margin-top:12px}
 </style>
 
 </head>
@@ -739,7 +743,7 @@ ko:{
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
  voting:"전체 투표",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 투표 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
- closedFail:"마감 · 미통과",
+ closedFail:"점수 미달",
  contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
  soonTitle:"준비 중",soonSub:"화면은 다음 단계에서 만듭니다.",
  voteFail:"투표가 저장되지 않았습니다: ",
@@ -1021,13 +1025,13 @@ function header(){
   const rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
   hdRight.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`+setBtnHtml();
   bindSetBtn();
-  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
+  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render();root.classList.remove("swap");void root.offsetWidth;root.classList.add("swap")});
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
   return `<nav class="tabs${scope==="mine"?" mine":""}" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav>`;
 }
-function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
+function head(stage,desc,extra="",right=""){if(scope==="mine"&&T("myDesc_"+stage))desc=T("myDesc_"+stage);return `<section class="ph-head"><div class="l"><h2>${SN(stage)}${scope==="mine"?`<span class="mytag">${T("scopeMine")}</span>`:""}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
 const NA=v=>v==="N/A";
 const disp=v=>NA(v)?T("naShort"):v;
@@ -1101,6 +1105,7 @@ function card(it){
       <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
+    ${ownerAct(it)}
 
   </article>`;
 }
@@ -1129,6 +1134,19 @@ function vfAnim(id,n){n=n||0;const old=vfMem.get(id);vfMem.set(id+"p",old??n);vf
 const pfHtml=c=>`<div class="pf ${c}" role="group" aria-label="${T("pfLabel")}">${["all","pass","fail"].map(k=>`<button type="button" data-pf="${k}" aria-pressed="${pf===k}">${T("pf_"+k)}</button>`).join("")}</div>`;
 let pf="all";try{pf=localStorage.getItem("mdi-pf")||"all"}catch(e){}
 const msecOpen={mReady:true,mVoting:true,mMoved:true,mProg:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
+/* 내 보드에서 카드 맨 아래 붙는 등록자 버튼 (컨택 시작 / 진행 시작 / 재심사) */
+function ownerAct(it){
+  if(scope!=="mine"||it.created_by!==me.id&&profile.role!=="admin")return "";
+  const ok=passed(it),isC=closed(it),rdy=readyToMove(it);
+  const UP='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const RT='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h10.5M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  if(isC&&!ok&&!it.contacted_at&&!it.progressed_at)return `<button type="button" class="mrr" data-rr="${it.id}">${T("rereview")}</button>`;
+  const kind=rdy?"contact":(!it.progressed_at&&isC&&ok)?"prog":"";if(!kind)return "";
+  const lab=kind==="prog"?T("toProg"):T("toContact"),slab=kind==="prog"?T("slideProg"):T("slideTo");
+  return matchMedia("(pointer:coarse)").matches
+    ?`<div class="gls mslide" data-slide="${it.id}" data-kind="${kind}" role="button" aria-label="${lab}"><span class="fill"></span><span class="sh">${slab}</span><span class="k">${RT}</span></div>`
+    :`<button type="button" class="gls mclick" data-mv="${it.id}" data-kind="${kind}"><span class="t">${lab}</span><span class="k">${UP}</span></button>`;
+}
 function mineHtml(stage){
   const my=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at);
   const ready=my.filter(readyToMove).sort((a,b)=>deadline(a)-deadline(b));
@@ -1177,12 +1195,10 @@ function render(){
   header();
   try{localStorage.setItem("mdi-tab2",tab)}catch(e){}
   if(tab==="admin")return adminView();
-  const list=items.filter(it=>stageOf(it)===tab);
+  if(scope==="mine"&&NOMINE.includes(tab))tab="cand";
+  const list=items.filter(it=>stageOf(it)===tab&&inScope(it));
   let html=tabsHtml();
-  if(scope==="mine"&&tab==="town")tab="cand";
-  if(scope==="mine"){
-    html+=mineHtml(tab);
-  }else if(tab==="cand"){
+  if(tab==="cand"){
     const open=list.filter(it=>!closed(it)).sort((a,b)=>deadline(a)-deadline(b));
     const fail=list.filter(it=>closed(it));
     const soon=open.filter(it=>deadline(it)-Date.now()<24*H).length;
@@ -2068,7 +2084,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.48";
+const APP_VER="2026-11-05.49";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
