@@ -243,7 +243,7 @@ button.vw-sec.tg:hover{color:var(--ink)}
 .pic .cmenu button:hover{background:var(--tile)}
 .pic:has(.cmenu) .tm{display:none}
 .who summary .regby .edit{font:inherit;font-size:12.5px;color:var(--ink);text-decoration:underline;text-underline-offset:2px;background:none;border:0;padding:0}
-.who summary .regby{margin-left:auto;margin-right:10px;font-weight:400;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.who summary .regby{margin-left:auto;margin-right:0;font-weight:400;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
 .facts{gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .facts::-webkit-scrollbar{display:none}
 .facts button{flex:none;border:1px solid var(--line)!important;border-radius:999px;padding:6px 12px!important;color:var(--fg);white-space:nowrap}
@@ -269,6 +269,7 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .pic .tm.end .tbar{background:rgba(255,255,255,.35)}.pic .tm.end .tbar i{background:#fff}
 @keyframes tmEnd{0%,100%{background:rgba(20,20,20,.55)}50%{background:rgba(232,55,11,.92)}}
 @media (prefers-reduced-motion:reduce){.pic .tm.end{animation:none;background:rgba(232,55,11,.92)}}
+.who summary .pm{margin-left:4px}
 </style>
 
 </head>
@@ -871,7 +872,7 @@ function card(it){
     ${isClosed?`<div class="result ${ok?"pass":"fail"}"><span>${ok?T("resPass"):T("resFail")}</span><span>${s.n?s.avg.toFixed(1)+T("pts"):T("noVotes")}</span></div>`
       :`<div class="vote" role="group" aria-label="${esc(it.name)}">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button type="button" data-v="${n}" data-id="${it.id}" aria-pressed="${mine===n}" aria-label="${n}">${n}</button>`).join("")}</div>`}
     <details class="who" data-whobox="${it.id}" ${openWho.has(it.id)?"open":""}>
-      <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="regby">${esc(name(it.created_by))} ${T("regBy")}${canEdit(it)&&!it.withdrawn_at?` · <button type="button" class="edit" data-edit="${it.id}">${T("editBtn")}</button>`:""}</span><span class="pm" aria-hidden="true"></span></summary>
+      <summary><span>${T("voters")}<span class="c">${s.n}/${voters.length}${T("ppl")}</span></span><span class="pm" aria-hidden="true"></span><span class="regby">${esc(name(it.created_by))} ${T("regBy")}${canEdit(it)&&!it.withdrawn_at?` · <button type="button" class="edit" data-edit="${it.id}">${T("editBtn")}</button>`:""}</span></summary>
       <dl>${voters.map(m=>vmap[m.id]!=null?`<dt>${esc(m.display_name)}</dt><dd>${P(vmap[m.id])}</dd>`:`<dt class="no">${esc(m.display_name)}</dt><dd class="no">${T("noVote")}</dd>`).join("")}</dl>
     </details>
     ${it.link&&!it.photos.length&&(it.created_by===me.id||profile.role==="admin")?`<button class="btn line getpic" data-getpic="${it.id}">${T("getPic")}</button>`:""}
