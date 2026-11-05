@@ -457,6 +457,10 @@ img.plw{opacity:0!important}
 .hd .right button.mybtn[aria-pressed="true"] .n{color:color-mix(in srgb,var(--bg) 65%,transparent)}
 .hd .right button.mybtn .rdy{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 6px rgba(22,194,90,.55)}
 @media (max-width:640px){.hd .right{gap:10px}.hd .right button.mybtn{height:28px;padding:0 10px;font-size:12px}}
+/* 끌어서 투표: 가로로 끌 때만 점수, 세로 스크롤은 그대로 */
+.vote{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.vote.dragging{cursor:grabbing}
+.vote.dragging::before{transition:none}
 </style>
 
 </head>
@@ -1234,11 +1238,10 @@ function render(){
   root.querySelectorAll("[data-mview]").forEach(el=>el.onclick=()=>openViewer(items.find(x=>x.id===el.dataset.mview)));
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
   root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=e=>{if(e.target.closest(".wdx,.wdov,.cx"))return;if(wdAsk.has(el.dataset.view)){wdAsk.delete(el.dataset.view);render();return}go()};el.onkeydown=e=>{if(e.target!==el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
-  root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{
-    const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
-    const score=+b.dataset.v;
+  const castVote=async(it,score,toggle)=>{
     const prev=votes.find(v=>v.candidate_id===it.id&&v.user_id===me.id);
-    const next=prev&&prev.score===score?null:score;   // 같은 점수를 다시 누르면 투표 취소
+    const next=toggle&&prev&&prev.score===score?null:score;   // 같은 점수를 다시 누르면 투표 취소 (끌어서 놓을 때는 취소 없음)
+    if(!toggle&&prev&&prev.score===score){render();return}
     votes=votes.filter(v=>!(v.candidate_id===it.id&&v.user_id===me.id));
     if(next!=null)votes.push({candidate_id:it.id,user_id:me.id,score:next});
     const pend={score:next,done:0};myPending.set(it.id,pend);
@@ -1254,6 +1257,25 @@ function render(){
     const error=await job.catch(e=>e);
     if(myPending.get(it.id)===pend)pend.done=Date.now();
     if(error){myPending.delete(it.id);toast(T("voteFail")+(error.message||error));await loadAll();render()}
+  };
+  root.querySelectorAll(".vote button").forEach(b=>b.onclick=()=>{
+    const v=b.closest(".vote");if(v&&v._dragged){v._dragged=false;return}   // 끌기 직후 생기는 클릭은 무시
+    const it=items.find(x=>x.id===b.dataset.id);if(!it||closed(it))return;
+    castVote(it,+b.dataset.v,true);
+  });
+  /* 끌어서 점수 주기: 손가락/마우스 위치에서 가장 가까운 숫자에 딱 붙음 (1~10 정수만) */
+  root.querySelectorAll(".vote").forEach(v=>{
+    const btns=[...v.querySelectorAll("button")];if(!btns.length)return;
+    const it=items.find(x=>x.id===btns[0].dataset.id);if(!it||closed(it))return;
+    let x0=null,drag=false,cur=0;
+    const pick=x=>{let best=1,d=1e9;btns.forEach(b=>{const r=b.getBoundingClientRect(),c=r.left+r.width/2,dd=Math.abs(x-c);if(dd<d){d=dd;best=+b.dataset.v}});return best};
+    const show=n=>{if(n===cur)return;cur=n;v.style.setProperty("--n",n);v.classList.add("has");v.classList.remove("vfa");btns.forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===n?"true":"false"))};
+    v.addEventListener("pointerdown",e=>{if(e.button>0)return;x0=e.clientX;drag=false;cur=0});
+    v.addEventListener("pointermove",e=>{if(x0==null)return;
+      if(!drag){if(Math.abs(e.clientX-x0)<6)return;drag=true;try{v.setPointerCapture(e.pointerId)}catch(_){}v.classList.add("dragging")}
+      show(pick(e.clientX))});
+    const end=e=>{if(x0==null)return;x0=null;if(!drag)return;drag=false;v.classList.remove("dragging");v._dragged=true;setTimeout(()=>{v._dragged=false},350);if(cur)castVote(it,cur,false)};
+    v.addEventListener("pointerup",end);v.addEventListener("pointercancel",e=>{x0=null;if(drag){drag=false;v.classList.remove("dragging");render()}});
   });
 }
 
@@ -2014,7 +2036,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.43";
+const APP_VER="2026-11-05.44";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
