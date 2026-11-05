@@ -799,8 +799,8 @@ button.vw-sec.tg:hover{color:var(--acc)}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
 <script>
 (function(){
-const SUPABASE_URL="https://cpiaqmjqyizefmjgkilp.supabase.co";
-const SUPABASE_KEY="sb_publishable_SCJLKokAn9NjJ8y6KPcaPA_T736cg1v"; // 공개용 키 (데이터는 로그인·승인 규칙으로 보호)
+const SUPABASE_URL="https://bsuuhpxkkhkfuwfdevpa.supabase.co";
+const SUPABASE_KEY="sb_publishable_VJF1ZR3idelVWE91AdXKnQ_nx19rj8V"; // 공개용 키 (데이터는 로그인·승인 규칙으로 보호)
 const BUCKET="candidate-photos";
 const PASS=0.6, H=3600e3;
 const STAGES=["cand","contact","prog","town","missed"];
@@ -2308,7 +2308,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.68";
+const APP_VER="2026-11-05.69";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
