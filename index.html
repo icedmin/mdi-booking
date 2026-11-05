@@ -464,7 +464,12 @@ img.plw{opacity:0!important}
 /* 카드 높이 정렬: 정보 칸이 남는 높이를 차지해 점수·투표 줄이 같은 높이에 오도록 */
 .grid .card>.info{flex:1 0 auto;align-content:start}
 /* PC: 화면 90% 크기로 (한 화면에 카드가 더 들어오게) */
-@media (min-width:1024px){html{zoom:.9}}
+@media (min-width:1024px){
+  .grid,.mgrid,.facts{zoom:.9}
+  .pf{height:34px;box-sizing:border-box;padding:3px;align-items:stretch}
+  .pf button{font-size:13px;line-height:1;padding:0 14px;display:inline-flex;align-items:center}
+  .ph-head .r #openReg{box-sizing:border-box;height:34px;display:inline-flex;align-items:center;padding:0 16px;font-size:13px;font-weight:500;line-height:1;letter-spacing:0;border-radius:999px}
+}
 </style>
 
 </head>
@@ -720,7 +725,7 @@ ko:{
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
- voting:"전체 투표",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 등록",
+ voting:"전체 투표",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 투표 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
  closedFail:"마감 · 미통과",
  contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
@@ -767,7 +772,7 @@ en:{
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
- voting:"All votes",soon24:"Closing in 24h",myTodo:"Not voted",addCand:"+ Add",
+ voting:"All votes",soon24:"Closing in 24h",myTodo:"Not voted",addCand:"+ Add to vote",
  emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
  closedFail:"Closed · not passed",
  contactDesc:"Models that passed the vote · moving to the next stage will be added once the rules are set",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
@@ -2040,7 +2045,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.45";
+const APP_VER="2026-11-05.46";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
