@@ -487,6 +487,11 @@ img.plw{opacity:0!important}
 /* 내 보드 카드: 전체 보드 카드와 같은 폭 (PC) */
 @media (min-width:641px){.mgrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:40px 24px}.mname{font-size:15px}.mavg{font-size:17px}}
 @media (max-width:640px){.pf.pf-l{height:37.4px;box-sizing:border-box;align-items:stretch}.pf.pf-l button{padding-top:0;padding-bottom:0;display:inline-flex;align-items:center}}
+/* 내 보드 토글 구역: 첫 구역 제목 줄이 전체 보드의 칸 버튼 줄과 같은 자리·높이에 오게 */
+.msecs>.msec{margin-top:26px}
+.msecs>.msec:first-child{margin-top:-16.8px}
+.msecs>.msec:first-child>summary{min-height:33.9px;margin-bottom:24.4px}
+@media (max-width:640px){.msecs>.msec:first-child{margin-top:-16px}.msecs>.msec:first-child>summary{min-height:37.4px;margin-bottom:23.6px}}
 </style>
 
 </head>
@@ -1191,11 +1196,7 @@ function mineHtml(stage){
   const grid=l=>l.length?`<ul class="mgrid">${l.map(row).join("")}</ul>`:"";
   let body="",extra="";
   if(stage==="cand"){
-    const groups={all:[...ready,...voting,...fail],ready,voting,fail};
-    if(!(mf in groups))mf="all";
-    const fb=(k,label)=>`<button type="button" data-mf="${k}" aria-pressed="${mf===k}">${label}<b>${groups[k].length}</b></button>`;
-    extra=`<div class="facts">${fb("all",T("mfAll"))}${fb("ready",T("mReady"))}${fb("voting",T("mVoting"))}${fb("fail",T("mFail"))}</div>`;
-    body=grid(groups[mf]);
+    body=`<div class="msecs">${sec("mReady",ready)+sec("mVoting",voting)+sec("mFail",fail)}</div>`;
   }else if(stage==="contact")body=grid(moved);
   else if(stage==="prog")body=grid(progd);
   const desc=stage==="cand"?T("candDesc"):stage==="contact"?T("contactDesc"):stage==="prog"?T("progDesc"):"";
@@ -1998,6 +1999,8 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&moreOpen){moreOpen=
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
 
 
+/* 창(등록·설정 등)을 닫은 뒤 원래 버튼에 남는 검은 테두리 없애기: 닫히면 초점을 풀어줌 */
+document.addEventListener("close",e=>{if(e.target&&e.target.tagName==="DIALOG")setTimeout(()=>{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()},0)},true);
 /* ---------- 컨택 되돌리기: 3초 동안 팝업, 그 뒤에도 Ctrl+Z(⌘+Z) ---------- */
 const undoStack=[];let undoT=null;
 function showUndo(it,kind){
@@ -2098,7 +2101,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.53";
+const APP_VER="2026-11-05.55";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
