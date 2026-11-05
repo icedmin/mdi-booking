@@ -259,6 +259,12 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .vw-grid button[data-k] .im{border-radius:8px}
 .pick button,.pick img{border-radius:8px}
 .bar,.bar i{border-radius:2px}
+.pic .tm{flex-direction:column;align-items:stretch;gap:5px;padding:6px 11px 7px}
+.pic .tm{display:flex}.pic .tm.soon{flex-direction:column}
+.tm .tbar{display:block;height:2px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden}
+.tm .tbar i{display:block;height:100%;border-radius:2px;background:var(--red);transition:width .6s linear}
+.pic .tm.soon::before{display:none!important}
+.pic .tm.soon>[data-left]::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px;box-shadow:0 0 6px rgba(232,55,11,.8)}
 </style>
 
 </head>
@@ -740,6 +746,7 @@ const name=uid=>members.find(m=>m.id===uid)?.display_name||T("unknown");
 const approvedMembers=()=>members.filter(m=>m.approved);
 function vOf(cid){return votes.filter(v=>v.candidate_id===cid)}
 function stats(it){const v=vOf(it.id).map(x=>x.score);const n=v.length;const avg=n?v.reduce((a,b)=>a+b,0)/n:0;return {n,avg,pct:avg/10}}
+function pct(rem,dl,st){st=typeof st==="number"?st:new Date(st).getTime();const tot=dl-st;if(!(tot>0))return 100;return Math.max(0,Math.min(100,rem/tot*100)).toFixed(2)}
 const deadline=it=>new Date(it.deadline).getTime();
 const closed=it=>Date.now()>=deadline(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
@@ -839,7 +846,7 @@ function card(it){
   const P=n=>n+T("pts");
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}">${left(rem)}</span></span>`:""}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span></span>`:""}</div>
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
@@ -964,6 +971,7 @@ setInterval(()=>{
     const rem=+el.dataset.dl-Date.now();
     if(rem<=0){re=true;return}
     el.textContent=left(rem);
+    const bar=el.nextElementSibling;if(bar&&bar.classList.contains("tbar"))bar.firstElementChild.style.width=pct(rem,+el.dataset.dl,+el.dataset.st)+"%";
     const box=el.closest(".tm,.status");if(box)box.classList.toggle("soon",rem<12*H);
   });
   if(re&&tab!=="admin")render();
