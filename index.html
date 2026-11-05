@@ -1268,7 +1268,7 @@ function buildList(it,g,sn,fo){
   if(first&&!/\/link-/.test(first.path))mainHit=first;
   else if(it.main_url){const k=mkey(it.main_url);mainHit=remote.find(x=>mkey(x.s||x.u)===k)||null}
   let lead=[];
-  if(!mainHit&&first){lead=[first];mainHit=first}   // 예전에 등록된 후보: 메인 사진이 포트폴리오 안에서 확인되지 않으면 맨 앞에 한 장만 표시
+  if(!mainHit&&first&&!remote.length){lead=[first];mainHit=first}   // 링크 사진이 없을 때만 저장된 메인 사진을 보여줌 (포트폴리오에 없는 메인 사진을 따로 칸으로 만들지 않음)
   if(mainHit)mainHit.main=true;
   const ups=uploads.filter(x=>x!==lead[0]);
   if(fo&&fo.length)return lead.concat(ups.filter(x=>x.main),remote,ups.filter(x=>!x.main));
@@ -1575,7 +1575,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-04.9";
+const APP_VER="2026-11-05.1";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
