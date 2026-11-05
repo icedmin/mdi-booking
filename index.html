@@ -446,6 +446,9 @@ img.plw{opacity:0!important}
 .gls.mclick{height:28px;border-radius:8px;font-size:12px;margin-top:6px}
 .gls.mclick .k{top:2px;right:2px;width:22px;height:22px;border-radius:6px}
 .gls.mclick .k svg{width:11px;height:11px}
+/* 컨택 버튼 글자: 얇게·조금 크게, 위아래 정중앙 */
+.gls.mclick,.gls.mslide{font-size:13px;font-weight:500;line-height:1}
+.gls.mclick .t,.gls.mslide .sh{display:block;line-height:1;transform:translateY(var(--ty,0px))}
 </style>
 
 </head>
@@ -2009,7 +2012,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.41";
+const APP_VER="2026-11-05.42";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
