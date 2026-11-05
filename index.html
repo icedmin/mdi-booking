@@ -339,6 +339,7 @@ img.plw{opacity:0!important}
 .pf button{border:0;background:none;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:500;color:var(--muted);white-space:nowrap;cursor:pointer}
 .pf button[aria-pressed="true"]{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 /* 내리기 확인 말풍선: 타이머와 같은 리퀴드 글라스 */
+.pic .wdov.still{animation:none}
 .pic .wdov{background:linear-gradient(160deg,rgba(255,255,255,.32),rgba(255,255,255,.06) 55%,rgba(255,255,255,.12)),rgba(20,20,20,.28);-webkit-backdrop-filter:blur(16px) saturate(1.8) brightness(.8);backdrop-filter:blur(16px) saturate(1.8) brightness(.8);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 .5px rgba(255,255,255,.35),0 6px 20px rgba(0,0,0,.18)}
 .pic .wdov p{text-shadow:0 0 1px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.4)}
@@ -689,7 +690,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 {const _sm=HTMLDialogElement.prototype.showModal;HTMLDialogElement.prototype.showModal=function(){this.setAttribute("tabindex","-1");_sm.call(this);try{this.focus({preventScroll:true})}catch(e){}}}
 
 let me=null, profile=null, members=[], items=[], votes=[], photoUrls={}, channel=null, authMode="login";
-const openWho=new Set();let filter="all";const wdAsk=new Set();let moreOpen=null;
+const openWho=new Set();let filter="all";let moreOpen=null;const wdAsk=new Set(),wdAnimated=new Set();   // 확인창은 처음 열릴 때만 나타나는 움직임let moreOpen=null;
 const DOTS=`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>`;
 /* '내가 아직 안 한 투표'에서 한 번 보인 후보는 투표해도 새로고침 전까지 남겨 둠 (점수 바로 고칠 수 있게) */
 const todoKeep=new Set();
@@ -927,7 +928,7 @@ function card(it){
   const P=n=>n+T("pts");
   const canView=urls.length||it.link||total;
   return `<article class="card" data-card="${it.id}">
-    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span></span>`:""}</div>
+    <div class="pic" ${canView?`data-view="${it.id}" role="button" tabindex="0" aria-label="${esc(it.name)} ${T("vwPortfolio")}"`:""}>${media}${!it.withdrawn_at&&(it.created_by===me.id||profile.role==="admin")?(wdAsk.has(it.id)?`<div class="wdov${wdAnimated.has(it.id)?" still":""}"><p>${T("wdAsk")}</p><div><button type="button" class="btn" data-wdyes="${it.id}">${T("wdYes")}</button><button type="button" class="btn line" data-wdno="${it.id}">${T("cancel")}</button></div></div>`:`<button type="button" class="cx" data-wd="${it.id}" title="${T("withdraw")}" aria-label="${T("withdraw")}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>`):""}${!isClosed?`<span class="tm ${scls}" data-timer="${it.id}" aria-label="${T("left")}"><span data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span></span>`:""}</div>
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
@@ -1037,6 +1038,7 @@ function render(){
     html+=head(tab,"")+`<div class="empty"><b>${T("soonTitle")}</b>${SN(tab)} · ${T("soonSub")}</div>`;
   }
   root.innerHTML=html;
+  for(const id of [...wdAnimated])if(!wdAsk.has(id))wdAnimated.delete(id);wdAsk.forEach(id=>wdAnimated.add(id));
   root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
   const o=document.getElementById("openReg");if(o)o.onclick=()=>openReg();
   root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();moreOpen=null;render();openReg(items.find(x=>x.id===b.dataset.edit))});
@@ -1826,7 +1828,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.17";
+const APP_VER="2026-11-05.18";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
