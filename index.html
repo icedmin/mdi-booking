@@ -491,10 +491,12 @@ img.plw{opacity:0!important}
 .msecs>.msec{margin-top:26px}
 .fph{height:var(--fh);margin-top:7.2px}
 @media (max-width:640px){.fph{margin-top:8px}}
-:root{--fh:33.875px}
-@media (max-width:640px){:root{--fh:37.4375px}}
-.msecs>.msec:first-child{margin-top:calc(-24px - var(--fh))}
-.msecs>.msec:first-child>summary{min-height:var(--fh);margin-bottom:24px;box-sizing:border-box}
+:root{--fh:33.875px;--sh:33.875px}
+@media (max-width:640px){:root{--fh:82.875px;--sh:37.4375px}}
+.msecs>.msec:first-child{margin-top:calc(-24px - var(--sh))}
+.msecs>.msec:first-child>summary{min-height:var(--sh);margin-bottom:24px;box-sizing:border-box}
+/* 폰: '전체·통과·미통과'는 '전체 투표·안 한 투표' 아래 줄로 (겹침 방지) */
+@media (max-width:640px){.frow{flex-wrap:wrap;row-gap:8px}.frow .facts{flex:1 0 100%}.frow .pf.pf-l{margin:0}}
 /* 범위 전환을 로고 옆으로 */
 .hd .inner{justify-content:flex-start}
 .hd .hscope{margin-left:22px;display:flex;align-items:center}
@@ -2160,7 +2162,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.62";
+const APP_VER="2026-11-05.63";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
