@@ -877,7 +877,7 @@ function card(it){
   const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
-  const scls=isClosed?"done":(rem<12*H?"soon":"")+(!isClosed&&rem<10*60e3?" end":"");
+  const scls=isClosed?"done":(rem<12*H?"soon":"")+(!isClosed&&rem<5*60e3?" end":"");
   const g=it.gtype==="yes"?esc(it.gamt||T("gNoAmt")):it.gtype==="no"?T("gNone"):T("gTbd");
   const voters=approvedMembers();
   const vmap=Object.fromEntries(vOf(it.id).map(v=>[v.user_id,v.score]));
@@ -1053,7 +1053,7 @@ setInterval(()=>{
     if(rem<=0){re=true;return}
     el.textContent=left(rem);
     const bar=el.nextElementSibling;if(bar&&bar.classList.contains("tbar"))bar.firstElementChild.style.width=pct(rem,+el.dataset.dl,+el.dataset.st)+"%";
-    const box=el.closest(".tm,.status");if(box){box.classList.toggle("soon",rem<12*H);if(box.classList.contains("tm"))box.classList.toggle("end",rem<10*60e3)}
+    const box=el.closest(".tm,.status");if(box){box.classList.toggle("soon",rem<12*H);if(box.classList.contains("tm"))box.classList.toggle("end",rem<5*60e3)}
   });
   if(re&&tab!=="admin")render();
 },1000);
@@ -1701,7 +1701,7 @@ document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".cmenu,.cm
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&moreOpen){moreOpen=null;render()}});
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.10";
+const APP_VER="2026-11-05.11";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
