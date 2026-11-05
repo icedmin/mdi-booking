@@ -515,6 +515,13 @@ img.plw{opacity:0!important}
 .mark{font-size:26px}
 .mark span{font-size:13.5px;margin-left:10px;vertical-align:4px}
 @media (max-width:640px){.mark{font-size:23px}.mark span{font-size:12px;margin-left:8px;vertical-align:3px}}
+/* 폰: 공유/내 보드 스위치를 탭 위 한 줄로, 폭을 꽉 채움 */
+@media (max-width:640px){
+  .tabbar{flex-wrap:wrap;row-gap:12px;column-gap:0;padding-top:12px}
+  .tabbar .scope{flex:1 0 100%;margin-bottom:0;height:36px;display:flex}
+  .tabbar .scope button{flex:1;justify-content:center;height:30px;font-size:13px;padding:0}
+  .tabbar .tabs{flex:1 0 100%}
+}
 </style>
 
 </head>
@@ -2149,7 +2156,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.59";
+const APP_VER="2026-11-05.60";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
