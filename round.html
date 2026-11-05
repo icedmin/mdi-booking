@@ -556,7 +556,7 @@ ko:{
  modelLink:"모델 링크",addLink:"+ 링크 추가",linkMore:"추가 링크 (스냅 등)",linkPart:"링크 {n}개 중 {f}개를 읽지 못했습니다",linkPh:"에이전시 보드, 인스타그램 등 https://",rescan:"다시 불러오기",
  drop:"사진을 끌어다 놓거나 눌러서 선택 · 여러 장 가능",dropN:"사진 {n}장 선택됨 · 더 추가하려면 누르기",
  modelName:"모델 이름 *",motherAg:"마더에이전시",gLabel:"게런티",gYes:"있음",gNo:"없음",gAmt:"게런티 금액",gAmtPh:"예: 5,000,000원",
- info:"정보·메모",infoPh:"치수, 경력, 가능 일정 등",cancel:"취소",submit:"등록하고 투표 시작",uploading:"올리는 중…",linkImporting:"링크 사진 가져오는 중…",linkFinding:"링크 사진 찾는 중…",
+ info:"정보·메모",infoPh:"치수, 경력, 가능 일정 등",cancel:"취소",submit:"등록",uploading:"올리는 중…",linkImporting:"링크 사진 가져오는 중…",linkFinding:"링크 사진 찾는 중…",
  errName:"모델 이름을 입력하세요.",errLinkOrPhoto:"모델 링크나 사진 중 하나는 넣어야 합니다.",errLinkFmt:"링크는 http:// 또는 https:// 로 시작해야 합니다.",
  upFail:"사진 업로드 실패: ",regFail:"등록 실패: ",regDone:"등록했습니다. 3일 투표가 시작됐습니다.",linkPartFail:"링크 사진 {n}장은 가져오지 못했습니다",
  needLink:"http:// 또는 https:// 로 시작하는 링크를 먼저 넣어 주세요.",scanning:"링크에서 사진을 찾는 중…",
@@ -603,7 +603,7 @@ en:{
  modelLink:"Model link",addLink:"+ Add link",linkMore:"Extra link (snaps, etc.)",linkPart:"Couldn't read {f} of {n} links",linkPh:"Agency board, Instagram, etc. https://",rescan:"Reload",
  drop:"Drag photos here or click to choose · multiple allowed",dropN:"{n} photo(s) selected · click to add more",
  modelName:"Model name *",motherAg:"Mother agency",gLabel:"Guarantee",gYes:"Yes",gNo:"No",gAmt:"Guarantee amount",gAmtPh:"e.g. KRW 5,000,000",
- info:"Info · memo",infoPh:"Measurements, experience, availability…",cancel:"Cancel",submit:"Add and start vote",uploading:"Uploading…",linkImporting:"Importing link photos…",linkFinding:"Finding link photos…",
+ info:"Info · memo",infoPh:"Measurements, experience, availability…",cancel:"Cancel",submit:"Add",uploading:"Uploading…",linkImporting:"Importing link photos…",linkFinding:"Finding link photos…",
  errName:"Enter the model's name.",errLinkOrPhoto:"Add a model link or at least one photo.",errLinkFmt:"Links must start with http:// or https://.",
  upFail:"Photo upload failed: ",regFail:"Couldn't add: ",regDone:"Added. The 3‑day vote has started.",linkPartFail:"{n} link photo(s) couldn't be imported",
  needLink:"Enter a link starting with http:// or https:// first.",scanning:"Finding photos on the link…",
@@ -649,7 +649,7 @@ function staticText(){
   document.getElementById("regForm").innerHTML=`
     <div class="top"><h3>${T("regTitle")}</h3><button type="button" class="x" id="cancelReg" aria-label="${T("close")}">×</button></div>
     <p class="hint">${T("regHint")}</p>
-    <div class="linkrow"><label for="f-link">${T("modelLink")}<input id="f-link" type="url" placeholder="${T("linkPh")}"></label><button type="button" class="btn line" id="scanBtn">${T("rescan")}</button></div>
+    <div class="linkrow"><label for="f-link">${T("modelLink")}<input id="f-link" type="url" placeholder="${T("linkPh")}"></label></div>
     <div id="xLinks"></div><button type="button" class="addlink" id="addLink">${T("addLink")}</button>
     <p class="pickmsg" id="pickMsg" hidden></p>
     <div class="pick" id="pick"></div>
@@ -1165,7 +1165,7 @@ function openReg(it){
   if(editId){
     const q=s=>document.querySelector(s);
     q("#regForm h3").textContent=T("editTitle");q("#regForm .hint").textContent=T("editHint");
-    q("#scanBtn").hidden=true;q("#regSubmit").textContent=T("saveBtn");
+    q("#regSubmit").textContent=T("saveBtn");
     const f={"f-link":it.link,"f-name":it.name,"f-agency":it.agency,"f-height":it.height,"f-bust":it.bust,"f-waist":it.waist,"f-hips":it.hips,"f-shoe":it.shoe,"f-nat":it.nationality,"f-age":it.age,"f-gamt":it.gamt,"f-memo":it.memo};
     const UP=["f-name","f-agency","f-height","f-bust","f-waist","f-hips","f-shoe","f-nat","f-age"];
     for(const [id,v] of Object.entries(f)){const el=document.getElementById(id);if(v==="N/A")setNA(id,true);else el.value=UP.includes(id)?(v||"").toUpperCase():(v||"")}
@@ -1231,7 +1231,7 @@ function bindReg(){
   const toUp=el=>{const v=el.value,u=v.toUpperCase();if(v===u)return;const a=el.selectionStart,b=el.selectionEnd;el.value=u;try{el.setSelectionRange(a,b)}catch(e){}};
   ["f-name","f-agency","f-height","f-bust","f-waist","f-hips","f-shoe","f-nat","f-age"].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.classList.add("upper");
     el.addEventListener("input",e=>{if(!e.isComposing)toUp(el)});el.addEventListener("compositionend",()=>toUp(el));el.addEventListener("change",()=>toUp(el))});
-  document.getElementById("scanBtn").onclick=()=>{scannedLink="";scanning=runScan(false)};
+  
   document.getElementById("addLink").onclick=()=>{const i=addLinkRow("");if(i)i.focus()};
   const linkInput=document.getElementById("f-link");
   linkInput.addEventListener("change",()=>{scanning=runScan(true)});
