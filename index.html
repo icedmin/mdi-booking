@@ -480,7 +480,7 @@ img.plw{opacity:0!important}
 .tabs button[disabled]{opacity:.35;cursor:not-allowed}
 .ph-head h2 .mytag{display:inline-block;vertical-align:3px;margin-left:8px;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:0}
 @media (max-width:640px){.hd .right{gap:8px}.hd .right .scope button{padding:0 10px;font-size:12px}}
-@media (max-width:400px){.hd .mark span{display:none}}
+
 /* 전체/내 보드 전환 시 부드럽게 */
 @keyframes scopeIn{from{opacity:.35}to{opacity:1}}
 .card>.gls,.card>.mrr{margin-top:12px}
@@ -492,6 +492,16 @@ img.plw{opacity:0!important}
 .msecs>.msec:first-child{margin-top:-16.8px}
 .msecs>.msec:first-child>summary{min-height:33.9px;margin-bottom:24.4px}
 @media (max-width:640px){.msecs>.msec:first-child{margin-top:-16px}.msecs>.msec:first-child>summary{min-height:37.4px;margin-bottom:23.6px}}
+/* 범위 전환을 로고 옆으로 */
+.hd .inner{justify-content:flex-start}
+.hd .hscope{margin-left:22px;display:flex;align-items:center}
+.hd .right{margin-left:auto}
+.hd .hscope .scope button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:0 13px;font-size:12.5px;font-weight:500;line-height:1;color:var(--muted);background:none;white-space:nowrap;cursor:pointer}
+.hd .hscope .scope button:hover{color:var(--ink)}
+.hd .hscope .scope button[aria-pressed="true"]{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.hd .hscope .scope button[data-scope="mine"][aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:640px){.hd .hscope{margin-left:12px}.hd .hscope .scope button{padding:0 10px;font-size:12px}}
+@media (max-width:389px){.hd .mark span{display:none}}
 </style>
 
 </head>
@@ -703,6 +713,7 @@ button.vw-sec.tg:hover{color:var(--acc)}
 
 <header class="hd gut"><div class="inner">
   <h1 class="mark">MDI<span>BOOKING</span></h1>
+  <div class="hscope" id="hdScope"></div>
   <div class="right" id="hdRight"></div>
 </div></header>
 
@@ -1029,9 +1040,11 @@ function subscribe(){
 /* ---------- 화면 ---------- */
 function header(){
   const rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
-  hdRight.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`+setBtnHtml();
+  const hs=document.getElementById("hdScope");
+  hs.innerHTML=`<div class="scope" role="group" aria-label="${T("scopeLabel")}"><button type="button" data-scope="all" aria-pressed="${scope==="all"}">${T("scopeAll")}</button><button type="button" data-scope="mine" aria-pressed="${scope==="mine"}">${T("scopeMine")}${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}"></span>`:""}</button></div>`;
+  hdRight.innerHTML=setBtnHtml();
   bindSetBtn();
-  hdRight.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
+  hs.querySelectorAll("[data-scope]").forEach(b=>b.onclick=()=>{if(scope===b.dataset.scope)return;scope=b.dataset.scope;try{localStorage.setItem("mdi-scope",scope)}catch(e){}if(scope==="mine"&&NOMINE.includes(tab))tab="cand";render()});
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
@@ -2101,7 +2114,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.55";
+const APP_VER="2026-11-05.56";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
