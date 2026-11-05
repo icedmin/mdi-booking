@@ -134,8 +134,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .who summary::-webkit-details-marker{display:none}
 .who summary .c{font-weight:400;color:var(--muted);margin-left:6px}
 .who summary .pm{width:18px;height:18px;display:grid;place-items:center;flex:none}
-.who summary .pm::before{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .15s}
-.who[open] summary .pm::before{transform:translateY(2px) rotate(-135deg)}
+.who summary .pm::before{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateX(1px) rotate(135deg);transition:transform .15s}
+.who[open] summary .pm::before{transform:translateY(-2px) rotate(45deg)}
 .who dl{margin:6px 0 0;display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:13px}
 .who dt{color:var(--fg)}
 .who dd{margin:0;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -305,8 +305,8 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .msec>summary::-webkit-details-marker{display:none}
 .msec>summary h3{margin:0}
 .msec>summary .pm{width:16px;height:16px;display:grid;place-items:center;color:var(--muted)}
-.msec>summary .pm::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .15s}
-.msec[open]>summary .pm::before{transform:translateY(1px) rotate(-135deg)}
+.msec>summary .pm::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateX(1px) rotate(135deg);transition:transform .15s}
+.msec[open]>summary .pm::before{transform:translateY(-2px) rotate(45deg)}
 .msec:not([open])>summary{margin-bottom:0}
 .mc.fail .mph{box-shadow:0 0 0 1px rgba(232,55,11,.5),0 0 6px rgba(232,55,11,.16)}
 /* 사진 로딩 표시 */
@@ -545,8 +545,8 @@ button.vw-sec.tg:hover{color:var(--acc)}
 .wd .q{font-size:12.5px;color:var(--bad);font-weight:700;width:100%;text-align:center}
 .wd .yes{color:var(--bad);font-weight:700;border-color:var(--bad)}
 .wdlist summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);list-style:none;padding:10px 0;display:flex;align-items:center;gap:8px}
-.wdlist summary .pm::before{content:"";display:block;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg)}
-.wdlist[open] summary .pm::before{transform:translateY(1px) rotate(-135deg)}
+.wdlist summary .pm::before{content:"";display:block;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateX(1px) rotate(135deg);transition:transform .15s}
+.wdlist[open] summary .pm::before{transform:translateY(-2px) rotate(45deg)}
 .wdlist summary::-webkit-details-marker{display:none}
 .wdlist ul{list-style:none;margin:0;padding:0}
 .wdlist li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
@@ -1836,7 +1836,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.20";
+const APP_VER="2026-11-05.21";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
