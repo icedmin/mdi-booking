@@ -270,6 +270,26 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 @keyframes tmEnd{0%,100%{background:rgba(20,20,20,.55)}50%{background:rgba(232,55,11,.92)}}
 @media (prefers-reduced-motion:reduce){.pic .tm.end{animation:none;background:rgba(232,55,11,.92)}}
 .who summary .pm{margin-left:4px}
+.tabs .tsep{flex:none;width:1px;align-self:center;height:14px;background:var(--line);margin:0 -10px 10px}
+.tabs .mytab .rdy{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--go);color:#fff;font-size:11px;font-weight:600;vertical-align:1px}
+.msec{margin-top:26px}.msec h3{font-size:15px;font-weight:600;margin:0 0 10px}.msec h3 .c{color:var(--muted);font-weight:400;margin-left:6px;font-size:13px}
+.mlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.mrow{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.mrow.rdy{border-color:color-mix(in srgb,var(--go) 55%,var(--line))}
+.mth{width:64px;height:80px;border-radius:10px;overflow:hidden;background:var(--line);display:grid;place-items:center;color:var(--muted);font-size:20px}
+.mth[role=button]{cursor:pointer}.mth img{width:100%;height:100%;object-fit:cover;display:block}
+.mbody{min-width:0;display:grid;gap:5px}
+.mtop{display:flex;align-items:baseline;gap:8px;min-width:0}.mname{margin:0;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mag{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mstate{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.tbar.mb{display:block;width:90px;height:2px;border-radius:2px;background:var(--line);overflow:hidden}.tbar.mb i{display:block;height:100%;background:var(--red)}
+.mscore{display:flex;align-items:center;gap:12px;font-size:13px}.mavg{font-weight:600;font-variant-numeric:tabular-nums}.mavg small{color:var(--muted);font-weight:400;margin-left:1px}.mscore .st{display:inline-flex;align-items:center;gap:6px}.mvn{color:var(--muted)}
+.mmiss{margin:0;font-size:12.5px;color:var(--ink)}.mmiss>span{color:var(--muted);margin-right:4px}.mmiss .all{color:var(--go);font-weight:600;margin:0}
+.mact{display:flex;justify-content:flex-end}
+.mvbtn{background:var(--go)!important;border-color:var(--go)!important;color:#fff!important;white-space:nowrap}
+.mvask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.mvask span{font-size:12.5px;color:var(--muted);white-space:nowrap}.mvask .btn{white-space:nowrap}
+@media (max-width:640px){.mrow{grid-template-columns:56px 1fr;gap:12px}.mth{width:56px;height:70px}.mact{grid-column:1/-1}.mact .mvbtn{width:100%}.mvask{width:100%;justify-content:space-between}.mvask span{flex:1 0 100%}.mvask .btn{flex:1}}
+.mscore.score{margin:0;padding:0;border:0}
+.mscore.score .st{font-size:13px}
 </style>
 
 </head>
@@ -517,7 +537,7 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",st_mine:"내 후보",mineDesc:"내가 등록한 후보의 투표 현황입니다. 전원이 투표하고 기준선(6.0)을 넘으면 마감 전에 컨택 중으로 넘길 수 있습니다.",mReady:"컨택 가능",mVoting:"투표 중",mMoved:"컨택 중",mFail:"마감 · 미통과",toContact:"컨택 중으로 넘기기",mvAsk:"넘기면 투표가 마감됩니다",mvYes:"넘기기",movedT:"컨택 중으로 넘겼습니다",mvFail:"넘기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준선 미달",movedAt:"컨택 이동",emptyMine:"등록한 후보가 없습니다",emptyMineSub:"후보 탭에서 후보를 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준선(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"전원 1~10점 투표 · 3일 뒤 평균 6.0점(60%) 이상이면 컨택 중으로 이동",
@@ -564,7 +584,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",st_mine:"My candidates",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Ready to contact",mVoting:"Voting",mMoved:"Contacting",mFail:"Closed · not passed",toContact:"Move to Contacting",mvAsk:"Voting will close",mvYes:"Move",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"Everyone votes 1–10 · after 3 days, average 6.0 (60%) or higher moves to Contacting",
@@ -600,14 +620,14 @@ let U={three:"in",shoe:"mm"};try{Object.assign(U,JSON.parse(localStorage.getItem
 if(!I18N[LANG])LANG="ko";
 const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
 const SN=s=>T("st_"+s);
-const EN={cand:"CANDIDATES",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
+const EN={mine:"MY CANDIDATES",cand:"CANDIDATES",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
 
 const root=document.getElementById("root"),hdRight=document.getElementById("hdRight");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=t=>new Date(t).toLocaleString(LANG==="en"?"en-US":"ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
 let tab="cand";try{tab=localStorage.getItem("mdi-tab2")||"cand"}catch(e){}
-if(!STAGES.includes(tab)&&tab!=="admin")tab="cand";
+if(!STAGES.includes(tab)&&tab!=="admin"&&tab!=="mine")tab="cand";
 document.documentElement.lang=LANG;
 
 if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>${T("loadFailSub")}</div>`;return}
@@ -753,7 +773,9 @@ function vOf(cid){return votes.filter(v=>v.candidate_id===cid)}
 function stats(it){const v=vOf(it.id).map(x=>x.score);const n=v.length;const avg=n?v.reduce((a,b)=>a+b,0)/n:0;return {n,avg,pct:avg/10}}
 function pct(rem,dl,st){st=typeof st==="number"?st:new Date(st).getTime();const tot=dl-st;if(!(tot>0))return 100;return Math.max(0,Math.min(100,rem/tot*100)).toFixed(2)}
 const deadline=it=>new Date(it.deadline).getTime();
-const closed=it=>Date.now()>=deadline(it);
+const closed=it=>!!it.contacted_at||Date.now()>=deadline(it);
+const allVoted=it=>{const ids=new Set(vOf(it.id).map(v=>v.user_id));return approvedMembers().every(m=>ids.has(m.id))};
+const readyToMove=it=>!it.withdrawn_at&&!closed(it)&&allVoted(it)&&passed(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
 function stageOf(it){if(it.withdrawn_at)return "withdrawn";if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
 function left(ms){if(ms<=0)return T("closedAt");const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+T("day"):"")+p(h)+":"+p(m)+":"+p(x)}
@@ -800,7 +822,8 @@ function header(){
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
-  return `<nav class="tabs" role="tablist">${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
+  const myN=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at).length,rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
+  return `<nav class="tabs" role="tablist"><button role="tab" class="mytab" aria-selected="${tab==="mine"}" data-tab="mine">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")}">${rdy}</span>`:""}</button><span class="tsep" aria-hidden="true"></span>${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
@@ -838,7 +861,7 @@ function sizeRows(it){
   return rows;
 }
 function card(it){
-  const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
+  const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0||!!it.contacted_at,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,1).map(p=>photoUrls[p]).filter(Boolean);   // 카드는 메인 사진 1장만
   const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
@@ -855,7 +878,7 @@ function card(it){
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
-        ${isClosed?`<p class="status ${scls}">${T("closedAt")} ${fmt(dl)}</p>`:""}</div>
+        ${isClosed?`<p class="status ${scls}">${it.contacted_at?T("movedAt")+" "+fmt(it.contacted_at):T("closedAt")+" "+fmt(dl)}</p>`:""}</div>
       ${sizeRows(it).length?`<div class="mr" title="${T("sizeTitle")}">${sizeRows(it).map(r=>`<p>${esc(r)}</p>`).join("")}</div>`:""}
     </div>
     <dl class="info">
@@ -894,6 +917,39 @@ function adminView(){
   });
 }
 
+let mvAsk=null;
+function mineHtml(){
+  const my=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at);
+  const ready=my.filter(readyToMove).sort((a,b)=>deadline(a)-deadline(b));
+  const voting=my.filter(it=>!closed(it)&&!readyToMove(it)).sort((a,b)=>deadline(a)-deadline(b));
+  const moved=my.filter(it=>closed(it)&&passed(it)).sort((a,b)=>new Date(b.contacted_at||b.deadline)-new Date(a.contacted_at||a.deadline));
+  const fail=my.filter(it=>closed(it)&&!passed(it));
+  const voters=approvedMembers();
+  const row=it=>{
+    const s=stats(it),ok=passed(it),isC=closed(it),dl=deadline(it),rem=dl-Date.now();
+    const ids=new Set(vOf(it.id).map(v=>v.user_id));const miss=voters.filter(m=>!ids.has(m.id));
+    const u=photoUrls[it.photos[0]];
+    const canView=u||it.link;
+    const state=isC?(it.contacted_at?`${T("movedAt")} ${fmt(it.contacted_at)}`:`${T("closedAt")} ${fmt(dl)}`)
+      :`<span class="mtime" data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar mb"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span>`;
+    const rdy=readyToMove(it);
+    const act=rdy?(mvAsk===it.id?`<div class="mvask"><span>${T("mvAsk")}</span><button type="button" class="btn" data-mvyes="${it.id}">${T("mvYes")}</button><button type="button" class="btn line" data-mvno="${it.id}">${T("cancel")}</button></div>`
+      :`<button type="button" class="btn mvbtn" data-mv="${it.id}">${T("toContact")}</button>`):"";
+    return `<li class="mrow${rdy?" rdy":""}">
+      <div class="mth" ${canView?`data-mview="${it.id}" role="button" tabindex="0"`:""}>${u?`<img src="${esc(u)}" alt="">`:`<b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>`}</div>
+      <div class="mbody">
+        <div class="mtop"><p class="mname">${esc(it.name)}</p><span class="mag">${esc(it.agency||"")}</span></div>
+        <div class="mstate">${state}</div>
+        <div class="mscore score"><span class="mavg">${s.n?s.avg.toFixed(1):"–"}<small>/10</small></span><span class="st ${ok?"ok":""}">${s.n?Math.round(s.pct*100)+"%":T("noVotes")}${lamp("m"+it.id,s.n?(ok?"go":"no"):"off")}</span><span class="mvn">${s.n}/${voters.length}${T("votedN")}</span></div>
+        ${!isC?`<p class="mmiss">${miss.length?`<span>${T("mvWait")}</span> ${miss.map(m=>esc(m.display_name)).join(", ")}`:`<span class="all">${T("mvAllIn")}</span>${ok?"":` · ${T("mvBelow")}`}`}</p>`:""}
+      </div>
+      ${act?`<div class="mact">${act}</div>`:""}
+    </li>`;
+  };
+  const sec=(k,list)=>list.length?`<div class="msec"><h3>${T(k)}<span class="c">${list.length}</span></h3><ul class="mlist">${list.map(row).join("")}</ul></div>`:"";
+  return head("mine",T("mineDesc"))+(my.length?sec("mReady",ready)+sec("mVoting",voting)+sec("mMoved",moved)+sec("mFail",fail)
+    :`<div class="empty"><b>${T("emptyMine")}</b>${T("emptyMineSub")}</div>`);
+}
 function render(){
   header();
   try{localStorage.setItem("mdi-tab2",tab)}catch(e){}
@@ -917,6 +973,8 @@ function render(){
       (shown.length?`<div class="grid">${shown.map(card).join("")}</div>`:(open.length?`<div class="empty"><b>${T("fNone")}</b></div>`:`<div class="empty"><b>${T("emptyCand")}</b>${T("emptyCandSub")}</div>`))+
       (fail.length&&filter==="all"?`<div class="sec"><h3>${T("closedFail")} ${fail.length}</h3><span class="en">CLOSED</span></div><div class="grid">${fail.map(card).join("")}</div>`:"")+
       (wds.length&&filter==="all"?`<details class="wdlist sec" style="display:block"><summary>${T("wdList")} ${wds.length}<span class="pm" aria-hidden="true"></span></summary><ul>${wds.map(it=>`<li><span><b>${esc(it.name)}</b> · ${esc(it.agency||"")}</span><span>${T("wdBy")} ${esc(name(it.withdrawn_by))} · ${fmt(it.withdrawn_at)}</span><button class="btn line" style="padding:6px 12px;font-size:12px" data-restore="${it.id}">${T("restore")}</button></li>`).join("")}</ul></details>`:"");
+  }else if(tab==="mine"){
+    html+=mineHtml();
   }else if(tab==="contact"){
     html+=head("contact",T("contactDesc"))+
       (list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyContact")}</b>${T("emptyContactSub")}</div>`);
@@ -945,6 +1003,16 @@ function render(){
     if(error)toast(T("wdFail")+error.message);else toast(T("restored"));
     await loadAll();render();
   });
+  root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{mvAsk=b.dataset.mv;render()});
+  root.querySelectorAll("[data-mvno]").forEach(b=>b.onclick=()=>{mvAsk=null;render()});
+  root.querySelectorAll("[data-mvyes]").forEach(b=>b.onclick=async()=>{
+    b.disabled=true;const id=b.dataset.mvyes;
+    const {error}=await sb.rpc("move_to_contact",{cid:id});
+    mvAsk=null;
+    if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}else toast(T("movedT"));
+    await loadAll();render();
+  });
+  root.querySelectorAll("[data-mview]").forEach(el=>el.onclick=()=>openViewer(items.find(x=>x.id===el.dataset.mview)));
   root.querySelectorAll("[data-getpic]").forEach(b=>b.onclick=()=>openPickFor(items.find(x=>x.id===b.dataset.getpic)));
   root.querySelectorAll("[data-view]").forEach(el=>{const go=()=>openViewer(items.find(x=>x.id===el.dataset.view));el.onclick=e=>{if(e.target.closest(".wdx,.wdov,.cx"))return;go()};el.onkeydown=e=>{if(e.target!==el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   root.querySelectorAll(".vote button").forEach(b=>b.onclick=async()=>{

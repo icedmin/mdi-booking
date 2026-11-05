@@ -713,7 +713,7 @@ const approvedMembers=()=>members.filter(m=>m.approved);
 function vOf(cid){return votes.filter(v=>v.candidate_id===cid)}
 function stats(it){const v=vOf(it.id).map(x=>x.score);const n=v.length;const avg=n?v.reduce((a,b)=>a+b,0)/n:0;return {n,avg,pct:avg/10}}
 const deadline=it=>new Date(it.deadline).getTime();
-const closed=it=>Date.now()>=deadline(it);
+const closed=it=>!!it.contacted_at||Date.now()>=deadline(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
 function stageOf(it){if(it.withdrawn_at)return "withdrawn";if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
 function left(ms){if(ms<=0)return T("closedAt");const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+T("day"):"")+p(h)+":"+p(m)+":"+p(x)}
@@ -798,7 +798,7 @@ function sizeRows(it){
   return rows;
 }
 function card(it){
-  const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0,ok=passed(it);
+  const s=stats(it),dl=deadline(it),rem=dl-Date.now(),isClosed=rem<=0||!!it.contacted_at,ok=passed(it);
   const mine=vOf(it.id).find(v=>v.user_id===me.id)?.score;
   const urls=it.photos.slice(0,1).map(p=>photoUrls[p]).filter(Boolean);   // 카드는 메인 사진 1장만
   const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
@@ -1580,7 +1580,7 @@ viewer.addEventListener("close",()=>{vIt=null;viewer.style.transition="";viewer.
 
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.2";
+const APP_VER="2026-11-05.3";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
