@@ -631,6 +631,13 @@ dialog#setDlg::backdrop{background:transparent}
 .auth label.chk input{flex:none;width:18px;height:18px;padding:0;margin:1px 0 0;border-radius:4px;accent-color:var(--ink)}
 .auth .chk span{display:flex;flex-direction:column;gap:2px}.auth .chk b{font-weight:600;color:var(--ink)}.auth .chk small{font-size:12px;color:var(--muted)}
 html.gated,html.gated body{overflow:hidden}
+.auth .btn-bio{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;margin-top:10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.auth .btn-bio:hover{border-color:var(--ink)}
+.pk-ask{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:120;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:14px;
+  background:var(--bg);color:var(--ink);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.16);font-size:13px;animation:undoIn .2s ease-out}
+.pk-ask i{flex:none;display:grid;color:var(--ink)}.pk-ask span{flex:1;min-width:0;line-height:1.35}
+.pk-ask button{flex:none;height:32px;padding:0 12px;border-radius:999px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.pk-ask .go{border:0;background:var(--ink);color:var(--bg)}.pk-ask .no{border:0;background:none;color:var(--muted);padding:0 6px}
 #pushGate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));
   background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);animation:pgIn .25s ease-out}
 @keyframes pgIn{from{opacity:0}}
@@ -643,6 +650,8 @@ html.gated,html.gated body{overflow:hidden}
 #pushGate li{counter-increment:s;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45}
 #pushGate li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
 #pushGate li svg{vertical-align:-3px;margin:0 2px}
+#pushGate li small,#pushForm li small{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+#pushGate li small svg,#pushForm li small svg{width:13px;height:14px}
 #pushGate .pg-go{display:block;width:100%;height:46px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
 #pushGate .pg-out{display:block;margin:10px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:8px;cursor:pointer}
 #setDlg .pv-push b{font-size:12px;font-weight:600;color:var(--go)}
@@ -940,7 +949,7 @@ if(!STAGES.includes(tab)&&tab!=="admin")tab="cand";
 document.documentElement.lang=LANG;
 
 if(!window.supabase){root.innerHTML=`<div class="empty"><b>${T("loadFail")}</b>${T("loadFailSub")}</div>`;return}
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{experimental:{passkey:true}}});   // Face ID·지문 로그인(패스키)
 /* 창을 열 때 첫 버튼(×)에 초점 테두리가 생기지 않도록 창 자체에 초점을 둠 */
 {const _sm=HTMLDialogElement.prototype.showModal;HTMLDialogElement.prototype.showModal=function(){this.setAttribute("tabindex","-1");_sm.call(this);try{this.focus({preventScroll:true})}catch(e){}}}
 
@@ -998,14 +1007,16 @@ const PT={ko:{row:"마감 알림",on:"켜짐",turnOn:"켜기",turnOff:"끄기",t
   bnOn:"가입 때 동의한 마감 알림을 이 기기에서 허용해 주세요",bnIos:"홈 화면에 추가하면 동의한 마감 알림을 받을 수 있어요",allow:"허용",suTitle:"투표 마감 알림 받기",suDesc:"(필수) 마감 10분·5분 전, 아직 투표하지 않았으면 폰으로 알림이 옵니다. 동의해야 가입할 수 있습니다.",suNeed:"마감 알림 받기에 동의해야 가입할 수 있습니다",
   onT:"알림을 켰습니다",offT:"알림을 껐습니다",deniedT:"알림이 허용되지 않았습니다",fail:"알림을 켜지 못했습니다: ",testT:"시험 알림을 보냈습니다",testFail:"시험 알림을 보내지 못했습니다: ",
   gTitle:"홈 화면에 추가하기",gSub:"아이폰은 홈 화면 앱에서만 알림을 받을 수 있습니다. 한 번만 하면 됩니다.",
-  g1:"Safari 아래쪽 __SHARE__ 공유 버튼을 누릅니다",g2:"목록에서 <b>홈 화면에 추가</b> → <b>추가</b>",g3:"홈 화면에 생긴 <b>MDI</b> 아이콘으로 엽니다",g4:"화면 위 알림 칸의 <b>켜기</b> → <b>허용</b>",ok:"확인",close:"닫기"},
+  g1:"Safari 아래쪽 __MORE__ 버튼을 누릅니다<small>공유 버튼 __SHARE__ 이 바로 보이면 그걸 누르고 3번으로</small>",g2:"<b>공유</b> → <b>더 보기</b>를 누릅니다",g3:"<b>홈 화면에 추가</b> → <b>추가</b>를 누릅니다",g4:"홈 화면에 생긴 <b>MDI</b> 아이콘으로 엽니다",g5:"로그인 후 <b>알림 허용</b> → <b>허용</b>",ok:"확인",close:"닫기"},
  en:{row:"Deadline alerts",on:"On",turnOn:"Turn on",turnOff:"Turn off",test:"Test",how:"How",denied:"Blocked",unsup:"Not supported here",
   noteIos:"On iPhone, alerts work only in the app added to the Home Screen.",noteDenied:"Allow MDI Booking in your phone's notification settings.",noteOn:"Alerts are sent 10, 5 and 3 minutes before a vote closes (not for models you voted on).",
   bnOn:"Allow the deadline alerts you agreed to on this device",bnIos:"Add to Home Screen to get the deadline alerts you agreed to",allow:"Allow",suTitle:"Get vote deadline alerts",suDesc:"(Required) 10 and 5 minutes before a vote closes, if you haven't voted. You must agree to sign up.",suNeed:"You must agree to deadline alerts to sign up",
   onT:"Alerts on",offT:"Alerts off",deniedT:"Notifications were not allowed",fail:"Couldn't turn on alerts: ",testT:"Test alert sent",testFail:"Couldn't send test alert: ",
   gTitle:"Add to Home Screen",gSub:"On iPhone, alerts only work in the Home Screen app. You only do this once.",
-  g1:"Tap the __SHARE__ Share button in Safari",g2:"Choose <b>Add to Home Screen</b> → <b>Add</b>",g3:"Open the <b>MDI</b> icon on your Home Screen",g4:"Tap <b>Turn on</b> in the alert bar → <b>Allow</b>",ok:"OK",close:"Close"}};
+  g1:"Tap the __MORE__ button at the bottom of Safari<small>If the Share button __SHARE__ is visible, tap it and skip to step 3</small>",g2:"Tap <b>Share</b> → <b>More</b>",g3:"Tap <b>Add to Home Screen</b> → <b>Add</b>",g4:"Open the <b>MDI</b> icon on your Home Screen",g5:"Log in, then <b>Allow notifications</b> → <b>Allow</b>",ok:"OK",close:"Close"}};
 const P=k=>(PT[LANG]||PT.ko)[k];
+const MORE_SVG='<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect x=".75" y=".75" width="20.5" height="14.5" rx="7.25" fill="none" stroke="#0a84ff" stroke-width="1.5"/><circle cx="6.5" cy="8" r="1.4" fill="#0a84ff"/><circle cx="11" cy="8" r="1.4" fill="#0a84ff"/><circle cx="15.5" cy="8" r="1.4" fill="#0a84ff"/></svg>';
+const iosSteps=()=>`<ol>${["g1","g2","g3","g4","g5"].map(k=>`<li><span>${P(k).replace("__SHARE__",SHARE_SVG).replace("__MORE__",MORE_SVG)}</span></li>`).join("")}</ol>`;
 const SHARE_SVG='<svg width="16" height="18" viewBox="0 0 16 18" fill="none" aria-hidden="true"><path d="M8 11V1.5M4.8 4.5 8 1.3l3.2 3.2" stroke="#0a84ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 7H3.2A1.2 1.2 0 0 0 2 8.2v7.6A1.2 1.2 0 0 0 3.2 17h9.6a1.2 1.2 0 0 0 1.2-1.2V8.2A1.2 1.2 0 0 0 12.8 7h-2.3" stroke="#0a84ff" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const BELL_SVG='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8a4 4 0 0 0-4 4v2.6L2.8 10.6v.9h10.4v-.9L12 8.4V5.8a4 4 0 0 0-4-4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 13.3a1.7 1.7 0 0 0 3.2 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 const X_SVG='<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -1029,7 +1040,7 @@ async function pushSync(){   // 로그인 후: 이 기기가 이미 켜져 있�
     if(s){const {error}=await sb.rpc("save_push_sub",subJson(s));pushOn=!error}}}catch(e){}
   pushChecked=true;
 }
-function pushRefreshUI(){updateGate();const d=document.getElementById("setDlg");if(d&&d.open)openSettings();if(me&&profile?.approved&&tab!=="admin")render()}
+function pushRefreshUI(){updateGate();pkSuggest();const d=document.getElementById("setDlg");if(d&&d.open)openSettings();if(me&&profile?.approved&&tab!=="admin")render()}
 async function pushEnable(){
   try{
     const perm=await Notification.requestPermission();   // 누른 즉시 물어봐야 아이폰에서 창이 뜸
@@ -1057,7 +1068,7 @@ async function pushTest(){
 }
 function openPushGuide(){
   const f=document.getElementById("pushForm"),d=document.getElementById("pushDlg");
-  f.innerHTML=`<h3>${P("gTitle")}</h3><p class="sub">${P("gSub")}</p><ol><li><span>${P("g1").replace("__SHARE__",SHARE_SVG)}</span></li><li><span>${P("g2")}</span></li><li><span>${P("g3")}</span></li><li><span>${P("g4")}</span></li></ol><div class="act"><button type="submit">${P("ok")}</button></div>`;
+  f.innerHTML=`<h3>${P("gTitle")}</h3><p class="sub">${P("gSub")}</p>${iosSteps()}<div class="act"><button type="submit">${P("ok")}</button></div>`;
   if(!d.open)d.showModal();
 }
 document.getElementById("pushDlg").addEventListener("click",e=>{if(e.target.id==="pushDlg")e.target.close()});
@@ -1083,7 +1094,7 @@ function updateGate(){
   const key=m==="ios-browser"?"Ios":m==="denied"?"Den":m==="off"?"Off":"Uns";
   if(g.dataset.k===key+LANG)return;
   g.dataset.k=key+LANG;
-  const steps=m==="ios-browser"?`<ol><li><span>${P("g1").replace("__SHARE__",SHARE_SVG)}</span></li><li><span>${P("g2")}</span></li><li><span>${P("g3")}</span></li><li><span>${LANG==="en"?"Log in and tap <b>Allow notifications</b> → <b>Allow</b>":"로그인 후 <b>알림 허용</b> → <b>허용</b>"}</span></li></ol>`:"";
+  const steps=m==="ios-browser"?iosSteps():"";
   const btn=m==="off"?`<button type="button" class="pg-go" data-gon>${G("bOff")}</button>`:m==="denied"?`<button type="button" class="pg-go" data-gre>${G("bDen")}</button>`:"";
   g.innerHTML=`<div class="pg-card"><i class="pg-bell">${BELL_SVG}</i><h3>${G("t"+key)}</h3><p>${G("d"+key)}</p>${steps}${btn}<button type="button" class="pg-out" data-gout>${G("logout")}</button></div>`;
   g.querySelector("[data-gon]")?.addEventListener("click",pushEnable);
@@ -1115,6 +1126,39 @@ function bindPush(el){
   el.querySelectorAll("[data-px]").forEach(b=>b.onclick=()=>{try{localStorage.setItem("mdi-push-x",b.dataset.px)}catch(e){}render()});
 }
 
+/* ---------- Face ID·지문 로그인 (패스키) ---------- */
+const PKT={ko:{loginBio:"Face ID·지문으로 로그인",loginFail:"Face ID·지문 로그인 실패: ",row:"Face ID·지문 로그인",reg:"이 기기 등록",
+  note:"등록하면 로그인 화면에서 비밀번호 없이 Face ID·지문으로 로그인할 수 있습니다.",regOk:"등록했습니다. 다음부터 Face ID·지문으로 로그인할 수 있습니다",regFail:"등록하지 못했습니다: ",
+  ask:"다음부터 Face ID·지문으로 로그인할까요?",later:"나중에"},
+ en:{loginBio:"Log in with Face ID / fingerprint",loginFail:"Biometric login failed: ",row:"Face ID / fingerprint login",reg:"Register this device",
+  note:"Once registered, you can log in with Face ID or fingerprint instead of a password.",regOk:"Registered. Next time you can log in with Face ID / fingerprint",regFail:"Couldn't register: ",
+  ask:"Log in with Face ID / fingerprint next time?",later:"Later"}};
+const PK=k=>(PKT[LANG]||PKT.ko)[k];
+const BIO_SVG='<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 6V4a2 2 0 0 1 2-2h2M12 2h2a2 2 0 0 1 2 2v2M16 12v2a2 2 0 0 1-2 2h-2M6 16H4a2 2 0 0 1-2-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6.3 6.5v1.2M11.7 6.5v1.2M9 6.5v3.2l-.9.6M6.6 11.8a3.4 3.4 0 0 0 4.8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+async function pkRegister(){
+  const d=document.getElementById("setDlg");if(d&&d.open)d.close();
+  document.getElementById("pkAsk")?.remove();
+  const {error}=await sb.auth.registerPasskey();
+  if(error){if(!/abort|cancel|NotAllowed/i.test(error.message||""))toast(PK("regFail")+(error.message||""));return}
+  try{localStorage.setItem("mdi-pk-"+me.id,"1")}catch(_){}
+  toast(PK("regOk"));
+}
+/* 폰에서 비밀번호로 로그인한 뒤 한 번만 등록 권유 (알림 잠금이 풀린 다음) */
+async function pkSuggest(){
+  try{
+    if(!me||!profile?.approved||!isPhone||!window.PublicKeyCredential||document.getElementById("pushGate"))return;
+    if(localStorage.getItem("mdi-pk-"+me.id)||localStorage.getItem("mdi-pk-ask-"+me.id))return;
+    if(!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()))return;
+  }catch(_){return}
+  if(document.getElementById("pkAsk"))return;
+  const c=document.createElement("div");c.id="pkAsk";c.className="pk-ask";c.setAttribute("role","dialog");
+  c.innerHTML=`<i>${BIO_SVG}</i><span>${PK("ask")}</span><button type="button" class="go">${PK("reg")}</button><button type="button" class="no">${PK("later")}</button>`;
+  document.body.appendChild(c);
+  const done=()=>{try{localStorage.setItem("mdi-pk-ask-"+me.id,"1")}catch(_){}c.remove()};
+  c.querySelector(".go").onclick=()=>{done();pkRegister()};
+  c.querySelector(".no").onclick=done;
+}
+
 /* ---------- 설정 ---------- */
 let THEME=(()=>{try{const t=localStorage.getItem("mdi-theme");return t==="light"||t==="dark"?t:"auto"}catch(e){return "auto"}})();
 function setTheme(t){THEME=t;try{localStorage.setItem("mdi-theme",t)}catch(e){}
@@ -1129,6 +1173,7 @@ function openSettings(){
     <div class="pv-row"><span>${T("unitShoe")}</span>${seg("data-u",[["shoe:mm","mm"],["shoe:us","US"],["shoe:eu","EU"]],U.shoe)}</div>
     <p class="pv-note">${T("shoeNote")}</p>
     ${me&&profile?.approved?pushRowHtml():""}
+    ${me&&window.PublicKeyCredential?`<div class="pv-row"><span>${PK("row")}</span><div class="pv-push"><button type="button" class="pri" data-pkreg>${PK("reg")}</button></div></div><p class="pv-note">${PK("note")}</p>`:""}
     ${me?`<div class="pv-menu">${profile?.approved&&profile.role==="admin"?`<button type="button" id="toAdmin">${tab==="admin"?T("toBoard"):T("members")}</button>`:""}<button type="button" id="logout">${T("logout")}</button></div>`:""}`;
   f.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{
     LANG=b.dataset.l;try{localStorage.setItem("mdi-lang",LANG)}catch(e){}
@@ -1140,6 +1185,7 @@ function openSettings(){
   f.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.u.split(":");U[k]=v;try{localStorage.setItem("mdi-units",JSON.stringify(U))}catch(e){}
     if(me&&profile?.approved&&tab!=="admin")render();openSettings()});
   bindPush(f);
+  f.querySelectorAll("[data-pkreg]").forEach(b=>b.onclick=pkRegister);
   const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();sb.auth.signOut()};
   const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{d.close();tab=tab==="admin"?"cand":"admin";render()};
   // 헤더의 버튼 바로 아래에 작은 창으로 띄움
@@ -1170,9 +1216,17 @@ function authView(mode="login",msg=""){
     ${mode==="signup"?`<label for="a-pw2">${T("password2")}<input id="a-pw2" type="password" autocomplete="new-password" required minlength="6"></label>`:""}
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
     <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
+    ${mode==="login"&&window.PublicKeyCredential?`<button class="btn-bio" type="button" id="aBio">${BIO_SVG}<span>${PK("loginBio")}</span></button>`:""}
     <p class="switch">${mode==="login"?`${T("firstTime")} <button type="button" id="aSwitch">${T("doSignup")}</button>`:`${T("haveAcct")} <button type="button" id="aSwitch">${T("doLogin")}</button>`}</p>
   </form>`;
   document.getElementById("aSwitch").onclick=()=>authView(mode==="login"?"signup":"login");
+  const bio=document.getElementById("aBio");
+  if(bio)bio.onclick=async()=>{
+    bio.disabled=true;const m0=document.getElementById("aMsg");
+    const {error}=await sb.auth.signInWithPasskey();
+    bio.disabled=false;
+    if(error&&!/abort|cancel|NotAllowed/i.test(error.message||"")){m0.textContent=PK("loginFail")+(error.message||"");m0.className="msg err";m0.hidden=false}
+  };
   const f=document.getElementById("authForm"),m=document.getElementById("aMsg");
   const say=(t,ok)=>{m.textContent=t;m.className="msg "+(ok?"ok":"err");m.hidden=false};
   f.onsubmit=async e=>{
@@ -2360,7 +2414,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.74";
+const APP_VER="2026-11-05.76";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
@@ -2377,7 +2431,7 @@ async function boot(session){
   root.innerHTML=`<div class="loading">${T("loading")}</div>`;
   try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
   subscribe();render();autoFill();
-  pushSync().then(()=>{if(tab!=="admin")render();updateGate()});
+  pushSync().then(()=>{if(tab!=="admin")render();updateGate();pkSuggest()});
 }
 /* 링크만 있고 사진이 없는 내 후보(관리자는 전체)는 메인 사진·포트폴리오를 자동으로 채움 — 세션당 1회 */
 const autoTried=new Set();
