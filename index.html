@@ -484,6 +484,8 @@ img.plw{opacity:0!important}
 /* 전체/내 보드 전환 시 부드럽게 */
 @keyframes scopeIn{from{opacity:.35}to{opacity:1}}
 .card>.gls,.card>.mrr{margin-top:12px}
+/* 내 보드 카드: 전체 보드 카드와 같은 폭 (PC) */
+@media (min-width:641px){.mgrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:40px 24px}.mname{font-size:15px}.mavg{font-size:17px}}
 </style>
 
 </head>
@@ -2084,7 +2086,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.50";
+const APP_VER="2026-11-05.51";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
