@@ -1402,7 +1402,7 @@ function render(){
     const it=items.find(x=>x.id===btns[0].dataset.id);if(!it||closed(it))return;
     let x0=null,y0=0,drag=false,cur=0,rects=null;
     const pick=x=>{let best=1,d=1e9;rects.forEach(([c,n])=>{const dd=Math.abs(x-c);if(dd<d){d=dd;best=n}});return best};
-    const show=n=>{if(n===cur)return;cur=n;v.style.setProperty("--n",n);v.classList.add("has");v.classList.remove("vfa");btns.forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===n?"true":"false"))};
+    const show=n=>{if(n===cur)return;cur=n;vfMem.set(it.id,n);v.style.setProperty("--n",n);v.classList.add("has");v.classList.remove("vfa");btns.forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===n?"true":"false"))};
     const begin=(x,y)=>{x0=x;y0=y;drag=false;cur=0;rects=btns.map(b=>{const r=b.getBoundingClientRect();return [r.left+r.width/2,+b.dataset.v]})};
     const startDrag=()=>{drag=true;voteDragging=true;v.classList.add("dragging")};
     const finish=commit=>{x0=null;if(!drag)return;drag=false;v.classList.remove("dragging");voteDragging=false;v._dragged=true;setTimeout(()=>{v._dragged=false},350);
@@ -2184,7 +2184,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.66";
+const APP_VER="2026-11-05.67";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
