@@ -461,6 +461,10 @@ img.plw{opacity:0!important}
 .vote{touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .vote.dragging{cursor:grabbing}
 .vote.dragging::before{transition:none}
+/* 카드 높이 정렬: 정보 칸이 남는 높이를 차지해 점수·투표 줄이 같은 높이에 오도록 */
+.grid .card>.info{flex:1 0 auto;align-content:start}
+/* PC: 화면 90% 크기로 (한 화면에 카드가 더 들어오게) */
+@media (min-width:1024px){html{zoom:.9}}
 </style>
 
 </head>
@@ -1061,7 +1065,7 @@ function card(it){
       <dt>${T("agency")}</dt><dd>${esc(it.agency||T("notEntered"))}</dd>
       <dt>${T("guarantee")}</dt><dd>${g}</dd>
       ${it.link?`<dt>${T("link")}</dt><dd class="lk">${itemLinks(it).map((u,i,a)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${a.length>1?T("open").replace(/\s*↗$/,"")+" "+(i+1)+" ↗":T("open")}</a>`).join("")}</dd>`:""}
-      ${it.memo?`<dt>${T("memo")}</dt><dd>${esc(it.memo)}</dd>`:""}
+      <dt>${T("memo")}</dt><dd>${esc(it.memo||"")}</dd>
     </dl>
     <div class="score">
       <div class="top"><span class="avg">${s.n?s.avg.toFixed(1):"–"}<small>/ 10</small></span><span class="st ${ok?"ok":""}">${s.n?`${Math.round(s.pct*100)}%`:T("noVotes")}${lamp(it.id,s.n?(ok?"go":"no"):"off")}</span></div>
@@ -2036,7 +2040,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.44";
+const APP_VER="2026-11-05.45";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
