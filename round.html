@@ -271,7 +271,7 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.pic .tm.end{animation:none;background:rgba(232,55,11,.92)}}
 .who summary .pm{margin-left:4px}
 .tabs .tsep{flex:none;width:1px;align-self:center;height:14px;background:var(--line);margin:0 -10px 10px}
-.tabs .mytab .rdy{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--go);color:#fff;font-size:11px;font-weight:600;vertical-align:1px}
+.tabs .mytab{position:relative}.tabs .mytab .rdy{position:absolute;top:-3px;right:-8px;width:7px;height:7px;border-radius:50%;background:var(--go);box-shadow:0 0 0 2px var(--bg)}
 .msec{margin-top:28px}.msec h3{font-size:14px;font-weight:600;margin:0 0 12px}.msec h3 .c{color:var(--muted);font-weight:400;margin-left:6px;font-size:13px}
 .mgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:26px 16px}
 .mc{min-width:0;display:flex;flex-direction:column;gap:6px}
@@ -829,7 +829,7 @@ function header(){
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{const k=stageOf(it);if(k in c)c[k]++});
   const myN=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at).length,rdy=items.filter(it=>it.created_by===me.id&&readyToMove(it)).length;
-  return `<nav class="tabs" role="tablist"><button role="tab" class="mytab" aria-selected="${tab==="mine"}" data-tab="mine">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")}">${rdy}</span>`:""}</button><span class="tsep" aria-hidden="true"></span>${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
+  return `<nav class="tabs" role="tablist"><button role="tab" class="mytab" aria-selected="${tab==="mine"}" data-tab="mine">${T("st_mine")}<span class="n">${myN}</span>${rdy?`<span class="rdy" title="${T("mReady")} ${rdy}" aria-label="${T("mReady")} ${rdy}"></span>`:""}</button><span class="tsep" aria-hidden="true"></span>${STAGES.map(s=>`<button role="tab" aria-selected="${s===tab}" data-tab="${s}">${SN(s)}<span class="n">${c[s]}</span></button>`).join("")}</nav>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
