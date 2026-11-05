@@ -426,6 +426,11 @@ img.plw{opacity:0!important}
 .gls.mclick .k{top:3px;right:3px;width:24px;height:24px;border-radius:6px}
 .gls.mclick .k svg{width:12px;height:12px}
 .gls.mclick .t{margin-right:22px}
+/* 폰 슬라이드도 얇게 (손잡이는 손가락으로 잡을 만큼 유지) */
+.gls.mslide{height:36px;border-radius:10px;font-size:12.5px;margin-top:8px}
+.gls.mslide .k{top:3px;left:3px;width:28px;height:28px;border-radius:7px}
+.gls.mslide .k svg{width:13px;height:13px}
+.gls.mslide .sh{padding-left:26px}
 </style>
 
 </head>
@@ -1198,7 +1203,7 @@ function render(){
   });   // PC: 클릭
   root.querySelectorAll("[data-slide]").forEach(tr=>{   // 폰: 끝까지 밀어야 넘어감
     const k=tr.querySelector(".k"),fill=tr.querySelector(".fill");let x0=null,x=0,done=false;
-    const max=()=>tr.clientWidth-k.offsetWidth-8;
+    const max=()=>tr.clientWidth-k.offsetWidth-6;
     const set=(v,anim)=>{x=Math.max(0,Math.min(max(),v));k.style.transition=fill.style.transition=anim?"transform .25s ease,width .25s ease":"none";k.style.transform=`translateX(${x}px)`;fill.style.width=(x+k.offsetWidth/2+3)+"px";tr.style.setProperty("--p",x/max())};
     tr.addEventListener("pointerdown",e=>{if(done)return;x0=e.clientX-x;tr.setPointerCapture(e.pointerId);tr.classList.add("drag")});
     tr.addEventListener("pointermove",e=>{if(x0==null||done)return;set(e.clientX-x0,false)});
@@ -1989,7 +1994,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.37";
+const APP_VER="2026-11-05.38";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
