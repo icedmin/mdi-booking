@@ -431,6 +431,7 @@ img.plw{opacity:0!important}
 .gls.mslide .k{top:3px;left:3px;width:28px;height:28px;border-radius:7px}
 .gls.mslide .k svg{width:13px;height:13px}
 .gls.mslide .sh{padding-left:26px}
+@media (max-width:640px){.ph-head+.msec{margin-top:2px}}
 </style>
 
 </head>
@@ -1994,7 +1995,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.38";
+const APP_VER="2026-11-05.39";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
