@@ -264,7 +264,10 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .tm .tbar{display:block;height:2px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden}
 .tm .tbar i{display:block;height:100%;border-radius:2px;background:var(--red);transition:width .6s linear}
 .pic .tm.soon::before{display:none!important}
-.pic .tm.soon>[data-left]::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px;box-shadow:0 0 6px rgba(232,55,11,.8)}
+.pic .tm.end{animation:tmEnd 2.4s ease-in-out infinite}
+.pic .tm.end .tbar{background:rgba(255,255,255,.35)}.pic .tm.end .tbar i{background:#fff}
+@keyframes tmEnd{0%,100%{background:rgba(20,20,20,.55)}50%{background:rgba(232,55,11,.92)}}
+@media (prefers-reduced-motion:reduce){.pic .tm.end{animation:none;background:rgba(232,55,11,.92)}}
 </style>
 
 </head>
@@ -839,7 +842,7 @@ function card(it){
   const total=((it.folders?.length?it.folders.reduce((a,f)=>a+f.i.length,0):(it.gallery?.length||0)+(it.snaps?.length||0))+it.photos.filter(p=>!/\/link-/.test(p)).length)||it.photos.length;
   const media=urls.length?`<div class="strip">${urls.map(u=>`<img src="${esc(u)}" alt="${esc(it.name)}">`).join("")}</div>`
     :`<div class="noimg"><div><b>${esc((it.name||"?").trim().charAt(0).toUpperCase())}</b>${it.photos.length?T("photoLoading"):(it.link?T("linkNoPhoto"):T("noPhoto"))}</div></div>`;
-  const scls=isClosed?"done":(rem<12*H?"soon":"");
+  const scls=isClosed?"done":(rem<12*H?"soon":"")+(!isClosed&&rem<10*60e3?" end":"");
   const g=it.gtype==="yes"?esc(it.gamt||T("gNoAmt")):it.gtype==="no"?T("gNone"):T("gTbd");
   const voters=approvedMembers();
   const vmap=Object.fromEntries(vOf(it.id).map(v=>[v.user_id,v.score]));
@@ -972,7 +975,7 @@ setInterval(()=>{
     if(rem<=0){re=true;return}
     el.textContent=left(rem);
     const bar=el.nextElementSibling;if(bar&&bar.classList.contains("tbar"))bar.firstElementChild.style.width=pct(rem,+el.dataset.dl,+el.dataset.st)+"%";
-    const box=el.closest(".tm,.status");if(box)box.classList.toggle("soon",rem<12*H);
+    const box=el.closest(".tm,.status");if(box){box.classList.toggle("soon",rem<12*H);if(box.classList.contains("tm"))box.classList.toggle("end",rem<10*60e3)}
   });
   if(re&&tab!=="admin")render();
 },1000);
