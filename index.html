@@ -297,7 +297,7 @@ dialog#setDlg{border-radius:12px}#setDlg .sg{border-radius:8px;overflow:hidden}
 .card .pic .tm .tbar{background:rgba(255,255,255,.35)}
 .card .pic .tm.end{animation:tmEnd 2.4s ease-in-out infinite}
 /* 타이머: 사진 하단 유리 띠 (D) */
-.card .pic .tm{left:0;right:0;bottom:0;border-radius:0 0 14px 14px;flex-direction:row;justify-content:center;align-items:center;padding:8px 12px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.card .pic .tm{left:0;right:0;bottom:0;border-radius:0 0 14px 14px;flex-direction:row;justify-content:center;align-items:center;padding:7.5px 12px 9.5px;font-size:11.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
 .card .pic .tm .tbar{position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:0}
 .card .pic .tm .tbar i{border-radius:0}
 </style>
@@ -1701,7 +1701,7 @@ document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".cmenu,.cm
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&moreOpen){moreOpen=null;render()}});
 /* ---------- 시작 ---------- */
 /* 새 버전 자동 적용: 브라우저가 예전 화면을 저장해 두고 보여주는 경우(최대 10분) 최신 파일과 버전을 비교해 한 번 새로고침 */
-const APP_VER="2026-11-05.11";
+const APP_VER="2026-11-05.12";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
