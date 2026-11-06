@@ -1099,7 +1099,7 @@ function updateGate(){
   g.innerHTML=`<div class="pg-card"><i class="pg-bell">${BELL_SVG}</i><h3>${G("t"+key)}</h3><p>${G("d"+key)}</p>${steps}${btn}<button type="button" class="pg-out" data-gout>${G("logout")}</button></div>`;
   g.querySelector("[data-gon]")?.addEventListener("click",pushEnable);
   g.querySelector("[data-gre]")?.addEventListener("click",async()=>{try{await Notification.requestPermission()}catch(_){}g.dataset.k="";await pushSync();updateGate()});   // 브라우저가 다시 물어볼 수 있으면 그 창을 띄움, 아니면 설정 안내 유지
-  g.querySelector("[data-gout]")?.addEventListener("click",()=>sb.auth.signOut());
+  g.querySelector("[data-gout]")?.addEventListener("click",logout);
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&isPhone&&me&&profile?.approved){pushSync().then(()=>{const g=document.getElementById("pushGate");if(g)g.dataset.k="";updateGate()})}});
 function pushBanner(){
@@ -1186,7 +1186,7 @@ function openSettings(){
     if(me&&profile?.approved&&tab!=="admin")render();openSettings()});
   bindPush(f);
   f.querySelectorAll("[data-pkreg]").forEach(b=>b.onclick=pkRegister);
-  const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();sb.auth.signOut()};
+  const lo=document.getElementById("logout");if(lo)lo.onclick=()=>{d.close();logout()};
   const a=document.getElementById("toAdmin");if(a)a.onclick=()=>{d.close();tab=tab==="admin"?"cand":"admin";render()};
   // 헤더의 버튼 바로 아래에 작은 창으로 띄움
   const btn=document.getElementById("openSet");
@@ -1498,6 +1498,7 @@ function mineHtml(stage){
 let voteDragging=false,renderWaiting=false;
 window.__mdiRender=()=>render();   // 점검용: 외부에서 화면 다시 그리기
 function render(){
+  if(!me||!profile?.approved)return;   // 로그아웃 뒤 늦게 도착한 갱신이 보드를 그리지 않도록
   if(voteDragging){renderWaiting=true;return}
   header();
   try{localStorage.setItem("mdi-tab2",tab)}catch(e){}
@@ -2414,24 +2415,37 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-06.77";
+const APP_VER="2026-11-06.78";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
   if(v&&v!==APP_VER&&sessionStorage.getItem("mdi-ver-reload")!==v){sessionStorage.setItem("mdi-ver-reload",v);location.reload()}
 }catch(e){}})();
 staticText();
+/* 로그아웃: 이 기기의 로그인 정보를 먼저 지우고(서버 연결 실패와 상관없이) 바로 로그인 화면으로 */
+async function logout(){
+  try{await sb.auth.signOut({scope:"local"})}catch(_){}
+  lastUid=null;boot(null);
+}
+let bootSeq=0;
 async function boot(session){
+  const run=++bootSeq;   // 늦게 끝난 이전 boot가 화면을 덮지 않도록
   me=session?.user||null;
-  if(!me){if(channel){sb.removeChannel(channel);channel=null}pushChecked=false;updateGate();return authView()}
+  if(!me){if(channel){sb.removeChannel(channel);channel=null}
+    pushChecked=false;pushOn=false;profile=null;items=[];votes=[];
+    document.querySelectorAll("dialog[open]").forEach(d=>{try{d.close()}catch(_){}});
+    document.getElementById("pkAsk")?.remove();document.getElementById("undoBar")?.classList.remove("show");
+    updateGate();return authView()}
   const {data,error}=await sb.from("profiles").select("*").eq("id",me.id).maybeSingle();
+  if(run!==bootSeq)return;
   if(error){root.innerHTML=`<div class="empty"><b>${T("infoFail")}</b>${esc(error.message)}</div>`;return}
   profile=data;
   if(!profile?.approved)return pendingView();
   root.innerHTML=`<div class="loading">${T("loading")}</div>`;
-  try{await loadAll()}catch(e){root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
+  try{await loadAll()}catch(e){if(run===bootSeq)root.innerHTML=`<div class="empty"><b>${T("dataFail")}</b>${esc(e.message)}</div>`;return}
+  if(run!==bootSeq)return;
   subscribe();render();autoFill();
-  pushSync().then(()=>{if(tab!=="admin")render();updateGate();pkSuggest()});
+  pushSync().then(()=>{if(run!==bootSeq||!me)return;if(tab!=="admin")render();updateGate();pkSuggest()});
 }
 /* 링크만 있고 사진이 없는 내 후보(관리자는 전체)는 메인 사진·포트폴리오를 자동으로 채움 — 세션당 1회 */
 const autoTried=new Set();
