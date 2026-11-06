@@ -635,6 +635,13 @@ html.gated,html.gated body{overflow:hidden}
 .auth .btn-bio:hover{border-color:var(--ink)}
 .pk-ask{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:120;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:14px;
   background:var(--bg);color:var(--ink);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.16);font-size:13px;animation:undoIn .2s ease-out}
+.pk-modal{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:24px 20px;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:pgIn .2s ease-out}
+.pk-modal .pk-card{width:min(360px,100%);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:24px 22px 14px;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.pk-modal .pk-ic{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--tile);margin-bottom:14px}.pk-modal .pk-ic svg{width:22px;height:22px}
+.pk-modal h3{margin:0 0 6px;font-size:18px;font-weight:700}.pk-modal p{margin:0 0 10px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.pk-modal .pk-note{font-size:12.5px;background:var(--tile);border-radius:10px;padding:9px 11px;color:var(--ink);margin-bottom:16px}
+.pk-modal .go{display:block;width:100%;height:46px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.pk-modal .no{display:block;margin:8px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:8px;cursor:pointer}
 .pk-ask i{flex:none;display:grid;color:var(--ink)}.pk-ask span{flex:1;min-width:0;line-height:1.35}
 .pk-ask button{flex:none;height:32px;padding:0 12px;border-radius:999px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .pk-ask .go{border:0;background:var(--ink);color:var(--bg)}.pk-ask .no{border:0;background:none;color:var(--muted);padding:0 6px}
@@ -897,7 +904,7 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mfAll:"All",scopeLabel:"Scope",scopeAll:"Shared",scopeMine:"Mine",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mfAll:"All",scopeLabel:"Scope",scopeAll:"Shared board",scopeMine:"My board",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"",
@@ -1129,10 +1136,10 @@ function bindPush(el){
 /* ---------- Face ID·지문 로그인 (패스키) ---------- */
 const PKT={ko:{loginBio:"Face ID·지문으로 로그인",loginFail:"Face ID·지문 로그인 실패: ",row:"Face ID·지문 로그인",reg:"이 기기 등록",
   note:"등록하면 로그인 화면에서 비밀번호 없이 Face ID·지문으로 로그인할 수 있습니다.",regOk:"등록했습니다. 다음부터 Face ID·지문으로 로그인할 수 있습니다",regFail:"등록하지 못했습니다: ",
-  ask:"다음부터 Face ID·지문으로 로그인할까요?",later:"나중에"},
+  ask:"다음부터 Face ID·지문으로 로그인할까요?",later:"나중에",suBio:"Face ID·지문으로 로그인하기",suBioDesc:"선택하면 첫 로그인 때 바로 등록 화면이 뜹니다. 나중에 설정에서도 등록할 수 있습니다.",mTitle:"Face ID·지문 등록",mDesc:"가입할 때 선택하신 Face ID·지문 로그인을 등록합니다. 다음부터 비밀번호 없이 로그인할 수 있습니다.",mNote:"다음 화면에 '패스키 저장'이 나오면 '계속'을 눌러 주세요. Face ID·지문으로 여는 로그인 열쇠입니다."},
  en:{loginBio:"Log in with Face ID / fingerprint",loginFail:"Biometric login failed: ",row:"Face ID / fingerprint login",reg:"Register this device",
   note:"Once registered, you can log in with Face ID or fingerprint instead of a password.",regOk:"Registered. Next time you can log in with Face ID / fingerprint",regFail:"Couldn't register: ",
-  ask:"Log in with Face ID / fingerprint next time?",later:"Later"}};
+  ask:"Log in with Face ID / fingerprint next time?",later:"Later",suBio:"Log in with Face ID / fingerprint",suBioDesc:"If checked, registration opens right after your first login. You can also do it later in settings.",mTitle:"Register Face ID / fingerprint",mDesc:"Register the Face ID / fingerprint login you chose at sign-up. Next time you can log in without a password.",mNote:"If the next screen says 'Save passkey', tap Continue. It is the login key opened with Face ID / fingerprint."}};
 const PK=k=>(PKT[LANG]||PKT.ko)[k];
 const BIO_SVG='<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 6V4a2 2 0 0 1 2-2h2M12 2h2a2 2 0 0 1 2 2v2M16 12v2a2 2 0 0 1-2 2h-2M6 16H4a2 2 0 0 1-2-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6.3 6.5v1.2M11.7 6.5v1.2M9 6.5v3.2l-.9.6M6.6 11.8a3.4 3.4 0 0 0 4.8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 async function pkRegister(){
@@ -1146,13 +1153,18 @@ async function pkRegister(){
 /* 폰에서 비밀번호로 로그인한 뒤 한 번만 등록 권유 (알림 잠금이 풀린 다음) */
 async function pkSuggest(){
   try{
-    if(!me||!profile?.approved||!isPhone||!window.PublicKeyCredential||document.getElementById("pushGate"))return;
+    const chosen=!!me?.user_metadata?.bio_opt_in;
+    if(!me||!profile?.approved||(!isPhone&&!chosen)||!window.PublicKeyCredential||document.getElementById("pushGate"))return;
     if(localStorage.getItem("mdi-pk-"+me.id)||localStorage.getItem("mdi-pk-ask-"+me.id))return;
     if(!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()))return;
   }catch(_){return}
   if(document.getElementById("pkAsk"))return;
-  const c=document.createElement("div");c.id="pkAsk";c.className="pk-ask";c.setAttribute("role","dialog");
-  c.innerHTML=`<i>${BIO_SVG}</i><span>${PK("ask")}</span><button type="button" class="go">${PK("reg")}</button><button type="button" class="no">${PK("later")}</button>`;
+  const chosen=!!me?.user_metadata?.bio_opt_in;
+  const c=document.createElement("div");c.id="pkAsk";c.setAttribute("role","dialog");
+  if(chosen){c.className="pk-modal";c.setAttribute("aria-modal","true");
+    c.innerHTML=`<div class="pk-card"><i class="pk-ic">${BIO_SVG}</i><h3>${PK("mTitle")}</h3><p>${PK("mDesc")}</p><p class="pk-note">${PK("mNote")}</p><button type="button" class="go">${PK("reg")}</button><button type="button" class="no">${PK("later")}</button></div>`}
+  else{c.className="pk-ask";
+    c.innerHTML=`<i>${BIO_SVG}</i><span>${PK("ask")}</span><button type="button" class="go">${PK("reg")}</button><button type="button" class="no">${PK("later")}</button>`}
   document.body.appendChild(c);
   const done=()=>{try{localStorage.setItem("mdi-pk-ask-"+me.id,"1")}catch(_){}c.remove()};
   c.querySelector(".go").onclick=()=>{done();pkRegister()};
@@ -1214,6 +1226,7 @@ function authView(mode="login",msg=""){
     <label for="a-email">${T("email")}<input id="a-email" type="email" autocomplete="email" required></label>
     <label for="a-pw">${T("password")}<input id="a-pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" required minlength="6"></label>
     ${mode==="signup"?`<label for="a-pw2">${T("password2")}<input id="a-pw2" type="password" autocomplete="new-password" required minlength="6"></label>`:""}
+    ${mode==="signup"&&window.PublicKeyCredential?`<label class="chk" for="a-bio"><input type="checkbox" id="a-bio"><span><b>${PK("suBio")}</b><small>${PK("suBioDesc")}</small></span></label>`:""}
     <p class="msg" id="aMsg" ${msg?"":"hidden"}>${esc(msg)}</p>
     <button class="btn" type="submit">${mode==="login"?T("doLogin"):T("doSignup")}</button>
     ${mode==="login"&&window.PublicKeyCredential?`<button class="btn-bio" type="button" id="aBio">${BIO_SVG}<span>${PK("loginBio")}</span></button>`:""}
@@ -1243,7 +1256,7 @@ function authView(mode="login",msg=""){
       if(!name){btn.disabled=false;return say(T("needName"))}
       if(pw.length<6){btn.disabled=false;return say(T("pwShort"))}
       if(pw!==document.getElementById("a-pw2").value){btn.disabled=false;return say(T("pwMismatch"))}
-      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name},emailRedirectTo:location.origin+location.pathname}});
+      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{display_name:name,bio_opt_in:!!document.getElementById("a-bio")?.checked},emailRedirectTo:location.origin+location.pathname}});
       btn.disabled=false;
       if(error)return say(T("signupFail")+error.message);
       if(!data.session)authView("login",T("signupDone"));
@@ -2415,7 +2428,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-06.78";
+const APP_VER="2026-11-06.80";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
