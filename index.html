@@ -2538,10 +2538,10 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-06.83";
+const APP_VER="2026-11-06.84";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
-  const v=(t.match(/const APP_VER="2026-11-06.83"]+)"/)||[])[1];
+  const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
   if(v&&v!==APP_VER&&sessionStorage.getItem("mdi-ver-reload")!==v){sessionStorage.setItem("mdi-ver-reload",v);location.reload()}
 }catch(e){}})();
 staticText();
