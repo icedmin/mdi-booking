@@ -661,6 +661,30 @@ html.gated,html.gated body{overflow:hidden}
 #pushGate li small svg,#pushForm li small svg{width:13px;height:14px}
 #pushGate .pg-go{display:block;width:100%;height:46px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
 #pushGate .pg-out{display:block;margin:10px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:8px;cursor:pointer}
+dialog#stageDlg{margin:auto;inset:0;height:fit-content;width:360px;max-width:calc(100vw - 32px);border:0;border-radius:16px;padding:0;background:var(--bg);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+dialog#stageDlg::backdrop{background:rgba(0,0,0,.35)}
+#stageForm{padding:20px 20px 16px;display:block}
+#stageForm h3{margin:0 0 4px;font-size:17px;font-weight:700}
+#stageForm .sub{margin:0 0 16px;font-size:13px;color:var(--muted);line-height:1.45}#stageForm .sub b{color:var(--ink);font-weight:600}
+#stageForm .sd{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;margin-bottom:12px}
+#stageForm .sd input{height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:500;background:var(--bg);color:var(--ink)}
+#stageForm .rs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+#stageForm .rs label{cursor:pointer}#stageForm .rs input{position:absolute;opacity:0;pointer-events:none}
+#stageForm .rs span{display:inline-block;padding:7px 12px;border:1px solid var(--line);border-radius:999px;font-size:13px}
+#stageForm .rs input:checked+span{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+#stageForm .act{display:flex;gap:8px;margin-top:6px}
+#stageForm .act button{flex:1;height:44px;border-radius:999px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+#stageForm .act .no{border:1px solid var(--line);background:var(--bg);color:var(--ink)}#stageForm .act .go{border:0;background:var(--ink);color:var(--bg)}
+.mck{margin-top:8px;border-top:1px solid var(--line);padding-top:6px;font-size:12.5px}
+.mck summary{display:flex;align-items:center;gap:6px;cursor:pointer;list-style:none;color:var(--muted)}.mck summary::-webkit-details-marker{display:none}
+.mck summary b{font-weight:600;color:var(--ink)}.mck summary b.all{color:var(--go)}.mck summary .pm{margin-left:auto}
+.mck ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.mck label{display:flex;align-items:center;gap:7px;cursor:pointer}.mck input{width:15px;height:15px;margin:0;accent-color:var(--ink)}
+.mck input:checked+span{color:var(--muted);text-decoration:line-through}
+.mlinks{display:flex;gap:12px;justify-content:flex-end;margin-top:6px}
+.mlinks button{border:0;background:none;padding:2px 0;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.tabs .ts{display:none}
+@media (max-width:640px){.tabs{gap:0;justify-content:space-between}.tabs .tl{display:none}.tabs .ts{display:inline}.tabs button{padding-inline:2px}}
 #setDlg .pv-push b{font-size:12px;font-weight:600;color:var(--go)}
 #setDlg .pv-push button{height:28px;padding:0 10px;font-size:12px;font-weight:500;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;cursor:pointer}
 #setDlg .pv-push button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -828,6 +852,7 @@ button.vw-sec.tg:hover{color:var(--acc)}
 <dialog id="pickDlg"><form method="dialog" id="pickForm"></form></dialog>
 <dialog id="setDlg"><form method="dialog" id="setForm"></form></dialog>
 <dialog id="pushDlg"><form method="dialog" id="pushForm"></form></dialog>
+<dialog id="stageDlg"><form method="dialog" id="stageForm"></form></dialog>
 <dialog id="viewer"><div class="vw" id="vw"></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
@@ -837,12 +862,12 @@ const SUPABASE_URL="https://bsuuhpxkkhkfuwfdevpa.supabase.co";
 const SUPABASE_KEY="sb_publishable_VJF1ZR3idelVWE91AdXKnQ_nx19rj8V"; // 공개용 키 (데이터는 로그인·승인 규칙으로 보호)
 const BUCKET="candidate-photos";
 const PASS=0.6, H=3600e3;
-const STAGES=["cand","contact","prog","town","missed"];
+const STAGES=["cand","contact","prog","town","out","missed"];
 
 /* ---------- 언어 ---------- */
 const I18N={
 ko:{
- st_cand:"모델 투표",st_contact:"컨택 중",st_prog:"진행 중",st_town:"체류 중",st_missed:"불발 리스트",
+ st_cand:"모델 투표",st_contact:"컨택 중",st_prog:"입국 준비",st_town:"체류 중",st_out:"출국 모델",st_missed:"불발 리스트",sh_cand:"투표",sh_contact:"컨택",sh_prog:"입국 준비",sh_town:"체류",sh_out:"출국",sh_missed:"불발",
  loadFail:"연결 도구를 불러오지 못했습니다",loadFailSub:"인터넷 연결을 확인하고 새로고침해 주세요.",
  login:"로그인",signup:"가입",loginSub:"MDI 부킹 보드는 승인된 사내 인원만 사용할 수 있습니다.",signupSub:"가입 후 관리자가 승인하면 사용할 수 있습니다.",
  nameOrTitle:"이름 또는 직함",email:"이메일",password:"비밀번호",doLogin:"로그인",doSignup:"가입하기",
@@ -857,14 +882,14 @@ ko:{
  noVotes:"투표 없음",passUp:"통과선 이상",passDown:"통과선 미만",passLine:"빨간 선이 통과선 6.0점(60%)",
  resPass:"통과 → 컨택 중",resFail:"미통과",pts:"점",
  myScore:"내 점수",changeHint:"다시 누르면 변경",notVoted:"아직 투표하지 않았습니다",
- voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",mfAll:"전체",scopeLabel:"보기 범위",scopeAll:"공유 보드",scopeMine:"내 보드",noMineBoard:"체류 중은 개인 보드가 없습니다",myDesc_cand:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",myDesc_contact:"내가 컨택 중인 모델입니다. 진행을 시작하면 진행 중으로 넘어갑니다.",myDesc_prog:"내가 진행 중인 모델입니다.",myDesc_missed:"",emptyMineStage:"해당하는 내 모델이 없습니다",mProg:"진행 중",toProg:"진행 시작",slideProg:"밀어서 진행 시작",progNamed:"{n} 진행 중으로 이동",progAt:"진행 이동",progDesc:"컨택을 마치고 진행 중인 모델입니다.",gfAll:"전체 진행",gfMine:"내 진행",gfNone:"내가 등록한 진행 중 모델이 없습니다",emptyProg:"진행 중인 모델이 없습니다",emptyProgSub:"내 모델 탭의 컨택 중 모델에서 진행을 시작하면 여기에 모입니다.",err_not_contacting:"컨택 중인 모델이 아닙니다",err_already_progressed:"이미 진행 중입니다",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_withdrawn:"철회된 후보입니다",
+ voters:"투표자 명단",ppl:"명",noVote:"미투표",regBy:"등록",pfLabel:"통과 여부",pf_all:"전체",pf_pass:"통과",pf_fail:"미통과",st_mine:"내 모델",mineDesc:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",mReady:"투표 통과",mVoting:"투표 중",mMoved:"컨택 중",mFail:"점수 미달",toContact:"컨택 시작",slideTo:"밀어서 컨택 시작",rereview:"재심사 요청",mfAll:"전체",scopeLabel:"보기 범위",scopeAll:"공유 보드",scopeMine:"내 보드",noMineBoard:"체류 중은 개인 보드가 없습니다",myDesc_cand:"내가 등록한 모델의 투표 현황입니다. 전원 투표 후 기준점(6.0) 이상이면 마감 전에 컨택을 시작할 수 있습니다.",myDesc_contact:"내가 컨택 중인 모델입니다. 진행을 시작하면 진행 중으로 넘어갑니다.",myDesc_prog:"내가 진행 중인 모델입니다.",myDesc_missed:"",emptyMineStage:"해당하는 내 모델이 없습니다",mProg:"진행 중",toProg:"입국 준비로",slideProg:"밀어서 입국 준비로",progNamed:"{n} 입국 준비로 이동",progAt:"진행 이동",progDesc:"계약이 정해져 계약서·비자·항공권 등 입국을 준비 중인 모델입니다.",townDesc:"입국해 체류 중인 모델입니다.",outDesc:"우리 회사에 왔다가 출국한 모델 기록입니다.",missedDesc:"컨택·입국 준비 중에 무산된 모델입니다.",emptyTown:"체류 중인 모델이 없습니다",emptyOut:"출국한 모델 기록이 없습니다",emptyMissed:"불발된 모델이 없습니다",toTown:"체류 중으로",slideTown:"밀어서 체류 중으로",toOut:"출국 처리",slideOut:"밀어서 출국 처리",townNamed:"{n} 체류 중으로 이동",outNamed:"{n} 출국 모델로 이동",missedNamed:"{n} 불발 처리",recallNamed:"{n} 다시 컨택 중으로",dContract:"계약 확정일",dArrive:"입국일",dDepart:"출국일",shProg:"입국 준비로 넘기기",shTown:"체류 중으로 넘기기",shOut:"출국 처리",shMissed:"불발 처리",shRecall:"다시 부르기",shProgD:"계약이 정해진 날짜를 확인해 주세요.",shTownD:"입국한 날짜를 확인해 주세요.",shOutD:"출국한 날짜를 확인해 주세요.",shMissedD:"무산된 이유를 골라 주세요. 나중에 같은 모델·에이전시를 볼 때 참고가 됩니다.",shRecallD:"이 모델을 다시 컨택 중으로 올립니다. 이전 기록은 남습니다.",rsAgency:"에이전시 거절",rsTerms:"조건 불일치",rsSchedule:"일정 안 맞음",rsVisa:"비자 문제",rsOther:"기타",rsNote:"메모 (선택)",ok:"확인",cancel:"취소",lkBack:"되돌리기",lkMiss:"불발 처리",lkRecall:"다시 부르기",backNamed:"{n} 이전 단계로",atContract:"계약",atArrive:"입국",atDepart:"출국",stayDays:"체류 {d}일",checklist:"체크리스트",ck_c1:"가능 여부 확인",ck_c2:"조건 제안",ck_c3:"조건 확정",ck_p1:"계약서",ck_p2:"비자 서류",ck_p3:"비자 발급",ck_p4:"항공권",ck_p5:"숙소",ck_p6:"입국일 확정",gfAll:"전체 진행",gfMine:"내 진행",gfNone:"내가 등록한 진행 중 모델이 없습니다",emptyProg:"입국 준비 중인 모델이 없습니다",emptyProgSub:"내 보드의 컨택 중 모델에서 '입국 준비로'를 누르면 여기에 모입니다.",err_not_contacting:"컨택 중인 모델이 아닙니다",err_already_progressed:"이미 진행 중입니다",cfAll:"전체 컨택",cfMine:"내 컨택",cfNone:"내가 등록한 컨택 중 모델이 없습니다",movedNamed:"{n} 컨택 중으로 이동",undo:"되돌리기",undone:"{n} 되돌렸습니다",undoFail:"되돌리지 못했습니다: ",err_not_moved:"이미 되돌렸습니다",rrAgain:"한 번 더 누르면 점수 초기화",rrDone:"재심사 투표를 시작했습니다",rrFail:"재심사를 요청하지 못했습니다: ",err_still_open:"아직 투표 중입니다",err_not_below:"점수 미달이 아닙니다",mvPass:"투표 통과",missN:"{n}명 미투표",votersShort:"투표자",mvAsk:"투표가 마감됩니다",mvYes:"확정",movedT:"컨택 중으로 옮겼습니다",mvFail:"옮기지 못했습니다: ",mvAllIn:"전원 투표 완료",mvWait:"미투표",mvBelow:"기준점 미달",movedAt:"컨택 이동",emptyMine:"등록한 모델이 없습니다",emptyMineSub:"모델 투표 탭에서 모델을 등록하면 여기에 모입니다.",votedN:"명 투표",err_not_all_voted:"아직 투표하지 않은 사람이 있습니다",err_below_pass:"평균이 기준점(6.0) 미만입니다",err_not_owner:"등록한 사람만 넘길 수 있습니다",err_closed:"이미 마감되었습니다",err_already_moved:"이미 넘어갔습니다",err_bad_stage:"지금 단계에서는 할 수 없습니다",err_withdrawn:"철회된 후보입니다",
  photoLoading:"사진 불러오는 중",linkNoPhoto:"링크로 등록 · 사진 없음",noPhoto:"사진 없음",photosN:"장",
  getPic:"링크에서 사진 가져오기",
  candDesc:"",
  voting:"전체 투표",soon24:"24시간 내 마감",myTodo:"안 한 투표",addCand:"+ 투표 등록",
  emptyCand:"투표 중인 후보가 없습니다",emptyCandSub:"오른쪽 위 ‘후보 등록’에서 모델 링크나 사진을 올리면 3일 투표가 시작됩니다.",
  closedFail:"점수 미달",
- contactDesc:"투표를 통과한 모델 · 다음 단계로 넘기는 기능은 기준이 정해지면 추가",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
+ contactDesc:"투표를 통과해 마더 에이전시와 계약 가능 여부·조건을 협상 중인 모델입니다.",emptyContact:"아직 통과한 모델이 없습니다",emptyContactSub:"후보 투표가 마감되면 통과한 모델이 여기로 옵니다.",
  soonTitle:"준비 중",soonSub:"화면은 다음 단계에서 만듭니다.",
  voteFail:"투표가 저장되지 않았습니다: ",
  memTitle:"사용자 관리",memDesc:"가입한 사람을 승인해야 보드를 볼 수 있습니다. 승인된 사람은 모두 투표자 명단에 포함됩니다.",
@@ -889,7 +914,7 @@ ko:{
  fAll:"전체 보기",fShowing:"표시 중:",fNone:"조건에 맞는 후보가 없습니다"
 },
 en:{
- st_cand:"Model vote",st_contact:"Contacting",st_prog:"In progress",st_town:"In town",st_missed:"Missed",
+ st_cand:"Model vote",st_contact:"Contacting",st_prog:"Pre-arrival",st_town:"In town",st_out:"Out of town",st_missed:"Missed",sh_cand:"Vote",sh_contact:"Contact",sh_prog:"Prep",sh_town:"Town",sh_out:"Out",sh_missed:"Missed",
  loadFail:"Couldn't load the connection library",loadFailSub:"Check your internet connection and refresh.",
  login:"Log in",signup:"Sign up",loginSub:"MDI Booking Board is for approved staff only.",signupSub:"You can use the board once an admin approves your account.",
  nameOrTitle:"Name or title",email:"Email",password:"Password",doLogin:"Log in",doSignup:"Sign up",
@@ -904,14 +929,14 @@ en:{
  noVotes:"No votes",passUp:"Above pass line",passDown:"Below pass line",passLine:"Red line = pass line 6.0 (60%)",
  resPass:"Passed → Contacting",resFail:"Not passed",pts:"",
  myScore:"My score",changeHint:"tap again to change",notVoted:"You haven't voted yet",
- voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mfAll:"All",scopeLabel:"Scope",scopeAll:"Shared board",scopeMine:"My board",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Start progress",slideProg:"Slide to start progress",progNamed:"{n} moved to In progress",progAt:"Progressed",progDesc:"Models past contacting.",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nothing in progress",emptyProgSub:"Start progress from a contacting model in My models.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_withdrawn:"Withdrawn candidate",
+ voters:"Voters",ppl:"",noVote:"Not voted",regBy:"Added by",pfLabel:"Pass filter",pf_all:"All",pf_pass:"Passing",pf_fail:"Not passing",st_mine:"My models",mineDesc:"Vote status of candidates you added. When everyone has voted and the score is at or above 6.0, you can move it to Contacting before the deadline.",mReady:"Passed",mVoting:"Voting",mMoved:"Contacting",mFail:"Below the line",toContact:"Start contact",slideTo:"Slide to start contact",rereview:"Request re-review",mfAll:"All",scopeLabel:"Scope",scopeAll:"Shared board",scopeMine:"My board",noMineBoard:"In town has no personal board",myDesc_cand:"Vote status of models you added.",myDesc_contact:"Models you are contacting.",myDesc_prog:"Models you have in progress.",myDesc_missed:"",emptyMineStage:"None of yours here",mProg:"In progress",toProg:"Move to Pre-arrival",slideProg:"Slide to Pre-arrival",progNamed:"{n} moved to Pre-arrival",progAt:"Progressed",progDesc:"Contract agreed; preparing contract, visa, flights and arrival.",townDesc:"Models currently in town.",outDesc:"Models who came and have left.",missedDesc:"Models that fell through during contact or pre-arrival.",emptyTown:"No models in town",emptyOut:"No past models yet",emptyMissed:"Nothing fell through",toTown:"Move to In town",slideTown:"Slide to In town",toOut:"Mark departed",slideOut:"Slide to mark departed",townNamed:"{n} moved to In town",outNamed:"{n} moved to Out of town",missedNamed:"{n} marked as missed",recallNamed:"{n} back to Contacting",dContract:"Contract date",dArrive:"Arrival date",dDepart:"Departure date",shProg:"Move to Pre-arrival",shTown:"Move to In town",shOut:"Mark departed",shMissed:"Mark as missed",shRecall:"Bring back",shProgD:"Confirm the date the contract was agreed.",shTownD:"Confirm the arrival date.",shOutD:"Confirm the departure date.",shMissedD:"Choose why it fell through.",shRecallD:"Move this model back to Contacting. Past records are kept.",rsAgency:"Agency declined",rsTerms:"Terms didn't match",rsSchedule:"Schedule",rsVisa:"Visa issue",rsOther:"Other",rsNote:"Note (optional)",ok:"Confirm",cancel:"Cancel",lkBack:"Undo step",lkMiss:"Mark missed",lkRecall:"Bring back",backNamed:"{n} moved back",atContract:"Contract",atArrive:"Arrived",atDepart:"Departed",stayDays:"{d} days in town",checklist:"Checklist",ck_c1:"Availability checked",ck_c2:"Terms proposed",ck_c3:"Terms agreed",ck_p1:"Contract",ck_p2:"Visa documents",ck_p3:"Visa issued",ck_p4:"Flights",ck_p5:"Housing",ck_p6:"Arrival date fixed",gfAll:"All in progress",gfMine:"My in progress",gfNone:"None of yours are in progress",emptyProg:"Nobody in pre-arrival",emptyProgSub:"Use 'Move to Pre-arrival' on a contacting model in My board.",err_not_contacting:"Not in contacting",err_already_progressed:"Already in progress",cfAll:"All contacting",cfMine:"My contacting",cfNone:"None of yours are being contacted",movedNamed:"{n} moved to Contacting",undo:"Undo",undone:"{n} restored",undoFail:"Could not undo: ",err_not_moved:"Already restored",rrAgain:"Tap again to reset scores",rrDone:"Re-review voting started",rrFail:"Could not request re-review: ",err_still_open:"Still voting",err_not_below:"Not below the line",mvPass:"Passing",missN:"{n} not voted",votersShort:"Voters",mvAsk:"Voting will close",mvYes:"Confirm",movedT:"Moved to Contacting",mvFail:"Could not move: ",mvAllIn:"Everyone voted",mvWait:"Not voted",mvBelow:"Below the line",movedAt:"Moved",emptyMine:"No candidates yet",emptyMineSub:"Candidates you add will appear here.",votedN:" voted",err_not_all_voted:"Not everyone has voted",err_below_pass:"Average is below 6.0",err_not_owner:"Only the person who added it can move it",err_closed:"Already closed",err_already_moved:"Already moved",err_bad_stage:"Not possible at this stage",err_withdrawn:"Withdrawn candidate",
  photoLoading:"Loading photo",linkNoPhoto:"Added by link · no photo",noPhoto:"No photo",photosN:"",
  getPic:"Get photos from link",
  candDesc:"",
  voting:"All votes",soon24:"Closing in 24h",myTodo:"Not voted",addCand:"+ Add to vote",
  emptyCand:"No candidates in voting",emptyCandSub:"Use ‘Add candidate’ at the top right to post a model link or photos. A 3‑day vote starts automatically.",
  closedFail:"Closed · not passed",
- contactDesc:"Models that passed the vote · moving to the next stage will be added once the rules are set",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
+ contactDesc:"Passed the vote; negotiating availability and terms with the mother agency.",emptyContact:"No models have passed yet",emptyContactSub:"Models that pass a candidate vote appear here.",
  soonTitle:"Coming soon",soonSub:"This screen will be built in a later step.",
  voteFail:"Your vote wasn't saved: ",
  memTitle:"Members",memDesc:"People must be approved before they can see the board. Every approved member appears in the voter list.",
@@ -940,7 +965,7 @@ let U={three:"in",shoe:"mm"};try{Object.assign(U,JSON.parse(localStorage.getItem
 if(!I18N[LANG])LANG="ko";
 const T=(k,v)=>{let s=(I18N[LANG][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s};
 const SN=s=>T("st_"+s);
-const EN={mine:"MY MODELS",cand:"MODEL VOTE",contact:"CONTACTING",prog:"IN PROGRESS",town:"IN TOWN",missed:"MISSED"};
+const EN={mine:"MY MODELS",cand:"MODEL VOTE",contact:"CONTACTING",prog:"PRE-ARRIVAL",town:"IN TOWN",out:"OUT OF TOWN",missed:"MISSED"};
 
 const root=document.getElementById("root"),hdRight=document.getElementById("hdRight");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1281,7 +1306,7 @@ const closed=it=>!!it.contacted_at||Date.now()>=deadline(it);
 const allVoted=it=>{const ids=new Set(vOf(it.id).map(v=>v.user_id));return approvedMembers().every(m=>ids.has(m.id))};
 const readyToMove=it=>!it.withdrawn_at&&!closed(it)&&allVoted(it)&&passed(it);
 function passed(it){const s=stats(it);return s.n>0&&s.pct>=PASS}
-function stageOf(it){if(it.withdrawn_at)return "withdrawn";if(it.progressed_at)return "prog";if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
+function stageOf(it){if(it.withdrawn_at)return "withdrawn";if(it.missed_at)return "missed";if(it.departed_at)return "out";if(it.arrived_at)return "town";if(it.progressed_at)return "prog";if(!closed(it))return "cand";return passed(it)?"contact":"cand"}
 function left(ms){if(ms<=0)return T("closedAt");const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,"0");return (d?d+T("day"):"")+p(h)+":"+p(m)+":"+p(x)}
 
 async function signPaths(paths){
@@ -1333,7 +1358,7 @@ function bindScope(){
 }
 function tabsHtml(){
   const c={};STAGES.forEach(s=>c[s]=0);items.forEach(it=>{if(!inScope(it))return;const k=stageOf(it);if(k in c)c[k]++});
-  return `<div class="tabbar">${scopeHtml}<nav class="tabs" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}>${SN(s)}<span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav></div>`;
+  return `<div class="tabbar">${scopeHtml}<nav class="tabs" role="tablist">${STAGES.map(s=>{const off=scope==="mine"&&NOMINE.includes(s);return `<button role="tab" aria-selected="${s===tab}" data-tab="${s}" ${off?`disabled aria-disabled="true" title="${T("noMineBoard")}"`:""}><span class="tl">${SN(s)}</span><span class="ts" aria-hidden="true">${T("sh_"+s)}</span><span class="n">${off?"":c[s]}</span></button>`}).join("")}</nav></div>`;
 }
 function head(stage,desc,extra="",right=""){return `<section class="ph-head"><div class="l"><h2>${SN(stage)}<span class="en">${EN[stage]}</span></h2>${desc?`<p>${desc}</p>`:""}${extra}</div>${right?`<div class="r">${right}</div>`:""}</section>`}
 
@@ -1388,7 +1413,7 @@ function card(it){
     <div class="meta">
       <div class="ml"><p class="name">${esc(it.name)}</p>
         ${(it.nationality||it.age)?`<p class="subline">${[NA(it.nationality)?T("mNat")+" "+T("naShort"):it.nationality,NA(it.age)?T("mAge")+" "+T("naShort"):it.age?it.age+T("ageUnit"):""].filter(Boolean).map(esc).join(" · ")}</p>`:""}
-        ${isClosed?`<p class="status ${scls}">${it.progressed_at?T("progAt")+" "+fmt(it.progressed_at):it.contacted_at?T("movedAt")+" "+fmt(it.contacted_at):T("closedAt")+" "+fmt(dl)}</p>`:""}</div>
+        ${isClosed?`<p class="status ${scls}">${stageLine(it)||(it.contacted_at?T("movedAt")+" "+fmt(it.contacted_at):T("closedAt")+" "+fmt(dl))}</p>`:""}</div>
       ${sizeRows(it).length?`<div class="mr" title="${T("sizeTitle")}">${sizeRows(it).map(r=>`<p>${esc(r)}</p>`).join("")}</div>`:""}
     </div>
     <dl class="info">
@@ -1445,6 +1470,55 @@ const pfMenuHtml=()=>`<div class="pfd pf-l${pfOpen?" open":""}"><button type="bu
 document.addEventListener("pointerdown",e=>{if(!pfOpen||(e.target.closest&&e.target.closest(".pfd")))return;pfOpen=false;document.querySelectorAll(".pfd.open").forEach(d=>{{d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")}})});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pfOpen){pfOpen=false;document.querySelectorAll(".pfd.open").forEach(d=>{d.classList.remove("open");d.querySelector(".pfb").setAttribute("aria-expanded","false")})}});
 const msecOpen={mReady:true,mVoting:true,mMoved:true,mProg:true,mFail:false};try{Object.assign(msecOpen,JSON.parse(localStorage.getItem("mdi-msec")||"{}"))}catch(e){}
+/* ---------- 단계 확인 창: 넘길 때 날짜 1개(또는 불발 사유)만 받음 ---------- */
+function stageSheet(kind,it){return new Promise(res=>{
+  const d=document.getElementById("stageDlg"),f=document.getElementById("stageForm");
+  const today=new Date(Date.now()+9*36e5).toISOString().slice(0,10);   // 한국 날짜
+  const T2={prog:["shProg","shProgD","dContract"],town:["shTown","shTownD","dArrive"],out:["shOut","shOutD","dDepart"],missed:["shMissed","shMissedD"],recall:["shRecall","shRecallD"]}[kind];
+  const RS=["rsAgency","rsTerms","rsSchedule","rsVisa","rsOther"];
+  f.innerHTML=`<h3>${T(T2[0])}</h3><p class="sub"><b>${esc(it?.name||"")}</b> · ${T(T2[1])}</p>
+    ${T2[2]?`<label class="sd">${T(T2[2])}<input type="date" id="sdDate" value="${kind==="out"&&it?.arrival_date&&it.arrival_date>today?it.arrival_date:today}" ${kind==="out"&&it?.arrival_date?`min="${it.arrival_date}"`:""} ${kind==="town"&&it?.contract_date?`min="${it.contract_date}"`:""} required></label>`:""}
+    ${kind==="missed"?`<div class="rs" role="radiogroup">${RS.map((k,i)=>`<label><input type="radio" name="rs" value="${T(k)}" ${i===0?"checked":""}><span>${T(k)}</span></label>`).join("")}</div><label class="sd">${T("rsNote")}<input type="text" id="sdNote" maxlength="120"></label>`:""}
+    <div class="act"><button type="button" class="no" value="cancel">${T("cancel")}</button><button type="submit" class="go" value="ok">${T("ok")}</button></div>`;
+  let done=false;const fin=v=>{if(done)return;done=true;if(d.open)d.close();res(v)};
+  f.querySelector(".no").onclick=()=>fin(null);
+  f.onsubmit=e=>{e.preventDefault();
+    const out={date:document.getElementById("sdDate")?.value||null};
+    if(kind==="missed"){const r=f.querySelector('input[name="rs"]:checked')?.value||"";const n=document.getElementById("sdNote").value.trim();out.reason=n?(r+" · "+n):r}
+    fin(out)};
+  d.onclose=()=>fin(null);
+  d.onclick=e=>{if(e.target===d)fin(null)};
+  d.showModal();
+})}
+/* ---------- 단계 이동 도우미 ---------- */
+const CHECKS={contact:["c1","c2","c3"],prog:["p1","p2","p3","p4","p5","p6"]};
+const dfmt=d=>{if(!d)return "";const x=new Date(d+"T00:00:00");return (x.getMonth()+1)+"/"+x.getDate()};
+function stageLine(it){   // 카드에 보일 단계 정보 한 줄
+  const st=stageOf(it);
+  if(st==="prog")return it.contract_date?`${T("atContract")} ${dfmt(it.contract_date)}`:"";
+  if(st==="town"){const days=it.arrival_date?Math.max(0,Math.floor((Date.now()-new Date(it.arrival_date+"T00:00:00"))/864e5)):0;return `${T("atArrive")} ${dfmt(it.arrival_date)} · ${T("stayDays").replace("{d}",days)}`}
+  if(st==="out")return `${T("atArrive")} ${dfmt(it.arrival_date)} → ${T("atDepart")} ${dfmt(it.departure_date)}`;
+  if(st==="missed")return `${T("sh_missed")}${it.missed_reason?" · "+esc(it.missed_reason):""}`;
+  return "";
+}
+function nextKind(it){const st=stageOf(it);if(readyToMove(it))return "contact";return st==="contact"?"prog":st==="prog"?"town":st==="town"?"out":""}
+const KLAB={contact:["toContact","slideTo"],prog:["toProg","slideProg"],town:["toTown","slideTown"],out:["toOut","slideOut"]};
+function checksHtml(it){
+  const st=stageOf(it),keys=CHECKS[st];if(!keys)return "";
+  const c=it.checks||{},done=keys.filter(k=>c[k]).length,can=it.created_by===me.id||profile.role==="admin";
+  return `<details class="mck" data-mck="${it.id}" ${mckOpen.has(it.id)?"open":""}><summary><span>${T("checklist")}</span><b class="${done===keys.length?"all":""}">${done}/${keys.length}</b><i class="pm" aria-hidden="true"></i></summary>
+    <ul>${keys.map(k=>`<li><label><input type="checkbox" data-chk="${it.id}" data-k="${k}" ${c[k]?"checked":""} ${can?"":"disabled"}><span>${T("ck_"+k)}</span></label></li>`).join("")}</ul></details>`;
+}
+const mckOpen=new Set();
+function stageLinks(it){   // 내 보드 카드 아래 작은 글자 버튼
+  if(it.created_by!==me.id&&profile.role!=="admin")return "";
+  const st=stageOf(it),L=[];
+  if(st==="contact"||st==="prog")L.push(`<button type="button" data-miss="${it.id}">${T("lkMiss")}</button>`);
+  if(st==="out"||st==="missed")L.push(`<button type="button" data-recall="${it.id}">${T("lkRecall")}</button>`);
+  if(st==="prog"||st==="town"||st==="out"||st==="missed"||(st==="contact"&&it.contacted_at&&!it.progressed_at))L.push(`<button type="button" data-back="${it.id}">${T("lkBack")}</button>`);
+  return L.length?`<div class="mlinks">${L.join("")}</div>`:"";
+}
+
 /* 내 보드에서 카드 맨 아래 붙는 등록자 버튼 (컨택 시작 / 진행 시작 / 재심사) */
 function ownerAct(it){
   if(scope!=="mine"||it.created_by!==me.id&&profile.role!=="admin")return "";
@@ -1452,8 +1526,8 @@ function ownerAct(it){
   const UP='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const RT='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h10.5M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   if(isC&&!ok&&!it.contacted_at&&!it.progressed_at)return `<button type="button" class="mrr" data-rr="${it.id}">${T("rereview")}</button>`;
-  const kind=rdy?"contact":(!it.progressed_at&&isC&&ok)?"prog":"";if(!kind)return "";
-  const lab=kind==="prog"?T("toProg"):T("toContact"),slab=kind==="prog"?T("slideProg"):T("slideTo");
+  const kind=nextKind(it);if(!kind)return "";
+  const lab=T(KLAB[kind][0]),slab=T(KLAB[kind][1]);
   return matchMedia("(pointer:coarse)").matches
     ?`<div class="gls mslide" data-slide="${it.id}" data-kind="${kind}" role="button" aria-label="${lab}"><span class="fill"></span><span class="sh">${slab}</span><span class="k">${RT}</span></div>`
     :`<button type="button" class="gls mclick" data-mv="${it.id}" data-kind="${kind}"><span class="t">${lab}</span><span class="k">${UP}</span></button>`;
@@ -1462,15 +1536,20 @@ function mineHtml(stage){
   const my=items.filter(it=>it.created_by===me.id&&!it.withdrawn_at);
   const ready=my.filter(readyToMove).sort((a,b)=>deadline(a)-deadline(b));
   const voting=my.filter(it=>!closed(it)&&!readyToMove(it)).sort((a,b)=>deadline(a)-deadline(b));
-  const progd=my.filter(it=>it.progressed_at).sort((a,b)=>new Date(b.progressed_at)-new Date(a.progressed_at));
-  const moved=my.filter(it=>!it.progressed_at&&closed(it)&&passed(it)).sort((a,b)=>new Date(b.contacted_at||b.deadline)-new Date(a.contacted_at||a.deadline));
-  const fail=my.filter(it=>!it.progressed_at&&closed(it)&&!passed(it));
+  const byStage=k=>my.filter(it=>stageOf(it)===k);
+  const progd=byStage("prog").sort((a,b)=>new Date(b.progressed_at)-new Date(a.progressed_at));
+  const moved=byStage("contact").sort((a,b)=>new Date(b.contacted_at||b.deadline)-new Date(a.contacted_at||a.deadline));
+  const townL=byStage("town").sort((a,b)=>new Date(b.arrived_at)-new Date(a.arrived_at));
+  const outL=byStage("out").sort((a,b)=>new Date(b.departed_at)-new Date(a.departed_at));
+  const missL=byStage("missed").sort((a,b)=>new Date(b.missed_at)-new Date(a.missed_at));
+  const fail=my.filter(it=>stageOf(it)==="cand"&&closed(it)&&!passed(it));
   const voters=approvedMembers();
   const row=it=>{
     const s=stats(it),ok=passed(it),isC=closed(it),dl=deadline(it),rem=dl-Date.now();
     const ids=new Set(vOf(it.id).map(v=>v.user_id));const miss=voters.filter(m=>!ids.has(m.id));
     const u=photoUrls[it.photos[0]];const canView=u||it.link;const rdy=readyToMove(it);
-    const time=isC?`<span class="mt-c">${it.contacted_at?`${T("movedAt")} ${fmt(it.contacted_at)}`:`${T("closedAt")} ${fmt(dl)}`}</span>`
+    const sl=stageLine(it);
+    const time=sl?`<span class="mt-c">${sl}</span>`:isC?`<span class="mt-c">${it.contacted_at?`${T("movedAt")} ${fmt(it.contacted_at)}`:`${T("closedAt")} ${fmt(dl)}`}</span>`
       :`<span class="mt-t" data-left="${it.id}" data-dl="${dl}" data-st="${new Date(it.created_at).getTime()||""}">${left(rem)}</span><span class="tbar mb"><i style="width:${pct(rem,dl,it.created_at)}%"></i></span>`;
     const ARW='<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6h7.5M6.5 2.8 9.7 6l-3.2 3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const stTxt=isC?"":(!s.n?`<span class="ms-none">${T("noVotes")}</span>`:ok?(miss.length?`<span class="ms-sub">${T("missN").replace("{n}",miss.length)}</span>`:""):`<span class="ms-no">${T("mvBelow")}</span>`);
@@ -1478,9 +1557,8 @@ function mineHtml(stage){
     const rr=isC&&!ok&&!it.contacted_at?`<button type="button" class="mrr" data-rr="${it.id}">${T("rereview")}</button>`:"";
     const UP='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const RT='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h10.5M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    const canProg=!it.progressed_at&&isC&&ok;   // 컨택 중 → 진행 중
-    const kind=rdy?"contact":canProg?"prog":"";
-    const lab=kind==="prog"?T("toProg"):T("toContact"),slab=kind==="prog"?T("slideProg"):T("slideTo");
+    const kind=nextKind(it);   // 다음 단계: 컨택 중 → 입국 준비 → 체류 중 → 출국
+    const lab=kind?T(KLAB[kind][0]):"",slab=kind?T(KLAB[kind][1]):"";
     const go=kind?(matchMedia("(pointer:coarse)").matches
       ?`<div class="gls mslide" data-slide="${it.id}" data-kind="${kind}" role="button" aria-label="${lab}"><span class="fill"></span><span class="sh">${slab}</span><span class="k">${RT}</span></div>`
       :`<button type="button" class="gls mclick" data-mv="${it.id}" data-kind="${kind}"><span class="t">${lab}</span><span class="k">${UP}</span></button>`):"";
@@ -1492,7 +1570,8 @@ function mineHtml(stage){
       <div class="mtime">${time}</div>
       ${who}
       ${stTxt?`<div class="mst"><span class="mst-t">${stTxt}</span></div>`:""}
-      ${go}${rr}
+      ${checksHtml(it)}
+      ${go}${rr}${stageLinks(it)}
     </li>`;
   };
   const sec=(k,list)=>list.length?`<details class="msec" data-msec="${k}" ${msecOpen[k]?"open":""}><summary><h3>${T(k)}<span class="c">${list.length}</span></h3><span class="pm" aria-hidden="true"></span></summary><ul class="mgrid">${list.map(row).join("")}</ul></details>`:"";
@@ -1504,9 +1583,12 @@ function mineHtml(stage){
     body=`<div class="msecs">${sec("mReady",ready)+sec("mVoting",voting)+sec("mFail",fail)}</div>`;
   }else if(stage==="contact")body=grid(moved);
   else if(stage==="prog")body=grid(progd);
-  const desc=stage==="cand"?T("candDesc"):stage==="contact"?T("contactDesc"):stage==="prog"?T("progDesc"):"";
+  else if(stage==="town")body=grid(townL);
+  else if(stage==="out")body=grid(outL);
+  else if(stage==="missed")body=grid(missL);
+  const desc=stage==="cand"?T("candDesc"):T(stage+"Desc");
   const title=head(stage,desc,extra,stage==="cand"?`<button class="btn" id="openReg">${T("addCand")}</button>`:"");
-  return title+(body||(stage==="missed"?`<div class="empty"><b>${T("soonTitle")}</b>${SN(stage)} · ${T("soonSub")}</div>`:`<div class="empty"><b>${T("emptyMineStage")}</b>${stage==="cand"?T("emptyMineSub"):""}</div>`));
+  return title+(body||`<div class="empty"><b>${T("emptyMineStage")}</b>${stage==="cand"?T("emptyMineSub"):""}</div>`);
 }
 let voteDragging=false,renderWaiting=false;
 window.__mdiRender=()=>render();   // 점검용: 외부에서 화면 다시 그리기
@@ -1548,8 +1630,11 @@ function render(){
     const shownG=list.slice().sort((a,b)=>new Date(b.progressed_at)-new Date(a.progressed_at));
     html+=head("prog",T("progDesc"))+
       (shownG.length?`<div class="grid">${shownG.map(card).join("")}</div>`:`<div class="empty"><b>${T("emptyProg")}</b>${T("emptyProgSub")}</div>`);
-  }else{
-    html+=head(tab,"")+`<div class="empty"><b>${T("soonTitle")}</b>${SN(tab)} · ${T("soonSub")}</div>`;
+  }else if(tab==="town"||tab==="out"||tab==="missed"){
+    const key={town:"arrived_at",out:"departed_at",missed:"missed_at"}[tab];
+    const shownS=list.slice().sort((a,b)=>new Date(b[key])-new Date(a[key]));
+    const E={town:"emptyTown",out:"emptyOut",missed:"emptyMissed"}[tab];
+    html+=head(tab,T(tab+"Desc"))+(shownS.length?`<div class="grid">${shownS.map(card).join("")}</div>`:`<div class="empty"><b>${T(E)}</b></div>`);
   }
   root.innerHTML=html;
   for(const id of [...wdAnimated])if(!wdAsk.has(id))wdAnimated.delete(id);wdAsk.forEach(id=>wdAnimated.add(id));
@@ -1587,12 +1672,37 @@ function render(){
   root.querySelectorAll("[data-mvno]").forEach(b=>b.onclick=()=>{mvAsk=null;render()});
   const doMove=async(id,kind)=>{
     kind=kind||"contact";
-    const {error}=await sb.rpc(kind==="prog"?"move_to_progress":"move_to_contact",{cid:id});
+    let error;
+    if(kind==="contact")({error}=await sb.rpc("move_to_contact",{cid:id}));
+    else{   // 입국 준비·체류 중·출국: 날짜를 확인받고 넘김
+      const r=await stageSheet(kind,items.find(x=>x.id===id));
+      if(!r){render();return}
+      ({error}=await sb.rpc("move_stage",{cid:id,target:kind,d:r.date}));
+    }
     if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("mvFail")+(k?T("err_"+k):error.message))}
     else{undoStack.push({id,kind});showUndo(items.find(x=>x.id===id),kind)}
     await loadAll();render();
   };
   root.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{b.disabled=true;doMove(b.dataset.mv,b.dataset.kind)});
+  const rpcErr=(error,pre)=>{const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(pre+(k?T("err_"+k):error.message))};
+  root.querySelectorAll("[data-miss]").forEach(b=>b.onclick=async()=>{const id=b.dataset.miss;const r=await stageSheet("missed",items.find(x=>x.id===id));if(!r)return;
+    const {error}=await sb.rpc("move_stage",{cid:id,target:"missed",reason:r.reason});
+    if(error)rpcErr(error,T("mvFail"));else{undoStack.push({id,kind:"missed"});showUndo(items.find(x=>x.id===id),"missed")}
+    await loadAll();render()});
+  root.querySelectorAll("[data-recall]").forEach(b=>b.onclick=async()=>{const id=b.dataset.recall;const r=await stageSheet("recall",items.find(x=>x.id===id));if(!r)return;
+    const {error}=await sb.rpc("move_stage",{cid:id,target:"recall"});
+    if(error)rpcErr(error,T("mvFail"));else toast(T("recallNamed").replace("{n}",items.find(x=>x.id===id)?.name||""));
+    await loadAll();render()});
+  root.querySelectorAll("[data-back]").forEach(b=>b.onclick=async()=>{const id=b.dataset.back;const it=items.find(x=>x.id===id);b.disabled=true;
+    const {error}=await sb.rpc(stageOf(it)==="contact"?"undo_contact":"undo_stage",{cid:id});
+    if(error)rpcErr(error,T("undoFail"));else toast(T("backNamed").replace("{n}",it?.name||""));
+    await loadAll();render()});
+  root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=async()=>{const it=items.find(x=>x.id===c.dataset.chk);if(!it)return;
+    const next={...(it.checks||{}),[c.dataset.k]:c.checked};if(!c.checked)delete next[c.dataset.k];
+    const prev=it.checks;it.checks=next;render();
+    const {error}=await sb.from("candidates").update({checks:next}).eq("id",it.id);
+    if(error){it.checks=prev;render();toast(T("mvFail")+error.message)}});
+  root.querySelectorAll("[data-mck]").forEach(d=>d.ontoggle=()=>{d.open?mckOpen.add(d.dataset.mck):mckOpen.delete(d.dataset.mck)});
   root.querySelectorAll("[data-rr]").forEach(b=>b.onclick=async()=>{   // 두 번 눌러야 실행 (점수가 지워지므로)
     if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent=T("rrAgain");clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove("arm");b.textContent=T("rereview")},4000);return}
     clearTimeout(b._t);b.disabled=true;
@@ -2332,7 +2442,7 @@ document.addEventListener("close",e=>{if(e.target&&e.target.tagName==="DIALOG")s
 const undoStack=[];let undoT=null;
 function showUndo(it,kind){
   const bar=document.getElementById("undoBar");if(!bar)return;
-  document.getElementById("undoMsg").textContent=T(kind==="prog"?"progNamed":"movedNamed").replace("{n}",it?it.name:"");
+  document.getElementById("undoMsg").textContent=T({prog:"progNamed",town:"townNamed",out:"outNamed",missed:"missedNamed"}[kind]||"movedNamed").replace("{n}",it?it.name:"");
   document.getElementById("undoBtn").textContent=T("undo");
   bar.hidden=false;bar.classList.remove("out");void bar.offsetWidth;bar.classList.add("in");
   clearTimeout(undoT);undoT=setTimeout(hideUndo,3000);
@@ -2341,7 +2451,7 @@ function hideUndo(){const bar=document.getElementById("undoBar");if(!bar||bar.hi
 async function undoLast(){
   const u=undoStack.pop();if(!u)return;const id=u.id;
   hideUndo();
-  const {error}=await sb.rpc(u.kind==="prog"?"undo_progress":"undo_contact",{cid:id});
+  const {error}=await sb.rpc(u.kind==="contact"?"undo_contact":"undo_stage",{cid:id});
   if(error){const k=(error.message||"").match(/[a-z_]+/g)?.find(x=>I18N.ko["err_"+x]);toast(T("undoFail")+(k?T("err_"+k):error.message))}
   else toast(T("undone").replace("{n}",items.find(x=>x.id===id)?.name||""));
   await loadAll();render();
@@ -2428,10 +2538,10 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-06.80";
+const APP_VER="2026-11-06.83";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
-  const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
+  const v=(t.match(/const APP_VER="2026-11-06.83"]+)"/)||[])[1];
   if(v&&v!==APP_VER&&sessionStorage.getItem("mdi-ver-reload")!==v){sessionStorage.setItem("mdi-ver-reload",v);location.reload()}
 }catch(e){}})();
 staticText();
