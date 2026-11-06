@@ -1003,13 +1003,13 @@ function staticText(){
 /* ---------- 폰 알림: 투표 마감 10분·5분 전, 아직 투표하지 않은 사람에게 ---------- */
 const VAPID_PUB="BDUU0EGxEkqyxFU1JnChxcbuXV6W8srPfarYaV-MEcRiLr_hlZl1QvZV7qeUw9ZwVnVEP-KOhUH3maGIA7pKiw8";
 const PT={ko:{row:"마감 알림",on:"켜짐",turnOn:"켜기",turnOff:"끄기",test:"시험",how:"방법 보기",denied:"차단됨",unsup:"이 브라우저는 지원 안 함",
-  noteIos:"아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",noteDenied:"폰 설정 › 알림에서 MDI Booking을 허용해 주세요.",noteOn:"마감 10분, 5분, 3분 전에 알림이 갑니다. (투표한 모델은 오지 않음)",
+  noteIos:"아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",noteDenied:"폰 설정 › 알림에서 MDI Booking을 허용해 주세요.",noteOn:"새 투표가 등록될 때와 마감 10분, 5분, 3분 전에 알림이 갑니다. (투표한 모델은 오지 않음)",
   bnOn:"가입 때 동의한 마감 알림을 이 기기에서 허용해 주세요",bnIos:"홈 화면에 추가하면 동의한 마감 알림을 받을 수 있어요",allow:"허용",suTitle:"투표 마감 알림 받기",suDesc:"(필수) 마감 10분·5분 전, 아직 투표하지 않았으면 폰으로 알림이 옵니다. 동의해야 가입할 수 있습니다.",suNeed:"마감 알림 받기에 동의해야 가입할 수 있습니다",
   onT:"알림을 켰습니다",offT:"알림을 껐습니다",deniedT:"알림이 허용되지 않았습니다",fail:"알림을 켜지 못했습니다: ",testT:"시험 알림을 보냈습니다",testFail:"시험 알림을 보내지 못했습니다: ",
   gTitle:"홈 화면에 추가하기",gSub:"아이폰은 홈 화면 앱에서만 알림을 받을 수 있습니다. 한 번만 하면 됩니다.",
   g1:"Safari 아래쪽 __MORE__ 버튼을 누릅니다<small>공유 버튼 __SHARE__ 이 바로 보이면 그걸 누르고 3번으로</small>",g2:"<b>공유</b> → <b>더 보기</b>를 누릅니다",g3:"<b>홈 화면에 추가</b> → <b>추가</b>를 누릅니다",g4:"홈 화면에 생긴 <b>MDI</b> 아이콘으로 엽니다",g5:"로그인 후 <b>알림 허용</b> → <b>허용</b>",ok:"확인",close:"닫기"},
  en:{row:"Deadline alerts",on:"On",turnOn:"Turn on",turnOff:"Turn off",test:"Test",how:"How",denied:"Blocked",unsup:"Not supported here",
-  noteIos:"On iPhone, alerts work only in the app added to the Home Screen.",noteDenied:"Allow MDI Booking in your phone's notification settings.",noteOn:"Alerts are sent 10, 5 and 3 minutes before a vote closes (not for models you voted on).",
+  noteIos:"On iPhone, alerts work only in the app added to the Home Screen.",noteDenied:"Allow MDI Booking in your phone's notification settings.",noteOn:"Alerts are sent when a new vote is posted and 10, 5 and 3 minutes before it closes (not for models you voted on).",
   bnOn:"Allow the deadline alerts you agreed to on this device",bnIos:"Add to Home Screen to get the deadline alerts you agreed to",allow:"Allow",suTitle:"Get vote deadline alerts",suDesc:"(Required) 10 and 5 minutes before a vote closes, if you haven't voted. You must agree to sign up.",suNeed:"You must agree to deadline alerts to sign up",
   onT:"Alerts on",offT:"Alerts off",deniedT:"Notifications were not allowed",fail:"Couldn't turn on alerts: ",testT:"Test alert sent",testFail:"Couldn't send test alert: ",
   gTitle:"Add to Home Screen",gSub:"On iPhone, alerts only work in the Home Screen app. You only do this once.",
@@ -1074,13 +1074,13 @@ function openPushGuide(){
 document.getElementById("pushDlg").addEventListener("click",e=>{if(e.target.id==="pushDlg")e.target.close()});
 /* 폰에서는 이 기기에서 알림을 허용해야 이용 가능 (PC는 상관없음) */
 const isPhone=isIOS||/Android/i.test(navigator.userAgent);
-const GPT={ko:{tOff:"알림 허용이 필요합니다",dOff:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 마감 10분, 5분, 3분 전에 알림이 갑니다.",bOff:"알림 허용",
-  tIos:"홈 화면에 추가해 주세요",dIos:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 마감 10분, 5분, 3분 전에 알림이 갑니다. 아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",
+const GPT={ko:{tOff:"알림 허용이 필요합니다",dOff:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 마감 10분, 5분, 3분 전에 알림이 갑니다. 새 투표가 등록될 때도 알림이 갑니다.",bOff:"알림 허용",
+  tIos:"홈 화면에 추가해 주세요",dIos:"폰에서는 투표 마감 알림을 받아야 이용할 수 있습니다. 마감 10분, 5분, 3분 전에 알림이 갑니다. 새 투표가 등록될 때도 알림이 갑니다. 아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있습니다.",
   tDen:"알림이 차단되어 있습니다",dDen:isIOS?"아이폰 설정 › 알림 › MDI Booking에서 알림 허용을 켠 뒤 '다시 확인'을 눌러 주세요.":"크롬 주소창 왼쪽 아이콘 › 권한(또는 사이트 설정) › 알림을 '허용'으로 바꾼 뒤 '다시 확인'을 눌러 주세요.",bDen:"다시 확인",
   tUns:"이 브라우저에서는 알림을 받을 수 없습니다",dUns:isIOS?"iOS 16.4 이상에서 Safari로 열어 주세요. 카카오톡 같은 앱 안의 브라우저에서는 알림이 안 됩니다.":"크롬으로 열어 주세요. 카카오톡 같은 앱 안의 브라우저에서는 알림이 안 됩니다.",
   logout:"로그아웃"},
- en:{tOff:"Allow notifications to continue",dOff:"On phones, deadline alerts are required. Alerts are sent 10, 5 and 3 minutes before a vote closes.",bOff:"Allow notifications",
-  tIos:"Add to Home Screen",dIos:"On phones, deadline alerts are required. Alerts are sent 10, 5 and 3 minutes before a vote closes. On iPhone, alerts only work in the app added to the Home Screen.",
+ en:{tOff:"Allow notifications to continue",dOff:"On phones, deadline alerts are required. Alerts are sent 10, 5 and 3 minutes before a vote closes, and when a new vote is posted.",bOff:"Allow notifications",
+  tIos:"Add to Home Screen",dIos:"On phones, deadline alerts are required. Alerts are sent 10, 5 and 3 minutes before a vote closes, and when a new vote is posted. On iPhone, alerts only work in the app added to the Home Screen.",
   tDen:"Notifications are blocked",dDen:isIOS?"Turn on notifications in Settings › Notifications › MDI Booking, then tap 'Check again'.":"Tap the icon left of the address bar › Permissions (Site settings) › Notifications › Allow, then tap 'Check again'.",bDen:"Check again",
   tUns:"This browser can't receive alerts",dUns:isIOS?"Open in Safari on iOS 16.4 or later. In-app browsers (e.g. KakaoTalk) can't receive alerts.":"Open in Chrome. In-app browsers (e.g. KakaoTalk) can't receive alerts.",logout:"Log out"}};
 const G=k=>(GPT[LANG]||GPT.ko)[k];
@@ -2414,7 +2414,7 @@ new MutationObserver(ms=>{for(const m of ms){
   m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==="IMG")plSeen(n);else n.querySelectorAll&&n.querySelectorAll("img").forEach(plSeen)});
 }}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["src"]});
 document.querySelectorAll("img").forEach(plSeen);
-const APP_VER="2026-11-05.76";
+const APP_VER="2026-11-06.77";
 (async()=>{try{
   const t=await (await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"})).text();
   const v=(t.match(/const APP_VER="([^"]+)"/)||[])[1];
